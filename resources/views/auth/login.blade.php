@@ -1,4 +1,8 @@
 <x-guest-layout>
+    <x-slot name="title">
+        Login
+    </x-slot>
+
     <div class="w-full max-w-md bg-white/10 backdrop-blur-xl rounded-2xl shadow-xl ring-1 ring-white/20 px-8 py-10">
         {{-- Logo & Judul --}}
         <div class="text-center mb-6">

@@ -10,9 +10,6 @@ use App\Models\DataDesa;
 
 class CamatController extends Controller
 {
-    /**
-     * Menampilkan semua data yang relevan untuk Camat (pending & approved).
-     */
     public function index()
     {
         $allData = [
@@ -25,15 +22,13 @@ class CamatController extends Controller
         return view('camat.index', compact('allData'));
     }
 
-    /**
-     * Mengubah status data (Approve atau Un-approve).
-     */
     public function updateStatus(Request $request)
     {
         $request->validate([
             'model' => 'required|string',
             'id' => 'required|integer',
-            'new_status' => 'required|string|in:pending,approved', // Hanya menerima 'pending' atau 'approved'
+            'new_status' => 'required|string|in:pending,approved',
+            'active_tab' => 'required|string', // Validasi input tab aktif
         ]);
 
         $modelName = 'App\\Models\\' . $request->model;
@@ -46,17 +41,17 @@ class CamatController extends Controller
         $data->save();
 
         $message = $request->new_status === 'approved' ? 'Data berhasil di-approve.' : 'Data berhasil ditarik kembali (un-approved).';
-        return back()->with('success', $message);
+        
+        // Simpan tab aktif ke session sebelum redirect
+        return back()->with('success', $message)->with('active_tab', $request->active_tab);
     }
 
-    /**
-     * Menghapus data secara permanen.
-     */
     public function destroy(Request $request)
     {
         $request->validate([
             'model' => 'required|string',
             'id' => 'required|integer',
+            'active_tab' => 'required|string', // Validasi input tab aktif
         ]);
 
         $modelName = 'App\\Models\\' . $request->model;
@@ -67,6 +62,7 @@ class CamatController extends Controller
         $data = $modelName::findOrFail($request->id);
         $data->delete();
 
-        return back()->with('success', 'Data berhasil dihapus secara permanen.');
+        // Simpan tab aktif ke session sebelum redirect
+        return back()->with('success', 'Data berhasil dihapus secara permanen.')->with('active_tab', $request->active_tab);
     }
 }

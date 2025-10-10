@@ -11,8 +11,7 @@ use Illuminate\Http\Request;
 class AdminController extends Controller
 {
     /**
-     * Menampilkan data yang sudah di-approve Camat (status: 'approved')
-     * dan juga yang sudah di-publish (status: 'published') untuk monitoring.
+     * Menampilkan data yang sudah di-approve Camat dan yang sudah di-publish.
      */
     public function publishedData()
     {
@@ -34,6 +33,7 @@ class AdminController extends Controller
         $request->validate([
             'model' => 'required|string',
             'id' => 'required|integer',
+            'active_tab' => 'required|string', // ✅ Tambahkan validasi untuk tab aktif
         ]);
 
         $modelName = 'App\\Models\\' . $request->model;
@@ -44,18 +44,19 @@ class AdminController extends Controller
 
         $data = $modelName::findOrFail($request->id);
 
-        // Toggle antara 'approved' dan 'published'
         if ($data->status === 'approved') {
             $data->status = 'published';
             $message = 'Data berhasil di-publish ke halaman publik.';
         } elseif ($data->status === 'published') {
-            $data->status = 'approved'; // Kembali ke status approved, bukan pending
+            $data->status = 'approved';
             $message = 'Data berhasil ditarik dari halaman publik.';
         } else {
              return back()->with('error', 'Status data tidak valid untuk aksi ini.');
         }
 
         $data->save();
-        return back()->with('success', $message);
+        
+        // ✅ Simpan tab aktif ke session sebelum redirect
+        return back()->with('success', $message)->with('active_tab', $request->active_tab);
     }
 }
