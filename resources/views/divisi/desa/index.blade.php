@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="title">
-        Divisi Desa
+        Manajemen Data Desa
     </x-slot>
 
     <x-slot name="header">
@@ -20,14 +20,24 @@
     <div class="py-12 bg-slate-50">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <section class="p-6 sm:p-8 bg-white shadow-lg rounded-2xl ring-1 ring-black/5">
-                <div class="flex items-center justify-between mb-6">
+                <div class="flex items-start justify-between mb-6">
                     <div>
                         <h3 class="text-xl font-bold text-red-900">Daftar Data Terinput</h3>
                         <p class="mt-1 text-sm text-gray-600">Berikut adalah semua data yang telah Anda masukkan.</p>
                     </div>
-                    <a href="{{ route('desa.create') }}" class="inline-flex items-center px-4 py-2 bg-red-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-700 active:bg-red-800 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition ease-in-out duration-150">
-                        + Tambah Data
-                    </a>
+                    {{-- ✅ PERBAIKAN: Tombol "Tambah Data" kondisional --}}
+                    @if($canCreate)
+                        <a href="{{ route('desa.create') }}" class="flex-shrink-0 inline-flex items-center px-4 py-2 bg-red-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-700 active:bg-red-800 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                            + Tambah Data 
+                        </a>
+                    @else
+                        <div class="flex-shrink-0 text-right">
+                             <span class="inline-flex items-center px-4 py-2 bg-gray-200 border border-transparent rounded-md font-semibold text-xs text-gray-500 uppercase tracking-widest cursor-not-allowed">
+                                + Tambah Data
+                            </span>
+                            <p class="mt-1 text-xs text-gray-500">Data untuk periode ini sudah diinput.</p>
+                        </div>
+                    @endif
                 </div>
 
                 <div class="space-y-4 mb-8">
@@ -65,20 +75,20 @@
                     <table class="w-full text-sm text-left text-gray-600">
                         <thead class="text-xs text-gray-700 uppercase bg-gray-100">
                             <tr>
-                                <th scope="col" class="px-6 py-3 rounded-l-lg">Jumlah Penduduk</th>
-                                <th scope="col" class="px-6 py-3">Luas Wilayah (m²)</th>
-                                <th scope="col" class="px-6 py-3">Potensi Desa</th>
-                                <th scope="col" class="px-6 py-3 rounded-r-lg">Status</th>
+                                <th scope="col" class="px-6 py-3 rounded-l-lg">Periode</th>
+                                <th scope="col" class="px-6 py-3">Nama Desa</th>
+                                <th scope="col" class="px-6 py-3">Kasus Stunting</th>
+                                <th scope="col" class="px-6 py-3">Status</th>
+                                <th scope="col" class="px-6 py-3 rounded-r-lg text-center">Aksi</th> {{-- Kolom Aksi --}}
                             </tr>
                         </thead>
                         <tbody>
                             @forelse ($data as $item)
                                 <tr class="bg-white border-b hover:bg-gray-50">
-                                    <td class="px-6 py-4 font-medium text-gray-900">{{ number_format($item->jumlah_penduduk) }}</td>
-                                    <td class="px-6 py-4">{{ number_format($item->luas_wilayah) }}</td>
-                                    <td class="px-6 py-4">{{ Str::limit($item->potensi_desa, 50) }}</td>
+                                    <td class="px-6 py-4">{{ $item->periode->format('F Y') }}</td>
+                                    <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">{{ $item->nama_desa }}</th>
+                                    <td class="px-6 py-4 font-medium text-red-700">{{ $item->jumlah_kasus_stunting }}</td>
                                     <td class="px-6 py-4">
-                                        {{-- ✅ PERBAIKAN: Logika status yang benar --}}
                                         @if($item->status === 'published')
                                             <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Published</span>
                                         @elseif($item->status === 'approved')
@@ -87,11 +97,23 @@
                                             <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Pending</span>
                                         @endif
                                     </td>
+                                    {{-- ✅ PERBAIKAN: Tombol Aksi --}}
+                                    <td class="px-6 py-4 text-center">
+                                        <div class="flex justify-center items-center space-x-2">
+                                            <a href="{{ route('desa.edit', $item->id) }}" class="font-medium text-blue-600 hover:text-blue-800">Edit</a>
+                                            <span class="text-gray-300">|</span>
+                                            <form action="{{ route('desa.destroy', $item->id) }}" method="POST" onsubmit="return confirm('Anda yakin ingin menghapus data ini?');">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="font-medium text-red-600 hover:text-red-800">Hapus</button>
+                                            </form>
+                                        </div>
+                                    </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="4" class="px-6 py-4 text-center text-gray-500">
-                                        Belum ada data yang diinput. Silakan klik tombol "+ Tambah Data".
+                                    <td colspan="6" class="px-6 py-4 text-center text-gray-500">
+                                        Belum ada data yang diinput.
                                     </td>
                                 </tr>
                             @endforelse

@@ -17,6 +17,12 @@
                     @csrf
                     <div class="space-y-6">
                         <div>
+                            <x-input-label for="periode" :value="__('Periode Laporan')" />
+                            <x-text-input id="periode" class="block mt-1 w-full" type="month" name="periode" :value="old('periode')" required autofocus />
+                            <x-input-error :messages="$errors->get('periode')" class="mt-2" />
+                        </div>
+
+                        <div>
                             <x-input-label for="judul_kegiatan" :value="__('Judul Kegiatan')" />
                             <x-text-input id="judul_kegiatan" class="block mt-1 w-full" type="text" name="judul_kegiatan" :value="old('judul_kegiatan')" required autofocus />
                             <x-input-error :messages="$errors->get('judul_kegiatan')" class="mt-2" />

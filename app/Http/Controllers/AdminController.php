@@ -11,15 +11,15 @@ use Illuminate\Http\Request;
 class AdminController extends Controller
 {
     /**
-     * Menampilkan data yang sudah di-approve Camat dan yang sudah di-publish.
+     * ✅ PERBAIKAN: Menampilkan SEMUA data dari setiap divisi.
      */
     public function publishedData()
     {
         $dataToReview = [
-            'gizi' => DataGizi::with('user')->whereIn('status', ['approved', 'published'])->latest()->get(),
-            'pencegahan' => DataPencegahan::with('user')->whereIn('status', ['approved', 'published'])->latest()->get(),
-            'penanggulangan' => DataPenanggulangan::with('user')->whereIn('status', ['approved', 'published'])->latest()->get(),
-            'desa' => DataDesa::with('user')->whereIn('status', ['approved', 'published'])->latest()->get(),
+            'gizi' => DataGizi::with('user')->latest()->get(),
+            'pencegahan' => DataPencegahan::with('user')->latest()->get(),
+            'penanggulangan' => DataPenanggulangan::with('user')->latest()->get(),
+            'desa' => DataDesa::with('user')->latest()->get(),
         ];
 
         return view('admin.published.index', compact('dataToReview'));
@@ -33,11 +33,10 @@ class AdminController extends Controller
         $request->validate([
             'model' => 'required|string',
             'id' => 'required|integer',
-            'active_tab' => 'required|string', // ✅ Tambahkan validasi untuk tab aktif
+            'active_tab' => 'required|string',
         ]);
 
         $modelName = 'App\\Models\\' . $request->model;
-
         if (!class_exists($modelName)) {
             return back()->with('error', 'Tipe data tidak valid.');
         }
@@ -56,7 +55,6 @@ class AdminController extends Controller
 
         $data->save();
         
-        // ✅ Simpan tab aktif ke session sebelum redirect
         return back()->with('success', $message)->with('active_tab', $request->active_tab);
     }
 }

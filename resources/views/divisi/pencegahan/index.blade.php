@@ -65,7 +65,8 @@
                     <table class="w-full text-sm text-left text-gray-600">
                         <thead class="text-xs text-gray-700 uppercase bg-gray-100">
                             <tr>
-                                <th scope="col" class="px-6 py-3 rounded-l-lg">Judul Kegiatan</th>
+                                <th scope="col" class="px-6 py-3 rounded-l-lg">Periode</th>
+                                <th scope="col" class="px-6 py-3">Judul Kegiatan</th>
                                 <th scope="col" class="px-6 py-3">Lokasi</th>
                                 <th scope="col" class="px-6 py-3">Tanggal</th>
                                 <th scope="col" class="px-6 py-3 rounded-r-lg">Status</th>
@@ -74,6 +75,7 @@
                         <tbody>
                             @forelse ($data as $item)
                                 <tr class="bg-white border-b hover:bg-gray-50">
+                                    <td class="px-6 py-4">{{ $item->periode->format('F Y') }}</td>
                                     <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">{{ $item->judul_kegiatan }}</th>
                                     <td class="px-6 py-4">{{ $item->lokasi }}</td>
                                     <td class="px-6 py-4">{{ \Carbon\Carbon::parse($item->tanggal_kegiatan)->format('d M Y') }}</td>

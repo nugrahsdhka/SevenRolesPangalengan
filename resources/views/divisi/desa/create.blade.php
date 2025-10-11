@@ -3,6 +3,20 @@
         Tambah Data Desa
     </x-slot>
 
+    <x-slot name="header">
+        <div class="flex justify-between items-center">
+            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+                {{ __('Tambah Data Desa Baru') }}
+            </h2>
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                <button type="submit" class="inline-flex items-center px-4 py-2 bg-red-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-700 active:bg-red-800 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                    Log Out
+                </button>
+            </form>
+        </div>
+    </x-slot>
+
     <div class="py-12 bg-slate-50">
         <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
             <section class="p-6 sm:p-8 bg-white shadow-lg rounded-2xl ring-1 ring-black/5">
@@ -15,22 +29,46 @@
 
                 <form method="POST" action="{{ route('desa.store') }}">
                     @csrf
-                    <div class="space-y-6">
-                        <div>
-                            <x-input-label for="jumlah_penduduk" :value="__('Jumlah Penduduk')" />
-                            <x-text-input id="jumlah_penduduk" class="block mt-1 w-full" type="number" name="jumlah_penduduk" :value="old('jumlah_penduduk')" required autofocus />
-                            <x-input-error :messages="$errors->get('jumlah_penduduk')" class="mt-2" />
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {{-- Kolom Kiri --}}
+                        <div class="space-y-6">
+                             <div>
+                                <x-input-label for="periode" :value="__('Periode Laporan')" />
+                                <x-text-input id="periode" class="block mt-1 w-full" type="month" name="periode" :value="old('periode')" required autofocus />
+                                <x-input-error :messages="$errors->get('periode')" class="mt-2" />
+                            </div>
+
+                            <div>
+                                <x-input-label for="nama_desa" :value="__('Nama Desa')" />
+                                <x-text-input id="nama_desa" class="block mt-1 w-full" type="text" name="nama_desa" :value="old('nama_desa')" required />
+                                <x-input-error :messages="$errors->get('nama_desa')" class="mt-2" />
+                            </div>
+
+                            <div>
+                                <x-input-label for="jumlah_penduduk" :value="__('Jumlah Penduduk')" />
+                                <x-text-input id="jumlah_penduduk" class="block mt-1 w-full" type="number" name="jumlah_penduduk" :value="old('jumlah_penduduk')" required />
+                                <x-input-error :messages="$errors->get('jumlah_penduduk')" class="mt-2" />
+                            </div>
+
+                            <div>
+                                <x-input-label for="luas_wilayah" :value="__('Luas Wilayah (dalam m²)')" />
+                                <x-text-input id="luas_wilayah" class="block mt-1 w-full" type="number" name="luas_wilayah" :value="old('luas_wilayah')" required />
+                                <x-input-error :messages="$errors->get('luas_wilayah')" class="mt-2" />
+                            </div>
+                            
+                            <div>
+                                <x-input-label for="jumlah_kasus_stunting">
+                                    Jumlah Kasus Stunting <span class="text-sm text-gray-500">(Opsional)</span>
+                                </x-input-label>
+                                <x-text-input id="jumlah_kasus_stunting" class="block mt-1 w-full" type="number" name="jumlah_kasus_stunting" :value="old('jumlah_kasus_stunting', 0)" />
+                                <x-input-error :messages="$errors->get('jumlah_kasus_stunting')" class="mt-2" />
+                            </div>
                         </div>
 
-                        <div>
-                            <x-input-label for="luas_wilayah" :value="__('Luas Wilayah (dalam m²)')" />
-                            <x-text-input id="luas_wilayah" class="block mt-1 w-full" type="number" name="luas_wilayah" :value="old('luas_wilayah')" required />
-                            <x-input-error :messages="$errors->get('luas_wilayah')" class="mt-2" />
-                        </div>
-
+                        {{-- Kolom Kanan --}}
                         <div>
                             <x-input-label for="potensi_desa" :value="__('Potensi Desa')" />
-                            <textarea id="potensi_desa" name="potensi_desa" rows="5"
+                            <textarea id="potensi_desa" name="potensi_desa" rows="16"
                                       class="block mt-1 w-full border-gray-300 focus:border-red-500 focus:ring-red-500 rounded-md shadow-sm">{{ old('potensi_desa') }}</textarea>
                             <x-input-error :messages="$errors->get('potensi_desa')" class="mt-2" />
                         </div>

@@ -25,7 +25,7 @@
 
     <div class="py-12 bg-slate-50">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            {{-- Notifikasi dengan Alpine.js --}}
+            {{-- Notifikasi --}}
             <div class="space-y-4 mb-8">
                 @if (session('success'))
                     {{-- ✅ PERBAIKAN: Tambahkan atribut x-data, x-show, x-init, dan x-transition --}}
@@ -100,7 +100,8 @@
                             <div class="py-4 border-b border-black/10 last:border-0 flex justify-between items-center">
                                 <div>
                                     <p class="font-semibold text-gray-800">{{ $data->judul }}</p>
-                                    <p class="text-xs text-gray-500 mt-1">Diinput oleh: <span class="font-medium">{{ $data->user->name }}</span></p>
+                                    <p class="mt-1 text-gray-700 text-sm">{{ $data->deskripsi }}</p>
+                                    <p class="text-xs text-gray-500 mt-1">Diinput oleh: <span class="font-medium">{{ $data->user->name }}</span> | Periode: {{ $data->periode->format('F Y') }}</p>
                                 </div>
                                 <div class="flex items-center space-x-2">
                                     @if($data->status === 'approved')
@@ -127,7 +128,8 @@
                             <div class="py-4 border-b border-black/10 last:border-0 flex justify-between items-center">
                                 <div>
                                     <p class="font-semibold text-gray-800">{{ $data->judul_kegiatan }}</p>
-                                    <p class="text-xs text-gray-500 mt-1">Diinput oleh: <span class="font-medium">{{ $data->user->name }}</span></p>
+                                    <p class="mt-1 text-gray-700 text-sm">{{ $data->deskripsi }}</p>
+                                    <p class="text-xs text-gray-500 mt-1">Diinput oleh: <span class="font-medium">{{ $data->user->name }} | Periode: {{ $data->periode->format('F Y') }}</span></p>
                                 </div>
                                 <div class="flex items-center space-x-2">
                                     @if($data->status === 'approved')
@@ -148,13 +150,14 @@
                         @endforelse
                     </div>
 
-                    {{-- Konten Penanggulangan --}}
+                    {{-- ✅ PERBAIKAN: Konten untuk Tab Penanggulangan --}}
                     <div x-show="activeTab === 'penanggulangan'" style="display: none;">
                         @forelse ($allData['penanggulangan'] as $data)
                             <div class="py-4 border-b border-black/10 last:border-0 flex justify-between items-center">
                                 <div>
                                     <p class="font-semibold text-gray-800">{{ $data->jenis_bencana }} ({{$data->jumlah_korban}} korban)</p>
-                                    <p class="text-xs text-gray-500 mt-1">Diinput oleh: <span class="font-medium">{{ $data->user->name }}</span></p>
+                                    <p class="mt-1 text-gray-700 text-sm">{{ $data->deskripsi }}</p>
+                                    <p class="text-xs text-gray-500 mt-1">Diinput oleh: <span class="font-medium">{{ $data->user->name }}</span> | Periode: {{ $data->periode->format('F Y') }}</p>
                                 </div>
                                 <div class="flex items-center space-x-2">
                                     @if($data->status === 'approved')
@@ -175,16 +178,19 @@
                         @endforelse
                     </div>
 
-                    {{-- Konten Desa --}}
+                    {{-- ✅ PERBAIKAN: Konten untuk Tab Desa --}}
                     <div x-show="activeTab === 'desa'" style="display: none;">
                         @forelse ($allData['desa'] as $data)
                             <div class="py-4 border-b border-black/10 last:border-0 flex justify-between items-center">
                                 <div>
-                                    <p class="font-semibold text-gray-800">Penduduk: {{ number_format($data->jumlah_penduduk) }} | Luas: {{ number_format($data->luas_wilayah) }} m²</p>
-                                    <p class="text-xs text-gray-500 mt-1">Diinput oleh: <span class="font-medium">{{ $data->user->name }}</span></p>
+                                    <p class="font-semibold text-gray-800">{{ $data->nama_desa }} (Kasus Stunting: <span class="text-red-700">{{ $data->jumlah_kasus_stunting }}</span>)</p>
+                                    <p class="mt-1 text-gray-700 text-sm">{{ $data->deskripsi }}</p>
+                                    <p class="text-xs text-gray-500 mt-1">Diinput oleh: <span class="font-medium">{{ $data->user->name }}</span> | Periode: {{ $data->periode->format('F Y') }}</p>
                                 </div>
                                 <div class="flex items-center space-x-2">
-                                    @if($data->status === 'approved')
+                                    @if($data->status === 'published')
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Published</span>
+                                    @elseif($data->status === 'approved')
                                         <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">Approved</span>
                                     @else
                                         <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Pending</span>
@@ -202,7 +208,6 @@
                         @endforelse
                     </div>
                 </div>
-
             </div>
         </div>
     </div>

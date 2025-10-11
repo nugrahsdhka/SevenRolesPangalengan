@@ -67,9 +67,8 @@ Route::middleware('auth')->group(function () {
     
     // Grup untuk Divisi Desa
     Route::middleware(['role:Divisi Desa'])->prefix('divisi-desa')->name('desa.')->group(function () {
-        Route::get('/', [DivisiDesaController::class, 'index'])->name('index');
-        Route::get('/create', [DivisiDesaController::class, 'create'])->name('create');
-        Route::post('/', [DivisiDesaController::class, 'store'])->name('store');
+        // ✅ PERBAIKAN: Gunakan Route::resource untuk menangani semua aksi CRUD
+        Route::resource('/', DivisiDesaController::class)->parameters(['' => 'data_desa']);
     });
 
     // Grup untuk Camat

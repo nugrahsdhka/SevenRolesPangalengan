@@ -8,3 +8,37 @@
 @source '../../storage/framework/views/*.php';
 @source '../**/*.blade.php';
 @source '../**/*.js';
+
+/* Styling Scrollbar Kustom untuk Browser WebKit (Chrome, Safari, Edge) */
+
+/* Mengatur lebar scrollbar */
+::-webkit-scrollbar {
+  width: 8px; /* Anda bisa ubah ukurannya, misal: 10px */
+  height: 8px;
+}
+
+/* Mengatur track (jalur) scrollbar */
+::-webkit-scrollbar-track {
+  background-color: #f1f5f9; /* Warna slate-100, cocok dengan background Anda */
+  border-radius: 10px;
+}
+
+/* Mengatur thumb (gagang) scrollbar */
+::-webkit-scrollbar-thumb {
+  background-color: #dc2626; /* Warna merah-600, sesuai tema Anda */
+  border-radius: 10px;
+  border: 1px solid #f1f5f9; /* Memberi sedikit jarak antara thumb dan track */
+}
+
+/* Mengatur thumb saat di-hover */
+::-webkit-scrollbar-thumb:hover {
+  background-color: #b91c1c; /* Warna merah-700 */
+}
+
+
+/* Styling Scrollbar Kustom untuk Firefox */
+/* Firefox menggunakan properti yang lebih simpel */
+html {
+  scrollbar-width: none; /* Opsi: 'auto', 'thin', 'none' */
+  scrollbar-color: #dc2626 #dc2626; /* Warna thumb dan track */
+}   

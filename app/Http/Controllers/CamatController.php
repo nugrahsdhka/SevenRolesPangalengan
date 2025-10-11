@@ -10,25 +10,31 @@ use App\Models\DataDesa;
 
 class CamatController extends Controller
 {
+    /**
+     * ✅ PERBAIKAN: Menampilkan SEMUA data dari setiap divisi.
+     */
     public function index()
     {
         $allData = [
-            'gizi' => DataGizi::with('user')->whereIn('status', ['pending', 'approved'])->latest()->get(),
-            'pencegahan' => DataPencegahan::with('user')->whereIn('status', ['pending', 'approved'])->latest()->get(),
-            'penanggulangan' => DataPenanggulangan::with('user')->whereIn('status', ['pending', 'approved'])->latest()->get(),
-            'desa' => DataDesa::with('user')->whereIn('status', ['pending', 'approved'])->latest()->get(),
+            'gizi' => DataGizi::with('user')->latest()->get(),
+            'pencegahan' => DataPencegahan::with('user')->latest()->get(),
+            'penanggulangan' => DataPenanggulangan::with('user')->latest()->get(),
+            'desa' => DataDesa::with('user')->latest()->get(),
         ];
 
         return view('camat.index', compact('allData'));
     }
 
+    /**
+     * Mengubah status data (Approve atau Un-approve).
+     */
     public function updateStatus(Request $request)
     {
         $request->validate([
             'model' => 'required|string',
             'id' => 'required|integer',
             'new_status' => 'required|string|in:pending,approved',
-            'active_tab' => 'required|string', // Validasi input tab aktif
+            'active_tab' => 'required|string',
         ]);
 
         $modelName = 'App\\Models\\' . $request->model;
@@ -41,17 +47,18 @@ class CamatController extends Controller
         $data->save();
 
         $message = $request->new_status === 'approved' ? 'Data berhasil di-approve.' : 'Data berhasil ditarik kembali (un-approved).';
-        
-        // Simpan tab aktif ke session sebelum redirect
         return back()->with('success', $message)->with('active_tab', $request->active_tab);
     }
 
+    /**
+     * Menghapus data secara permanen.
+     */
     public function destroy(Request $request)
     {
         $request->validate([
             'model' => 'required|string',
             'id' => 'required|integer',
-            'active_tab' => 'required|string', // Validasi input tab aktif
+            'active_tab' => 'required|string',
         ]);
 
         $modelName = 'App\\Models\\' . $request->model;
@@ -62,7 +69,6 @@ class CamatController extends Controller
         $data = $modelName::findOrFail($request->id);
         $data->delete();
 
-        // Simpan tab aktif ke session sebelum redirect
         return back()->with('success', 'Data berhasil dihapus secara permanen.')->with('active_tab', $request->active_tab);
     }
 }

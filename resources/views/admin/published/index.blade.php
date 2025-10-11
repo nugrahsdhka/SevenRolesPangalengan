@@ -28,14 +28,30 @@
             {{-- Notifikasi --}}
             <div class="space-y-4 mb-8">
                 @if (session('success'))
-                    <div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 500)" x-transition class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded-lg" role="alert">
+                    {{-- ✅ PERBAIKAN: Tambahkan atribut x-data, x-show, x-init, dan x-transition --}}
+                    <div x-data="{ show: true }"
+                         x-show="show"
+                         x-init="setTimeout(() => show = false, 500)"
+                         x-transition:leave="transition ease-in duration-300"
+                         x-transition:leave-start="opacity-100"
+                         x-transition:leave-end="opacity-0"
+                         class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded-lg" 
+                         role="alert">
                         <p class="font-bold">Sukses</p>
                         <p>{{ session('success') }}</p>
                     </div>
                 @endif
                 @if (session('error'))
-                    <div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 500)" x-transition class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-lg" role="alert">
-                        <p class="font-bold">Error</p>
+                    {{-- ✅ PERBAIKAN: Tambahkan atribut x-data, x-show, x-init, dan x-transition --}}
+                    <div x-data="{ show: true }"
+                         x-show="show"
+                         x-init="setTimeout(() => show = false, 500)"
+                         x-transition:leave="transition ease-in duration-300"
+                         x-transition:leave-start="opacity-100"
+                         x-transition:leave-end="opacity-0"
+                         class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-lg" 
+                         role="alert">
+                         <p class="font-bold">Error</p>
                         <p>{{ session('error') }}</p>
                     </div>
                 @endif
@@ -89,19 +105,25 @@
                             <div class="py-4 border-b border-black/10 last:border-0 flex justify-between items-center">
                                 <div>
                                     <p class="font-semibold text-gray-800">{{ $data->judul }}</p>
-                                    <p class="text-xs text-gray-500 mt-1">Diinput oleh: <span class="font-medium">{{ $data->user->name }}</span> | Dibuat pada: {{ $data->created_at->format('d M Y') }}</p>
+                                    <p class="mt-1 text-gray-700 text-sm">{{ $data->deskripsi }}</p>
+                                    <p class="text-xs text-gray-500 mt-1">Diinput oleh: <span class="font-medium">{{ $data->user->name }}</span> | Dibuat pada: {{ $data->created_at->format('d M Y') }} | Periode: {{ $data->periode->format('F Y') }}</p>
                                 </div>
                                 <div class="flex items-center space-x-4 flex-shrink-0 ml-4">
                                     @if($data->status === 'published')
                                         <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Published</span>
-                                    @else
+                                    @elseif($data->status === 'approved')
                                         <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">Approved</span>
+                                    @else
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Pending</span>
                                     @endif
-                                    <form action="{{ route('admin.publish') }}" method="POST"> @csrf <input type="hidden" name="model" value="DataGizi"> <input type="hidden" name="id" value="{{ $data->id }}"> <input type="hidden" name="active_tab" x-bind:value="activeTab"> <button type="submit" class="px-3 py-1 text-xs font-medium text-white rounded-lg {{ $data->status === 'published' ? 'bg-yellow-500 hover:bg-yellow-600' : 'bg-green-500 hover:bg-green-600' }}">{{ $data->status === 'published' ? 'Tarik' : 'Publish' }}</button></form>
+                                    
+                                    @if($data->status !== 'pending')
+                                        <form action="{{ route('admin.publish') }}" method="POST"> @csrf <input type="hidden" name="model" value="DataGizi"> <input type="hidden" name="id" value="{{ $data->id }}"> <input type="hidden" name="active_tab" x-bind:value="activeTab"> <button type="submit" class="px-3 py-1 text-xs font-medium text-white rounded-lg {{ $data->status === 'published' ? 'bg-yellow-500 hover:bg-yellow-600' : 'bg-green-500 hover:bg-green-600' }}">{{ $data->status === 'published' ? 'Tarik' : 'Publish' }}</button></form>
+                                    @endif
                                 </div>
                             </div>
                         @empty
-                            <p class="text-sm text-gray-500 pt-4">Tidak ada data Gizi yang di-approved.</p>
+                            <p class="text-sm text-gray-500 pt-4">Tidak ada data Gizi untuk diproses.</p>
                         @endforelse
                     </div>
 
@@ -111,19 +133,25 @@
                             <div class="py-4 border-b border-black/10 last:border-0 flex justify-between items-center">
                                 <div>
                                     <p class="font-semibold text-gray-800">{{ $data->judul_kegiatan }}</p>
-                                    <p class="text-xs text-gray-500 mt-1">Diinput oleh: <span class="font-medium">{{ $data->user->name }}</span> | Dibuat pada: {{ $data->created_at->format('d M Y') }}</p>
+                                    <p class="mt-1 text-gray-700 text-sm">{{ $data->deskripsi }}</p>
+                                    <p class="text-xs text-gray-500 mt-1">Diinput oleh: <span class="font-medium">{{ $data->user->name }}</span> | Dibuat pada: {{ $data->created_at->format('d M Y') }} | Periode: {{ $data->periode->format('F Y') }}</p>
                                 </div>
                                 <div class="flex items-center space-x-4 flex-shrink-0 ml-4">
                                     @if($data->status === 'published')
                                         <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Published</span>
-                                    @else
+                                    @elseif($data->status === 'approved')
                                         <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">Approved</span>
+                                    @else
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Pending</span>
                                     @endif
-                                    <form action="{{ route('admin.publish') }}" method="POST"> @csrf <input type="hidden" name="model" value="DataPencegahan"> <input type="hidden" name="id" value="{{ $data->id }}"> <input type="hidden" name="active_tab" x-bind:value="activeTab"> <button type="submit" class="px-3 py-1 text-xs font-medium text-white rounded-lg {{ $data->status === 'published' ? 'bg-yellow-500 hover:bg-yellow-600' : 'bg-green-500 hover:bg-green-600' }}">{{ $data->status === 'published' ? 'Tarik' : 'Publish' }}</button></form>
+
+                                    @if($data->status !== 'pending')
+                                        <form action="{{ route('admin.publish') }}" method="POST"> @csrf <input type="hidden" name="model" value="DataPencegahan"> <input type="hidden" name="id" value="{{ $data->id }}"> <input type="hidden" name="active_tab" x-bind:value="activeTab"> <button type="submit" class="px-3 py-1 text-xs font-medium text-white rounded-lg {{ $data->status === 'published' ? 'bg-yellow-500 hover:bg-yellow-600' : 'bg-green-500 hover:bg-green-600' }}">{{ $data->status === 'published' ? 'Tarik' : 'Publish' }}</button></form>
+                                    @endif
                                 </div>
                             </div>
                         @empty
-                            <p class="text-sm text-gray-500 pt-4">Tidak ada data Pencegahan yang di-approved.</p>
+                            <p class="text-sm text-gray-500 pt-4">Tidak ada data Pencegahan untuk diproses.</p>
                         @endforelse
                     </div>
 
@@ -133,19 +161,25 @@
                             <div class="py-4 border-b border-black/10 last:border-0 flex justify-between items-center">
                                 <div>
                                     <p class="font-semibold text-gray-800">{{ $data->jenis_bencana }} ({{$data->jumlah_korban}} Korban)</p>
-                                    <p class="text-xs text-gray-500 mt-1">Diinput oleh: <span class="font-medium">{{ $data->user->name }}</span> | Dibuat pada: {{ $data->created_at->format('d M Y') }}</p>
+                                    <p class="mt-1 text-gray-700 text-sm">{{ $data->deskripsi }}</p>
+                                    <p class="text-xs text-gray-500 mt-1">Diinput oleh: <span class="font-medium">{{ $data->user->name }}</span> | Dibuat pada: {{ $data->created_at->format('d M Y') }} | Periode: {{ $data->periode->format('F Y') }}</p>
                                 </div>
                                 <div class="flex items-center space-x-4 flex-shrink-0 ml-4">
                                     @if($data->status === 'published')
                                         <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Published</span>
-                                    @else
+                                    @elseif($data->status === 'approved')
                                         <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">Approved</span>
+                                    @else
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Pending</span>
                                     @endif
-                                    <form action="{{ route('admin.publish') }}" method="POST"> @csrf <input type="hidden" name="model" value="DataPenanggulangan"> <input type="hidden" name="id" value="{{ $data->id }}"> <input type="hidden" name="active_tab" x-bind:value="activeTab"> <button type="submit" class="px-3 py-1 text-xs font-medium text-white rounded-lg {{ $data->status === 'published' ? 'bg-yellow-500 hover:bg-yellow-600' : 'bg-green-500 hover:bg-green-600' }}">{{ $data->status === 'published' ? 'Tarik' : 'Publish' }}</button></form>
+
+                                    @if($data->status !== 'pending')
+                                        <form action="{{ route('admin.publish') }}" method="POST"> @csrf <input type="hidden" name="model" value="DataPenanggulangan"> <input type="hidden" name="id" value="{{ $data->id }}"> <input type="hidden" name="active_tab" x-bind:value="activeTab"> <button type="submit" class="px-3 py-1 text-xs font-medium text-white rounded-lg {{ $data->status === 'published' ? 'bg-yellow-500 hover:bg-yellow-600' : 'bg-green-500 hover:bg-green-600' }}">{{ $data->status === 'published' ? 'Tarik' : 'Publish' }}</button></form>
+                                    @endif
                                 </div>
                             </div>
                         @empty
-                            <p class="text-sm text-gray-500 pt-4">Tidak ada data Penanggulangan yang di-approved.</p>
+                            <p class="text-sm text-gray-500 pt-4">Tidak ada data Penanggulangan untuk diproses.</p>
                         @endforelse
                     </div>
 
@@ -154,24 +188,29 @@
                         @forelse ($dataToReview['desa'] as $data)
                             <div class="py-4 border-b border-black/10 last:border-0 flex justify-between items-center">
                                 <div>
-                                    <p class="font-semibold text-gray-800">Penduduk: {{ number_format($data->jumlah_penduduk) }} | Luas: {{ number_format($data->luas_wilayah) }} m²</p>
+                                    <p class="font-semibold text-gray-800">{{ $data->nama_desa }} (Kasus Stunting: <span class="text-red-700">{{ $data->jumlah_kasus_stunting }}</span>)</p>
+                                    <p class="mt-1 text-gray-700 text-sm">{{ $data->deskripsi }}</p>
                                     <p class="text-xs text-gray-500 mt-1">Diinput oleh: <span class="font-medium">{{ $data->user->name }}</span> | Dibuat pada: {{ $data->created_at->format('d M Y') }}</p>
                                 </div>
                                 <div class="flex items-center space-x-4 flex-shrink-0 ml-4">
                                     @if($data->status === 'published')
                                         <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Published</span>
-                                    @else
+                                    @elseif($data->status === 'approved')
                                         <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">Approved</span>
+                                    @else
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Pending</span>
                                     @endif
-                                    <form action="{{ route('admin.publish') }}" method="POST"> @csrf <input type="hidden" name="model" value="DataDesa"> <input type="hidden" name="id" value="{{ $data->id }}"> <input type="hidden" name="active_tab" x-bind:value="activeTab"> <button type="submit" class="px-3 py-1 text-xs font-medium text-white rounded-lg {{ $data->status === 'published' ? 'bg-yellow-500 hover:bg-yellow-600' : 'bg-green-500 hover:bg-green-600' }}">{{ $data->status === 'published' ? 'Tarik' : 'Publish' }}</button></form>
+
+                                    @if($data->status !== 'pending')
+                                        <form action="{{ route('admin.publish') }}" method="POST"> @csrf <input type="hidden" name="model" value="DataDesa"> <input type="hidden" name="id" value="{{ $data->id }}"> <input type="hidden" name="active_tab" x-bind:value="activeTab"> <button type="submit" class="px-3 py-1 text-xs font-medium text-white rounded-lg {{ $data->status === 'published' ? 'bg-yellow-500 hover:bg-yellow-600' : 'bg-green-500 hover:bg-green-600' }}">{{ $data->status === 'published' ? 'Tarik' : 'Publish' }}</button></form>
+                                    @endif
                                 </div>
                             </div>
                         @empty
-                            <p class="text-sm text-gray-500 pt-4">Tidak ada data Desa yang di-approved.</p>
+                            <p class="text-sm text-gray-500 pt-4">Tidak ada data Desa untuk diproses.</p>
                         @endforelse
                     </div>
                 </div>
-
             </div>
         </div>
     </div>

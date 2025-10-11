@@ -97,6 +97,7 @@
                                 <div>
                                     <h4 class="font-semibold text-gray-800">{{ $data->judul }}</h4>
                                     <p class="mt-1 text-gray-700 text-sm">{{ $data->deskripsi }}</p>
+                                    <p class="mt-1 text-gray-700 text-sm">Periode: {{ $data->periode->format('F Y') }}</p>
                                 </div>
                             @endforeach
                         </div>
@@ -118,6 +119,7 @@
                                     <h4 class="font-semibold text-gray-800">{{ $data->judul_kegiatan }}</h4>
                                     <p class="mt-1 text-gray-700 text-sm">{{ $data->laporan_singkat }}</p>
                                     <p class="text-xs text-gray-500 mt-2">Lokasi: {{ $data->lokasi }} | Tanggal: {{ \Carbon\Carbon::parse($data->tanggal_kegiatan)->format('d M Y') }}</p>
+                                    <p class="mt-1 text-gray-700 text-sm">Periode: {{ $data->periode->format('F Y') }}</p>
                                 </div>
                             @endforeach
                         </div>
@@ -138,6 +140,7 @@
                                 <div>
                                     <h4 class="font-semibold text-gray-800">{{ $data->jenis_bencana }} ({{$data->jumlah_korban}} Korban)</h4>
                                     <p class="mt-1 text-gray-700 text-sm">{{ $data->tindakan }}</p>
+                                    <p class="mt-1 text-gray-700 text-sm">Periode: {{ $data->periode->format('F Y') }}</p>
                                 </div>
                             @endforeach
                         </div>
@@ -156,14 +159,16 @@
                          <div class="space-y-5 border-t border-black/10 pt-4">
                             @foreach($publishedData['desa'] as $data)
                                 <div>
+                                    <h4 class="font-bold text-xl text-gray-800">{{ $data->nama_desa }}</h4>
                                     <h4 class="font-semibold text-gray-800">Penduduk: {{number_format($data->jumlah_penduduk)}} | Luas Wilayah: {{number_format($data->luas_wilayah)}} m²</h4>
+                                    <h4 class="font-medium text-gray-800">Kasus Stunting: {{number_format($data->jumlah_kasus_stunting)}}</h4>
                                     <p class="mt-1 text-gray-700 text-sm">{{ $data->potensi_desa }}</p>
+                                    <p class="mt-1 text-gray-700 text-sm">Periode: {{ $data->periode->format('F Y') }}</p>
                                 </div>
                             @endforeach
                         </div>
                     </section>
                 @endif
-                
             </div>
         </div>
     </main>
