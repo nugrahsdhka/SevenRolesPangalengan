@@ -13,7 +13,7 @@
 
 /* Mengatur lebar scrollbar */
 ::-webkit-scrollbar {
-  width: 8px; /* Anda bisa ubah ukurannya, misal: 10px */
+  width: 3px; /* Anda bisa ubah ukurannya, misal: 10px */
   height: 8px;
 }
 
@@ -40,5 +40,9 @@
 /* Firefox menggunakan properti yang lebih simpel */
 html {
   scrollbar-width: none; /* Opsi: 'auto', 'thin', 'none' */
-  scrollbar-color: #dc2626 #dc2626; /* Warna thumb dan track */
+  scrollbar-color: #dc2626 #fff; /* Warna thumb dan track */
 }   
+
+.preserve-lines {
+  white-space: pre-wrap;
+}

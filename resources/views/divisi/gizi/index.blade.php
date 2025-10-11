@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="title">
-        Divisi Gizi
+        Manajemen Data Gizi
     </x-slot>
 
     <x-slot name="header">
@@ -68,7 +68,8 @@
                                 <th scope="col" class="px-6 py-3 rounded-l-lg">Periode</th>
                                 <th scope="col" class="px-6 py-3">Judul</th>
                                 <th scope="col" class="px-6 py-3">Deskripsi</th>
-                                <th scope="col" class="px-6 py-3 rounded-r-lg">Status</th>
+                                <th scope="col" class="px-6 py-3">Status</th>
+                                <th scope="col" class="px-6 py-3 rounded-r-lg text-center">Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -76,24 +77,26 @@
                                 <tr class="bg-white border-b hover:bg-gray-50">
                                     <td class="px-6 py-4">{{ $item->periode->format('F Y') }}</td>
                                     <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">{{ $item->judul }}</th>
-                                    <td class="px-6 py-4">{{ Str::limit($item->deskripsi, 70) }}</td>
+                                    <th scope="row" class="px-6 py-4 font-sm preserve-lines">{{ $item->deskripsi }}</th>
                                     <td class="px-6 py-4">
-                                        {{-- ✅ PERBAIKAN: Logika status yang benar --}}
-                                        @if($item->status === 'published')
-                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Published</span>
-                                        @elseif($item->status === 'approved')
-                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">Approved</span>
-                                        @else
-                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Pending</span>
-                                        @endif
+                                        @if($item->status === 'published')<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Published</span>
+                                        @elseif($item->status === 'approved')<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">Approved</span>
+                                        @else<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Pending</span>@endif
+                                    </td>
+                                    <td class="px-6 py-4 text-center">
+                                        <div class="flex justify-center items-center space-x-2">
+                                            <a href="{{ route('gizi.edit', $item->id) }}" class="font-medium text-blue-600 hover:text-blue-800">Edit</a>
+                                            <span class="text-gray-300">|</span>
+                                            <form action="{{ route('gizi.destroy', $item->id) }}" method="POST" onsubmit="return confirm('Anda yakin ingin menghapus data ini?');">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="font-medium text-red-600 hover:text-red-800">Hapus</button>
+                                            </form>
+                                        </div>
                                     </td>
                                 </tr>
                             @empty
-                                <tr>
-                                    <td colspan="3" class="px-6 py-4 text-center text-gray-500">
-                                        Belum ada data yang diinput. Silakan klik tombol "+ Tambah Data".
-                                    </td>
-                                </tr>
+                                <tr><td colspan="4" class="px-6 py-4 text-center text-gray-500">Belum ada data yang diinput.</td></tr>
                             @endforelse
                         </tbody>
                     </table>

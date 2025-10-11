@@ -77,6 +77,7 @@
                             <tr>
                                 <th scope="col" class="px-6 py-3 rounded-l-lg">Periode</th>
                                 <th scope="col" class="px-6 py-3">Nama Desa</th>
+                                <th scope="col" class="px-6 py-3">Jumlah Penduduk</th>
                                 <th scope="col" class="px-6 py-3">Kasus Stunting</th>
                                 <th scope="col" class="px-6 py-3">Status</th>
                                 <th scope="col" class="px-6 py-3 rounded-r-lg text-center">Aksi</th> {{-- Kolom Aksi --}}
@@ -87,7 +88,8 @@
                                 <tr class="bg-white border-b hover:bg-gray-50">
                                     <td class="px-6 py-4">{{ $item->periode->format('F Y') }}</td>
                                     <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">{{ $item->nama_desa }}</th>
-                                    <td class="px-6 py-4 font-medium text-red-700">{{ $item->jumlah_kasus_stunting }}</td>
+                                    <td class="px-6 py-4 font-medium text-gray-900">{{ $item->jumlah_penduduk }}</td>
+                                    <td class="px-6 py-4 font-medium text-gray-900">{{ $item->jumlah_kasus_stunting }}</td>
                                     <td class="px-6 py-4">
                                         @if($item->status === 'published')
                                             <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Published</span>

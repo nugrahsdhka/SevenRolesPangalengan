@@ -100,7 +100,7 @@
                             <div class="py-4 border-b border-black/10 last:border-0 flex justify-between items-center">
                                 <div>
                                     <p class="font-semibold text-gray-800">{{ $data->judul }}</p>
-                                    <p class="mt-1 text-gray-700 text-sm">{{ $data->deskripsi }}</p>
+                                    <p class="mt-1 text-gray-700 text-sm preserve-lines">{{ $data->deskripsi }}</p>
                                     <p class="text-xs text-gray-500 mt-1">Diinput oleh: <span class="font-medium">{{ $data->user->name }}</span> | Periode: {{ $data->periode->format('F Y') }}</p>
                                 </div>
                                 <div class="flex items-center space-x-2">
@@ -183,8 +183,8 @@
                         @forelse ($allData['desa'] as $data)
                             <div class="py-4 border-b border-black/10 last:border-0 flex justify-between items-center">
                                 <div>
-                                    <p class="font-semibold text-gray-800">{{ $data->nama_desa }} (Kasus Stunting: <span class="text-red-700">{{ $data->jumlah_kasus_stunting }}</span>)</p>
-                                    <p class="mt-1 text-gray-700 text-sm">{{ $data->deskripsi }}</p>
+                                    <p class="font-semibold text-gray-800">{{ $data->nama_desa }}</p>
+                                    <p class="font-semibold mt-1 text-gray-700 text-sm">Jumlah Penduduk: {{ $data->jumlah_penduduk }} | Kasus Stunting {{ $data->jumlah_kasus_stunting }}</p>
                                     <p class="text-xs text-gray-500 mt-1">Diinput oleh: <span class="font-medium">{{ $data->user->name }}</span> | Periode: {{ $data->periode->format('F Y') }}</p>
                                 </div>
                                 <div class="flex items-center space-x-2">

@@ -46,9 +46,8 @@ Route::middleware('auth')->group(function () {
 
     // Grup untuk Divisi Gizi
     Route::middleware(['role:Divisi Gizi'])->prefix('divisi-gizi')->name('gizi.')->group(function () {
-        Route::get('/', [DivisiGiziController::class, 'index'])->name('index');
-        Route::get('/create', [DivisiGiziController::class, 'create'])->name('create');
-        Route::post('/', [DivisiGiziController::class, 'store'])->name('store');
+        // ✅ PERBAIKAN: Gunakan Route::resource untuk menangani semua aksi CRUD
+        Route::resource('/', DivisiGiziController::class)->parameters(['' => 'data_gizi']);
     });
 
     // Grup untuk Divisi Pencegahan
