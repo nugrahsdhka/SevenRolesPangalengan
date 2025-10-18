@@ -6,16 +6,25 @@
     <x-slot name="header">
         <div class="flex justify-between items-center">
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                {{ __('Penerbitan Data - Approved by Camat') }}
+                {{ __('Admin') }}
             </h2>
-            
-            <div class="flex gap-2">
-                <a href="{{ route('welcome') }}" class="inline-flex items-center px-4 py-2 bg-gray-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 active:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition ease-in-out duration-150">
-                    Home
-                </a>
+            <div class="flex gap-1">
+                <form method="GET" action="{{ route('welcome') }}">
+                    <button type="submit" class="inline-flex items-center gap-2 rounded-lg bg-gray-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-gray-700">
+                        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                  d="M3 9.75L12 3l9 6.75M4.5 10.5V21h15V10.5M9 21v-6h6v6" />
+                        </svg>
+
+                        Home
+                    </button>
+                </form>
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
-                    <button type="submit" class="inline-flex items-center px-4 py-2 bg-red-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-700 active:bg-red-800 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                    <button type="submit" class="inline-flex items-center gap-2 rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-red-700">
+                        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                        </svg>
                         Log Out
                     </button>
                 </form>
@@ -23,195 +32,288 @@
         </div>
     </x-slot>
 
-    <div class="py-12 bg-slate-50">
+    <div class="py-8 bg-gradient-to-br from-slate-50 via-rose-50/30 to-slate-50">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            {{-- Notifikasi --}}
-            <div class="space-y-4 mb-8">
-                @if (session('success'))
-                    {{-- ✅ PERBAIKAN: Tambahkan atribut x-data, x-show, x-init, dan x-transition --}}
-                    <div x-data="{ show: true }"
-                         x-show="show"
-                         x-init="setTimeout(() => show = false, 500)"
-                         x-transition:leave="transition ease-in duration-300"
-                         x-transition:leave-start="opacity-100"
-                         x-transition:leave-end="opacity-0"
-                         class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded-lg" 
-                         role="alert">
-                        <p class="font-bold">Sukses</p>
-                        <p>{{ session('success') }}</p>
+            {{-- Alert Messages --}}
+            @if (session('success'))
+                <div x-data="{ show: true }"
+                     x-show="show"
+                     x-init="setTimeout(() => show = false, 3000)"
+                     x-transition:leave="transition ease-in duration-300"
+                     x-transition:leave-start="opacity-100"
+                     x-transition:leave-end="opacity-0"
+                     class="mb-6 flex items-center gap-3 rounded-xl bg-green-50 p-4 ring-1 ring-green-200">
+                    <div class="flex-shrink-0">
+                        <svg class="h-5 w-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
                     </div>
-                @endif
-                @if (session('error'))
-                    {{-- ✅ PERBAIKAN: Tambahkan atribut x-data, x-show, x-init, dan x-transition --}}
-                    <div x-data="{ show: true }"
-                         x-show="show"
-                         x-init="setTimeout(() => show = false, 500)"
-                         x-transition:leave="transition ease-in duration-300"
-                         x-transition:leave-start="opacity-100"
-                         x-transition:leave-end="opacity-0"
-                         class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-lg" 
-                         role="alert">
-                         <p class="font-bold">Error</p>
-                        <p>{{ session('error') }}</p>
+                    <div class="flex-1">
+                        <p class="text-sm font-medium text-green-900">{{ session('success') }}</p>
                     </div>
-                @endif
-            </div>
+                    <button @click="show = false" class="flex-shrink-0 text-green-600 hover:text-green-800">
+                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+            @endif
 
-            {{-- Kontainer Utama untuk Tab --}}
-            <div x-data="{ activeTab: '{{ session('active_tab', 'gizi') }}' }" class="bg-white shadow-lg rounded-2xl ring-1 ring-black/5 overflow-hidden">
-                
+            @if (session('error'))
+                <div x-data="{ show: true }"
+                     x-show="show"
+                     x-init="setTimeout(() => show = false, 3000)"
+                     x-transition:leave="transition ease-in duration-300"
+                     x-transition:leave-start="opacity-100"
+                     x-transition:leave-end="opacity-0"
+                     class="mb-6 flex items-center gap-3 rounded-xl bg-red-50 p-4 ring-1 ring-red-200">
+                    <div class="flex-shrink-0">
+                        <svg class="h-5 w-5 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <div class="flex-1">
+                        <p class="text-sm font-medium text-red-900">{{ session('error') }}</p>
+                    </div>
+                    <button @click="show = false" class="flex-shrink-0 text-red-600 hover:text-red-800">
+                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+            @endif
+
+            {{-- Main Card --}}
+            <section x-data="{ activeTab: '{{ session('active_tab', 'gizi') }}' }" class="rounded-2xl bg-white shadow-lg ring-1 ring-gray-900/5">
+                {{-- Header --}}
+                <div class="p-6 sm:p-8 border-b border-gray-200">
+                    <h3 class="text-xl font-bold text-gray-900">Penerbitan Data</h3>
+                    <p class="mt-1 text-sm text-gray-500">Pilih tab untuk mempublikasikan atau menarik data yang sudah disetujui Camat</p>
+                </div>
+
                 {{-- Navigasi Tab --}}
-                <div class="border-b border-gray-200">
-                    <nav class="-mb-px flex" aria-label="Tabs">
-                        {{-- Tab Gizi --}}
+                <div>
+                    <nav class="-mb-px flex px-6 sm:px-8" aria-label="Tabs">
                         <button @click="activeTab = 'gizi'" 
-                                :class="{ 'border-red-600 text-red-600': activeTab === 'gizi', 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300': activeTab !== 'gizi' }"
-                                class="w-1/4 py-4 px-1 text-center border-b-2 font-medium text-sm focus:outline-none flex justify-center items-center gap-2">
-                            <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" /></svg>
+                                :class="{ 'border-red-500 text-red-600': activeTab === 'gizi', 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300': activeTab !== 'gizi' }"
+                                class="w-1/4 py-4 px-1 text-center border-b-2 font-medium text-sm focus:outline-none flex justify-center items-center gap-2 transition">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
                             Data Gizi
                         </button>
-
-                        {{-- Tab Pencegahan --}}
                         <button @click="activeTab = 'pencegahan'" 
-                                :class="{ 'border-red-600 text-red-600': activeTab === 'pencegahan', 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300': activeTab !== 'pencegahan' }"
-                                class="w-1/4 py-4 px-1 text-center border-b-2 font-medium text-sm focus:outline-none flex justify-center items-center gap-2">
-                             <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.286zm0 13.036h.008v.008h-.008v-.008z" /></svg>
+                                :class="{ 'border-red-500 text-red-600': activeTab === 'pencegahan', 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300': activeTab !== 'pencegahan' }"
+                                class="w-1/4 py-4 px-1 text-center border-b-2 font-medium text-sm focus:outline-none flex justify-center items-center gap-2 transition">
+                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
                             Data Pencegahan
                         </button>
-
-                         {{-- Tab Penanggulangan --}}
-                         <button @click="activeTab = 'penanggulangan'" 
-                                :class="{ 'border-red-600 text-red-600': activeTab === 'penanggulangan', 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300': activeTab !== 'penanggulangan' }"
-                                class="w-1/4 py-4 px-1 text-center border-b-2 font-medium text-sm focus:outline-none flex justify-center items-center gap-2">
-                             <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" /></svg>
+                        <button @click="activeTab = 'penanggulangan'" 
+                                :class="{ 'border-red-500 text-red-600': activeTab === 'penanggulangan', 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300': activeTab !== 'penanggulangan' }"
+                                class="w-1/4 py-4 px-1 text-center border-b-2 font-medium text-sm focus:outline-none flex justify-center items-center gap-2 transition">
+                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" /></svg>
                             Data Penanggulangan
                         </button>
-
-                         {{-- Tab Desa --}}
                          <button @click="activeTab = 'desa'" 
-                                :class="{ 'border-red-600 text-red-600': activeTab === 'desa', 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300': activeTab !== 'desa' }"
-                                class="w-1/4 py-4 px-1 text-center border-b-2 font-medium text-sm focus:outline-none flex justify-center items-center gap-2">
-                            <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h7.5" /></svg>
+                                :class="{ 'border-red-500 text-red-600': activeTab === 'desa', 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300': activeTab !== 'desa' }"
+                                class="w-1/4 py-4 px-1 text-center border-b-2 font-medium text-sm focus:outline-none flex justify-center items-center gap-2 transition">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 21v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21m0 0h4.5V3.545M12.75 21h7.5V10.75M2.25 21h1.5m18 0h-18M2.25 9l4.5-1.636M18.75 3l-1.5.545m0 6.205l3 1m-3-1l-1.5.545m0 0l-2.25 1.318m5.25-1.75l-5.25 1.75" /></svg>
                             Data Desa
                         </button>
                     </nav>
                 </div>
 
                 {{-- Konten Tab --}}
-                <div class="p-6 sm:p-8">
+                <div>
                     {{-- Konten Gizi --}}
-                    <div x-show="activeTab === 'gizi'">
-                         @forelse ($dataToReview['gizi'] as $data)
-                            <div class="py-4 border-b border-black/10 last:border-0 flex justify-between items-center">
-                                <div>
-                                    <p class="font-semibold text-gray-800">{{ $data->judul }}</p>
-                                    <p class="mt-1 text-gray-700 text-sm preserve-lines">{{ $data->deskripsi }}</p>
-                                    <p class="text-xs text-gray-500 mt-1">Diinput oleh: <span class="font-medium">{{ $data->user->name }}</span> | Dibuat pada: {{ $data->created_at->format('d M Y') }} | Periode: {{ $data->periode->format('F Y') }}</p>
-                                </div>
-                                <div class="flex items-center space-x-4 flex-shrink-0 ml-4">
-                                    @if($data->status === 'published')
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Published</span>
-                                    @elseif($data->status === 'approved')
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">Approved</span>
-                                    @else
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Pending</span>
-                                    @endif
-                                    
-                                    @if($data->status !== 'pending')
-                                        <form action="{{ route('admin.publish') }}" method="POST"> @csrf <input type="hidden" name="model" value="DataGizi"> <input type="hidden" name="id" value="{{ $data->id }}"> <input type="hidden" name="active_tab" x-bind:value="activeTab"> <button type="submit" class="px-3 py-1 text-xs font-medium text-white rounded-lg {{ $data->status === 'published' ? 'bg-yellow-500 hover:bg-yellow-600' : 'bg-green-500 hover:bg-green-600' }}">{{ $data->status === 'published' ? 'Tarik' : 'Publish' }}</button></form>
-                                    @endif
-                                </div>
-                            </div>
-                        @empty
-                            <p class="text-sm text-gray-500 pt-4">Tidak ada data Gizi untuk diproses.</p>
-                        @endforelse
+                    <div x-show="activeTab === 'gizi'" class="overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead class="bg-gray-50">
+                                    <tr class="border-b border-gray-200">
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-700">Detail Data</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-700">Penginput</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-700">Status</th>
+                                        <th scope="col" class="px-6 py-3 text-center text-xs font-semibold uppercase tracking-wider text-gray-700">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-200 bg-white">
+                                    @forelse ($dataToReview['gizi'] as $data)
+                                        <tr class="transition hover:bg-gray-50">
+                                            <td class="px-6 py-4">
+                                                <div class="text-sm font-semibold text-gray-900">{{ $data->judul }}</div>
+                                                <div class="text-sm text-gray-600 mt-1 preserve-lines">{{ Str::limit($data->deskripsi, 100) }}</div>
+                                            </td>
+                                            <td class="whitespace-nowrap px-6 py-4">
+                                                <div class="text-sm text-gray-900">{{ $data->user->name }}</div>
+                                                <div class="text-xs text-gray-500">{{ $data->periode->format('F Y') }}</div>
+                                            </td>
+                                            <td class="whitespace-nowrap px-6 py-4">
+                                                @if($data->status === 'published')
+                                                    <span class="inline-flex items-center gap-1 rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-700"><span class="h-1.5 w-1.5 rounded-full bg-green-600"></span>Published</span>
+                                                @elseif($data->status === 'approved')
+                                                    <span class="inline-flex items-center gap-1 rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-700"><span class="h-1.5 w-1.5 rounded-full bg-blue-600"></span>Approved</span>
+                                                @elseif($data->status !== 'approved')
+                                                    <span class="inline-flex items-center gap-1 rounded-full bg-yellow-100 px-3 py-1 text-xs font-medium text-yellow-700"><span class="h-1.5 w-1.5 rounded-full bg-yellow-600"></span>Pending</span>
+                                                @endif
+                                            </td>
+                                            <td class="whitespace-nowrap px-6 py-4">
+                                                <div class="flex items-center justify-center gap-2">
+                                                    @if($data->status !== 'pending')
+                                                        <form action="{{ route('admin.publish') }}" method="POST"> @csrf <input type="hidden" name="model" value="DataGizi"> <input type="hidden" name="id" value="{{ $data->id }}"> <input type="hidden" name="active_tab" x-bind:value="activeTab"> <button type="submit" class="px-3 py-1 text-xs font-medium text-white rounded-md {{ $data->status === 'published' ? 'bg-yellow-500 hover:bg-yellow-600' : 'bg-green-500 hover:bg-green-600' }} transition">{{ $data->status === 'published' ? 'Tarik' : 'Publish' }}</button></form>
+                                                    @endif
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    @empty
+                                        <tr><td colspan="4" class="px-6 py-12 text-center"><svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" /></svg><p class="mt-4 text-sm text-gray-500">Tidak ada data Gizi untuk diproses.</p></td></tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
 
                     {{-- Konten Pencegahan --}}
                     <div x-show="activeTab === 'pencegahan'" style="display: none;">
-                        @forelse ($dataToReview['pencegahan'] as $data)
-                            <div class="py-4 border-b border-black/10 last:border-0 flex justify-between items-center">
-                                <div>
-                                    <p class="font-semibold text-gray-800">{{ $data->judul_kegiatan }}</p>
-                                    <p class="mt-1 text-gray-700 text-sm">{{ $data->deskripsi }}</p>
-                                    <p class="text-xs text-gray-500 mt-1">Diinput oleh: <span class="font-medium">{{ $data->user->name }}</span> | Dibuat pada: {{ $data->created_at->format('d M Y') }} | Periode: {{ $data->periode->format('F Y') }}</p>
-                                </div>
-                                <div class="flex items-center space-x-4 flex-shrink-0 ml-4">
-                                    @if($data->status === 'published')
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Published</span>
-                                    @elseif($data->status === 'approved')
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">Approved</span>
-                                    @else
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Pending</span>
-                                    @endif
-
-                                    @if($data->status !== 'pending')
-                                        <form action="{{ route('admin.publish') }}" method="POST"> @csrf <input type="hidden" name="model" value="DataPencegahan"> <input type="hidden" name="id" value="{{ $data->id }}"> <input type="hidden" name="active_tab" x-bind:value="activeTab"> <button type="submit" class="px-3 py-1 text-xs font-medium text-white rounded-lg {{ $data->status === 'published' ? 'bg-yellow-500 hover:bg-yellow-600' : 'bg-green-500 hover:bg-green-600' }}">{{ $data->status === 'published' ? 'Tarik' : 'Publish' }}</button></form>
-                                    @endif
-                                </div>
-                            </div>
-                        @empty
-                            <p class="text-sm text-gray-500 pt-4">Tidak ada data Pencegahan untuk diproses.</p>
-                        @endforelse
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead class="bg-gray-50">
+                                    <tr class="border-b border-gray-200">
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-700">Kegiatan</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-700">Penginput</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-700">Status</th>
+                                        <th scope="col" class="px-6 py-3 text-center text-xs font-semibold uppercase tracking-wider text-gray-700">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-200 bg-white">
+                                    @forelse ($dataToReview['pencegahan'] as $data)
+                                        <tr class="transition hover:bg-gray-50">
+                                            <td class="px-6 py-4">
+                                                <div class="text-sm font-semibold text-gray-900">{{ $data->judul_kegiatan }}</div>
+                                                <div class="text-xs text-gray-500 mt-1">{{ $data->lokasi }} | {{ $data->tanggal_kegiatan->format('d F Y') }}</div>
+                                            </td>
+                                            <td class="whitespace-nowrap px-6 py-4">
+                                                <div class="text-sm text-gray-900">{{ $data->user->name }}</div>
+                                                <div class="text-xs text-gray-500">{{ $data->periode->format('F Y') }}</div>
+                                            </td>
+                                            <td class="whitespace-nowrap px-6 py-4">
+                                                @if($data->status === 'published')
+                                                    <span class="inline-flex items-center gap-1 rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-700"><span class="h-1.5 w-1.5 rounded-full bg-green-600"></span>Published</span>
+                                                @elseif($data->status === 'approved')
+                                                    <span class="inline-flex items-center gap-1 rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-700"><span class="h-1.5 w-1.5 rounded-full bg-blue-600"></span>Approved</span>
+                                                @endif
+                                            </td>
+                                            <td class="whitespace-nowrap px-6 py-4">
+                                                <div class="flex items-center justify-center gap-2">
+                                                    @if($data->status !== 'pending')
+                                                        <form action="{{ route('admin.publish') }}" method="POST"> @csrf <input type="hidden" name="model" value="DataPencegahan"> <input type="hidden" name="id" value="{{ $data->id }}"> <input type="hidden" name="active_tab" x-bind:value="activeTab"> <button type="submit" class="px-3 py-1 text-xs font-medium text-white rounded-md {{ $data->status === 'published' ? 'bg-yellow-500 hover:bg-yellow-600' : 'bg-green-500 hover:bg-green-600' }} transition">{{ $data->status === 'published' ? 'Tarik' : 'Publish' }}</button></form>
+                                                    @endif
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    @empty
+                                         <tr><td colspan="4" class="px-6 py-12 text-center"><svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" /></svg><p class="mt-4 text-sm text-gray-500">Tidak ada data Pencegahan untuk diproses.</p></td></tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
 
                     {{-- Konten Penanggulangan --}}
-                    <div x-show="activeTab === 'penanggulangan'" style="display: none;">
-                        @forelse ($dataToReview['penanggulangan'] as $data)
-                            <div class="py-4 border-b border-black/10 last:border-0 flex justify-between items-center">
-                                <div>
-                                    <p class="font-semibold text-gray-800">{{ $data->jenis_bencana }} ({{$data->jumlah_korban}} Korban)</p>
-                                    <p class="mt-1 text-gray-700 text-sm">{{ $data->deskripsi }}</p>
-                                    <p class="text-xs text-gray-500 mt-1">Diinput oleh: <span class="font-medium">{{ $data->user->name }}</span> | Dibuat pada: {{ $data->created_at->format('d M Y') }} | Periode: {{ $data->periode->format('F Y') }}</p>
-                                </div>
-                                <div class="flex items-center space-x-4 flex-shrink-0 ml-4">
-                                    @if($data->status === 'published')
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Published</span>
-                                    @elseif($data->status === 'approved')
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">Approved</span>
-                                    @else
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Pending</span>
-                                    @endif
-
-                                    @if($data->status !== 'pending')
-                                        <form action="{{ route('admin.publish') }}" method="POST"> @csrf <input type="hidden" name="model" value="DataPenanggulangan"> <input type="hidden" name="id" value="{{ $data->id }}"> <input type="hidden" name="active_tab" x-bind:value="activeTab"> <button type="submit" class="px-3 py-1 text-xs font-medium text-white rounded-lg {{ $data->status === 'published' ? 'bg-yellow-500 hover:bg-yellow-600' : 'bg-green-500 hover:bg-green-600' }}">{{ $data->status === 'published' ? 'Tarik' : 'Publish' }}</button></form>
-                                    @endif
-                                </div>
-                            </div>
-                        @empty
-                            <p class="text-sm text-gray-500 pt-4">Tidak ada data Penanggulangan untuk diproses.</p>
-                        @endforelse
+                     <div x-show="activeTab === 'penanggulangan'" style="display: none;">
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead class="bg-gray-50">
+                                    <tr class="border-b border-gray-200">
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-700">Bencana</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-700">Penginput</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-700">Status</th>
+                                        <th scope="col" class="px-6 py-3 text-center text-xs font-semibold uppercase tracking-wider text-gray-700">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-200 bg-white">
+                                    @forelse ($dataToReview['penanggulangan'] as $data)
+                                        <tr class="transition hover:bg-gray-50">
+                                            <td class="px-6 py-4">
+                                                <div class="text-sm font-semibold text-gray-900">{{ $data->jenis_bencana }}</div>
+                                                <div class="text-xs text-gray-500 mt-1">{{ $data->jumlah_korban }} Korban</div>
+                                            </td>
+                                            <td class="whitespace-nowrap px-6 py-4">
+                                                <div class="text-sm text-gray-900">{{ $data->user->name }}</div>
+                                                <div class="text-xs text-gray-500">{{ $data->periode->format('F Y') }}</div>
+                                            </td>
+                                            <td class="whitespace-nowrap px-6 py-4">
+                                                @if($data->status === 'published')
+                                                    <span class="inline-flex items-center gap-1 rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-700"><span class="h-1.5 w-1.5 rounded-full bg-green-600"></span>Published</span>
+                                                @elseif($data->status === 'approved')
+                                                    <span class="inline-flex items-center gap-1 rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-700"><span class="h-1.5 w-1.5 rounded-full bg-blue-600"></span>Approved</span>
+                                                @endif
+                                            </td>
+                                            <td class="whitespace-nowrap px-6 py-4">
+                                                <div class="flex items-center justify-center gap-2">
+                                                    @if($data->status !== 'pending')
+                                                        <form action="{{ route('admin.publish') }}" method="POST"> @csrf <input type="hidden" name="model" value="DataPenanggulangan"> <input type="hidden" name="id" value="{{ $data->id }}"> <input type="hidden" name="active_tab" x-bind:value="activeTab"> <button type="submit" class="px-3 py-1 text-xs font-medium text-white rounded-md {{ $data->status === 'published' ? 'bg-yellow-500 hover:bg-yellow-600' : 'bg-green-500 hover:bg-green-600' }} transition">{{ $data->status === 'published' ? 'Tarik' : 'Publish' }}</button></form>
+                                                    @endif
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    @empty
+                                         <tr><td colspan="4" class="px-6 py-12 text-center"><svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" /></svg><p class="mt-4 text-sm text-gray-500">Tidak ada data Penanggulangan untuk diproses.</p></td></tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
 
                     {{-- Konten Desa --}}
                     <div x-show="activeTab === 'desa'" style="display: none;">
-                        @forelse ($dataToReview['desa'] as $data)
-                            <div class="py-4 border-b border-black/10 last:border-0 flex justify-between items-center">
-                                <div>
-                                    <p class="font-semibold text-gray-800">{{ $data->nama_desa }}</p>
-                                    <p class="font-semibold mt-1 text-gray-700 text-sm">Jumlah Penduduk: {{ $data->jumlah_penduduk }} | Kasus Stunting {{ $data->jumlah_kasus_stunting }}</p>
-                                    <p class="text-xs text-gray-500 mt-1">Diinput oleh: <span class="font-medium">{{ $data->user->name }}</span> | Dibuat pada: {{ $data->created_at->format('d M Y') }}</p>
-                                </div>
-                                <div class="flex items-center space-x-4 flex-shrink-0 ml-4">
-                                    @if($data->status === 'published')
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Published</span>
-                                    @elseif($data->status === 'approved')
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">Approved</span>
-                                    @else
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Pending</span>
-                                    @endif
-
-                                    @if($data->status !== 'pending')
-                                        <form action="{{ route('admin.publish') }}" method="POST"> @csrf <input type="hidden" name="model" value="DataDesa"> <input type="hidden" name="id" value="{{ $data->id }}"> <input type="hidden" name="active_tab" x-bind:value="activeTab"> <button type="submit" class="px-3 py-1 text-xs font-medium text-white rounded-lg {{ $data->status === 'published' ? 'bg-yellow-500 hover:bg-yellow-600' : 'bg-green-500 hover:bg-green-600' }}">{{ $data->status === 'published' ? 'Tarik' : 'Publish' }}</button></form>
-                                    @endif
-                                </div>
-                            </div>
-                        @empty
-                            <p class="text-sm text-gray-500 pt-4">Tidak ada data Desa untuk diproses.</p>
-                        @endforelse
+                       <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead class="bg-gray-50">
+                                    <tr class="border-b border-gray-200">
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-700">Nama Desa</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-700">Populasi</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-700">Penginput</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-700">Status</th>
+                                        <th scope="col" class="px-6 py-3 text-center text-xs font-semibold uppercase tracking-wider text-gray-700">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-200 bg-white">
+                                    @forelse ($dataToReview['desa'] as $data)
+                                        <tr class="transition hover:bg-gray-50">
+                                            <td class="px-6 py-4">
+                                                <div class="text-sm font-semibold text-gray-900">{{ $data->nama_desa }}</div>
+                                            </td>
+                                            <td class="px-6 py-4">
+                                                <div class="text-sm text-gray-900">{{ number_format($data->jumlah_penduduk) }} Jiwa</div>
+                                                <div class="text-xs text-red-600 mt-1">{{ number_format($data->jumlah_kasus_stunting) }} Kasus Stunting</div>
+                                            </td>
+                                            <td class="whitespace-nowrap px-6 py-4">
+                                                <div class="text-sm text-gray-900">{{ $data->user->name }}</div>
+                                                <div class="text-xs text-gray-500">{{ $data->periode->format('F Y') }}</div>
+                                            </td>
+                                            <td class="whitespace-nowrap px-6 py-4">
+                                                @if($data->status === 'published')
+                                                    <span class="inline-flex items-center gap-1 rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-700"><span class="h-1.5 w-1.5 rounded-full bg-green-600"></span>Published</span>
+                                                @elseif($data->status === 'approved')
+                                                    <span class="inline-flex items-center gap-1 rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-700"><span class="h-1.5 w-1.5 rounded-full bg-blue-600"></span>Approved</span>
+                                                @endif
+                                            </td>
+                                            <td class="whitespace-nowrap px-6 py-4">
+                                                <div class="flex items-center justify-center gap-2">
+                                                    @if($data->status !== 'pending')
+                                                        <form action="{{ route('admin.publish') }}" method="POST"> @csrf <input type="hidden" name="model" value="DataDesa"> <input type="hidden" name="id" value="{{ $data->id }}"> <input type="hidden" name="active_tab" x-bind:value="activeTab"> <button type="submit" class="px-3 py-1 text-xs font-medium text-white rounded-md {{ $data->status === 'published' ? 'bg-yellow-500 hover:bg-yellow-600' : 'bg-green-500 hover:bg-green-600' }} transition">{{ $data->status === 'published' ? 'Tarik' : 'Publish' }}</button></form>
+                                                    @endif
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    @empty
+                                         <tr><td colspan="5" class="px-6 py-12 text-center"><svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" /></svg><p class="mt-4 text-sm text-gray-500">Tidak ada data Desa untuk diproses.</p></td></tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
-            </div>
+            </section>
         </div>
     </div>
 </x-app-layout>

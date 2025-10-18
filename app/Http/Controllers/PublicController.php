@@ -10,7 +10,7 @@ use Illuminate\Http\Request;
 
 class PublicController extends Controller
 {
-    public function index()
+    public function home()
     {
         // LOGIKA BARU: Ambil data yang statusnya 'published'
         $publishedData = [
@@ -20,6 +20,27 @@ class PublicController extends Controller
             'desa' => DataDesa::where('status', 'published')->latest()->get(),
         ];
 
-        return view('welcome', compact('publishedData'));
+        return view('public_view.home.welcome', compact('publishedData'));
     }
+
+    public function dataStunting() 
+    {
+        return view('public_view.dataStunting.index');
+    }
+
+    public function dataWilayah() 
+    {
+        return view('public_view.dataWilayah.index');
+    }
+
+    public function analisisHotspot() 
+    {
+        return view('public_view.analisisHotspot.index');
+    }
+
+    public function peta() 
+    {
+        return view('public_view.peta.index');
+    }
+
 }
