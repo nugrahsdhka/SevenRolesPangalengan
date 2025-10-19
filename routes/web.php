@@ -1,10 +1,10 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\CamatController;
 use App\Http\Controllers\PublicController;
-use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\DivisiDesaController;
 use App\Http\Controllers\DivisiGiziController;
 use App\Http\Controllers\DivisiPencegahanController;
@@ -32,12 +32,7 @@ Route::get('/dashboard', function () {
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 // Authenticated Routes
-Route::middleware('auth')->group(function () {
-    Route::get('/dashboard-view', fn() => view('dashboard'))->name('dashboard.view');
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-
+Route::middleware('auth', 'verified')->group(function () {
     // Divisi Gizi
     Route::middleware(['role:Divisi Gizi'])->prefix('divisi-gizi')->name('gizi.')->group(function () {
         Route::resource('/', DivisiGiziController::class)->parameters(['' => 'data_gizi']);
@@ -69,6 +64,8 @@ Route::middleware('auth')->group(function () {
     Route::middleware(['role:IT Admin'])->prefix('admin')->name('admin.')->group(function () {
         Route::get('/published-data', [AdminController::class, 'publishedData'])->name('published.index');
         Route::post('/publish-data', [AdminController::class, 'publish'])->name('publish');
+        Route::get('/users/create', [UserController::class, 'create'])->name('users.create');
+        Route::post('/users', [UserController::class, 'store'])->name('users.store');
     });
 });
 

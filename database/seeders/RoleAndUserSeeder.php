@@ -26,42 +26,48 @@ class RoleAndUserSeeder extends Seeder
         $userGizi = User::create([
             'name' => 'User Gizi',
             'email' => 'gizi@test.com',
-            'password' => Hash::make('123456')
+            'password' => Hash::make('123456'),
+            'email_verified_at' => now(),
         ]);
         $userGizi->assignRole($roleGizi);
 
         $userPencegahan = User::create([
             'name' => 'User Pencegahan',
             'email' => 'pencegahan@test.com',
-            'password' => Hash::make('123456')
+            'password' => Hash::make('123456'),
+            'email_verified_at' => now(),
         ]);
         $userPencegahan->assignRole($rolePencegahan);
 
         $userPenanggulangan = User::create([
             'name' => 'User Penanggulangan',
             'email' => 'penanggulangan@test.com',
-            'password' => Hash::make('123456')
+            'password' => Hash::make('123456'),
+            'email_verified_at' => now(),
         ]);
         $userPenanggulangan->assignRole($rolePenanggulangan);
 
         $userDesa = User::create([
             'name' => 'User Desa',
             'email' => 'desa@test.com',
-            'password' => Hash::make('123456')
+            'password' => Hash::make('123456'),
+            'email_verified_at' => now(),
         ]);
         $userDesa->assignRole($roleDesa);
 
         $userCamat = User::create([
             'name' => 'User Camat',
             'email' => 'camat@test.com',
-            'password' => Hash::make('123456')
+            'password' => Hash::make('123456'),
+            'email_verified_at' => now(),
         ]);
         $userCamat->assignRole($roleCamat);
 
         $userAdmin = User::create([
             'name' => 'User IT Admin',
             'email' => 'admin@test.com',
-            'password' => Hash::make('123456')
+            'password' => Hash::make('123456'),
+            'email_verified_at' => now(),
         ]);
         $userAdmin->assignRole($roleAdmin);
     }

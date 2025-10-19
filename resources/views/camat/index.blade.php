@@ -5,9 +5,15 @@
 
     <x-slot name="header">
         <div class="flex justify-between items-center">
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                {{ __('Camat') }}
-            </h2>
+            <div class="flex gap-1 justify-center items-center">
+                <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+                    {{ __('Camat') }}
+                </h2>
+                <span class="text-gray-300">|</span>
+                <h2 class="font-semibold text-xs text-gray-800 leading-tight">
+                    {{ auth()->user()->name }}
+                </h2>
+            </div>
             <div class="flex gap-1">
                 <form method="GET" action="{{ route('welcome') }}">
                     <button type="submit" class="inline-flex items-center gap-2 rounded-lg bg-gray-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-gray-700">

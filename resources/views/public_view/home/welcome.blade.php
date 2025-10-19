@@ -443,7 +443,7 @@
                                                 </div>
                                                 <p class="text-lg font-black text-emerald-900">
                                                     <span x-text="new Intl.NumberFormat('id-ID').format(currentItem.luas_wilayah)"></span>
-                                                    <span class="text-base">m²</span>
+                                                    <span class="text-base">km²</span>
                                                 </p>
                                                 <p class="text-xs text-emerald-700 mt-1 font-medium">Luas Wilayah</p>
                                             </div>
