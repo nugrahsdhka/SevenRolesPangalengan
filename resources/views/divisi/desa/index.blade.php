@@ -50,9 +50,8 @@
             {{-- Main Card --}}
             <section class="rounded-2xl bg-white p-6 shadow-lg ring-1 ring-gray-900/5 sm:p-8">
                 <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                    <div>
-                        <h3 class="text-xl font-bold text-gray-900">Daftar Data Desa</h3>
-                        <p class="mt-1 text-sm text-gray-500">Kelola dan pantau data desa yang telah diinput</p>
+                    <div class="flex flex-col justify-center items-center">
+                        <h3 class="text-md font-bold text-red-700">Daftar Data Desa</h3>
                     </div>
                     @if($canCreate)
                         <a href="{{ route('desa.create') }}" class="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-red-600 to-rose-600 px-4 py-2.5 text-sm font-semibold text-white shadow-md transition hover:from-red-700 hover:to-rose-700 hover:shadow-lg">

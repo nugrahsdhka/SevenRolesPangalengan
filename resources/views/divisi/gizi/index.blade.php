@@ -62,9 +62,8 @@
             {{-- Main Card --}}
             <section class="rounded-2xl bg-white p-6 shadow-lg ring-1 ring-gray-900/5 sm:p-8">
                 <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                    <div>
-                        <h3 class="text-xl font-bold text-gray-900">Daftar Data Gizi</h3>
-                        <p class="mt-1 text-sm text-gray-500">Kelola dan pantau data gizi yang telah diinput</p>
+                    <div class="flex flex-col justify-center items-center">
+                        <h3 class="text-md font-bold text-red-700">Daftar Data Gizi</h3>
                     </div>
                     <a href="{{ route('gizi.create') }}" class="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-red-600 to-rose-600 px-4 py-2.5 text-sm font-semibold text-white shadow-md transition hover:from-red-700 hover:to-rose-700 hover:shadow-lg">
                         <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
@@ -84,22 +83,16 @@
                             @csrf
                             {{-- ✅ Kita ubah dari 'sm:flex-row' menjadi 'sm:flex-col' atau biarkan saja --}}
                             <div class="flex flex-col sm:flex-row sm:items-end gap-4">
-                                
-                                {{-- ✅ HAPUS SELURUH DIV UNTUK 'PERIODE' INI --}}
-                                {{-- <div class="flex-1">
-                                    <label for="periode" class="block text-sm font-medium text-gray-700">Periode Laporan</label>
-                                    <input type="month" name="periode" id="periode" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required>
-                                </div> --}}
 
                                 {{-- Biarkan input file ini --}}
                                 <div class="flex-1">
                                     <label for="file" class="block text-sm font-medium text-gray-700">Pilih File Excel</label>
-                                    <input type="file" name="file" id="file" class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" required>
+                                    <input type="file" name="file" id="file" class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-rose-50 file:text-red-700 hover:file:bg-rose-100" required>
                                 </div>
                                 
                                 {{-- Biarkan tombol upload ini --}}
                                 <div class="flex-shrink-0">
-                                    <button type="submit" class="w-full sm:w-auto inline-flex justify-center items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-indigo-700">
+                                    <button type="submit" class="w-full sm:w-auto inline-flex justify-center items-center gap-2 rounded-lg bg-gradient-to-r from-red-600 to-rose-700 px-4 py-2 text-sm font-semibold text-white transition hover:bg-rose-800">
                                         Upload
                                     </button>
                                 </div>

@@ -67,8 +67,16 @@
             {{-- Main Card --}}
             <section x-data="{ activeTab: '{{ session('active_tab', 'gizi') }}' }" class="rounded-2xl bg-white shadow-lg ring-1 ring-gray-900/5 overflow-hidden">
                 {{-- Header --}}
-                    <div class="flex justify-center items-center py-2 border border-b ">
-                        <h1 class="text-md font-bold text-red-700">Penerbitan Data</h1>
+                    <div class="flex flex-col justify-center items-center py-2 border border-b ">
+                        <h1 class="text-md font-bold text-red-700">
+                            Penerbitan Data
+                        </h1>
+                        <p class="text-sm font-bold text-red-700">
+                            <span x-show="activeTab === 'gizi'">Divisi Gizi</span>
+                            <span x-show="activeTab === 'pencegahan'">Divisi Pencegahan</span>
+                            <span x-show="activeTab === 'penanggulangan'">Divisi Penanggulangan</span>
+                            <span x-show="activeTab === 'desa'">Divisi Desa</span>
+                        </p>
                     </div>
 
                 {{-- 🔁 Navigasi Tab (gaya camat: scrollable di mobile, rata di desktop) --}}

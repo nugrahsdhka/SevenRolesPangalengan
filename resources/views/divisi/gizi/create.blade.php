@@ -14,9 +14,9 @@
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
                         </svg>
                     </div>
-                    <div>
-                        <h3 class="text-xl font-bold text-gray-900">Formulir Tambah Data Gizi</h3>
-                        <p class="text-sm text-gray-500">Lengkapi informasi data gizi dengan teliti</p>
+                    <div class="flex flex-col justify-start items-start">
+                        <h3 class="text-lg font-bold text-red-700">Formulir Tambah Data Gizi</h3>
+                        <p class="text-xs font-bold text-red-700">Lengkapi Form di Bawah</p>
                     </div>
                 </div>
 

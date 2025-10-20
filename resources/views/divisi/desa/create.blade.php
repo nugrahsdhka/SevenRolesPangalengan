@@ -13,9 +13,9 @@
                             <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 21v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21m0 0h4.5V3.545M12.75 21h7.5V10.75M2.25 21h1.5m18 0h-18M2.25 9l4.5-1.636M18.75 3l-1.5.545m0 6.205l3 1m-3-1l-1.5.545m0 0l-2.25 1.318m5.25-1.75l-5.25 1.75" />
                         </svg>
                     </div>
-                    <div>
-                        <h3 class="text-xl font-bold text-gray-900">Formulir Tambah Data Desa</h3>
-                        <p class="text-sm text-gray-500">Lengkapi informasi data desa dengan teliti</p>
+                    <div class="flex flex-col justify-start items-start">
+                        <h3 class="text-lg font-bold text-green-700">Formulir Tambah Data Desa</h3>
+                        <p class="text-xs font-bold text-green-700">Lengkapi Form di Bawah</p>
                     </div>
                 </div>
 

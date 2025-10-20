@@ -65,8 +65,17 @@
                 
                 {{-- Navigasi Tab (scrollable di mobile, tetap rata di desktop) --}}
                 <div class="border-b border-gray-200">
-                    <div class="flex justify-center items-center py-2 border border-b ">
-                        <h1 class="text-md font-bold text-red-700">Review dan Approval Data</h1>
+                    {{-- HEADER --}}
+                    <div class="flex flex-col justify-center items-center py-2 border border-b ">
+                        <h1 class="text-md font-bold text-red-700">
+                            Review dan Approval Data
+                        </h1>
+                        <p class="text-sm font-bold text-red-700">
+                            <span x-show="activeTab === 'gizi'">Divisi Gizi</span>
+                            <span x-show="activeTab === 'pencegahan'">Divisi Pencegahan</span>
+                            <span x-show="activeTab === 'penanggulangan'">Divisi Penanggulangan</span>
+                            <span x-show="activeTab === 'desa'">Divisi Desa</span>
+                        </p>
                     </div>
                     <nav class="-mb-px flex overflow-x-auto no-scrollbar" aria-label="Tabs">
                         <div class="flex w-full sm:w-auto sm:flex-1">
@@ -125,34 +134,42 @@
                                         <span class="inline-flex items-center gap-1 rounded-full bg-yellow-100 px-3 py-1 text-xs font-medium text-yellow-700"><span class="h-1.5 w-1.5 rounded-full bg-yellow-600"></span>Pending</span>
                                     @endif
                                     
-                                    @if($data->status !== 'published')
-                                        @if($data->status === 'pending')
-                                            <form action="{{ route('camat.status') }}" method="POST" class="inline">
-                                                @csrf
-                                                <input type="hidden" name="model" value="DataGizi">
-                                                <input type="hidden" name="id" value="{{ $data->id }}">
-                                                <input type="hidden" name="new_status" value="approved">
-                                                <input type="hidden" name="active_tab" x-bind:value="activeTab">
-                                                <button type="submit" class="px-3 py-1 text-xs font-medium text-white rounded-lg bg-green-600 hover:bg-green-700">Approve</button>
-                                            </form>
-                                        @elseif($data->status === 'approved')
-                                            <form action="{{ route('camat.status') }}" method="POST" class="inline">
-                                                @csrf
-                                                <input type="hidden" name="model" value="DataGizi">
-                                                <input type="hidden" name="id" value="{{ $data->id }}">
-                                                <input type="hidden" name="new_status" value="pending">
-                                                <input type="hidden" name="active_tab" x-bind:value="activeTab">
-                                                <button type="submit" class="px-3 py-1 text-xs font-medium text-white rounded-lg bg-yellow-600 hover:bg-yellow-700">Tarik</button>
-                                            </form>
-                                        @endif
-                                        <form action="{{ route('camat.destroy') }}" method="POST" onsubmit="return confirm('Anda yakin ingin menghapus data ini?');" class="inline">
-                                            @csrf @method('DELETE')
+                                    @if($data->status === 'pending')
+                                        <form action="{{ route('camat.status') }}" method="POST" class="inline">
+                                            @csrf
                                             <input type="hidden" name="model" value="DataGizi">
                                             <input type="hidden" name="id" value="{{ $data->id }}">
+                                            <input type="hidden" name="new_status" value="approved">
                                             <input type="hidden" name="active_tab" x-bind:value="activeTab">
-                                            <button type="submit" class="px-3 py-1 text-xs font-medium text-white rounded-lg bg-red-600 hover:bg-red-700">Hapus</button>
+                                            <button type="submit" class="px-3 py-1 text-xs font-medium text-white rounded-lg bg-green-600 hover:bg-green-700">Approve</button>
+                                        </form>
+                                    @elseif($data->status === 'approved')
+                                        <form action="{{ route('camat.status') }}" method="POST" class="inline">
+                                            @csrf
+                                            <input type="hidden" name="model" value="DataGizi">
+                                            <input type="hidden" name="id" value="{{ $data->id }}">
+                                            <input type="hidden" name="new_status" value="pending">
+                                            <input type="hidden" name="active_tab" x-bind:value="activeTab">
+                                            <button type="submit" class="px-3 py-1 text-xs font-medium text-white rounded-lg bg-yellow-600 hover:bg-yellow-700">Tarik</button>
+                                        </form>
+                                    @elseif($data->status === 'published')
+                                        <form action="{{ route('camat.status') }}" method="POST" class="inline">
+                                            @csrf
+                                            <input type="hidden" name="model" value="DataGizi">
+                                            <input type="hidden" name="id" value="{{ $data->id }}">
+                                            <input type="hidden" name="new_status" value="approved">
+                                            <input type="hidden" name="active_tab" x-bind:value="activeTab">
+                                            <button type="submit" class="px-3 py-1 text-xs font-medium text-white rounded-lg bg-yellow-600 hover:bg-yellow-700">Tarik</button>
                                         </form>
                                     @endif
+                                    
+                                    <form action="{{ route('camat.destroy') }}" method="POST" onsubmit="return confirm('Anda yakin ingin menghapus data ini?');" class="inline">
+                                        @csrf @method('DELETE')
+                                        <input type="hidden" name="model" value="DataGizi">
+                                        <input type="hidden" name="id" value="{{ $data->id }}">
+                                        <input type="hidden" name="active_tab" x-bind:value="activeTab">
+                                        <button type="submit" class="px-3 py-1 text-xs font-medium text-white rounded-lg bg-red-600 hover:bg-red-700">Hapus</button>
+                                    </form>
                                 </div>
                             </div>
                         @empty
@@ -171,7 +188,7 @@
                                     </p>
                                 </div>
                                 <div class="flex flex-wrap items-center gap-2 sm:justify-end">
-                                    <button @click="openModal = true; modalData = {{ Js::from($data) }}; modalTitle = 'Detail Data Pencegahan'" class="text-xs text-indigo-600 hover:underline px-2">Detail</button>
+                                    <button @click="openModal = true; modalData = {{ Js::from($data) }}; modalTitle = 'Detail Data Gizi'" class="text-xs text-indigo-600 hover:underline px-2">Detail</button>
                                     
                                     @if($data->status === 'published')
                                         <span class="inline-flex items-center gap-1 rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-700"><span class="h-1.5 w-1.5 rounded-full bg-green-600"></span>Published</span>
@@ -181,34 +198,42 @@
                                         <span class="inline-flex items-center gap-1 rounded-full bg-yellow-100 px-3 py-1 text-xs font-medium text-yellow-700"><span class="h-1.5 w-1.5 rounded-full bg-yellow-600"></span>Pending</span>
                                     @endif
                                     
-                                    @if($data->status !== 'published')
-                                        @if($data->status === 'pending')
-                                            <form action="{{ route('camat.status') }}" method="POST" class="inline">
-                                                @csrf
-                                                <input type="hidden" name="model" value="DataPencegahan">
-                                                <input type="hidden" name="id" value="{{ $data->id }}">
-                                                <input type="hidden" name="new_status" value="approved">
-                                                <input type="hidden" name="active_tab" x-bind:value="activeTab">
-                                                <button type="submit" class="px-3 py-1 text-xs font-medium text-white rounded-lg bg-green-600 hover:bg-green-700">Approve</button>
-                                            </form>
-                                        @elseif($data->status === 'approved')
-                                            <form action="{{ route('camat.status') }}" method="POST" class="inline">
-                                                @csrf
-                                                <input type="hidden" name="model" value="DataPencegahan">
-                                                <input type="hidden" name="id" value="{{ $data->id }}">
-                                                <input type="hidden" name="new_status" value="pending">
-                                                <input type="hidden" name="active_tab" x-bind:value="activeTab">
-                                                <button type="submit" class="px-3 py-1 text-xs font-medium text-white rounded-lg bg-yellow-600 hover:bg-yellow-700">Tarik</button>
-                                            </form>
-                                        @endif
-                                        <form action="{{ route('camat.destroy') }}" method="POST" onsubmit="return confirm('Anda yakin ingin menghapus data ini?');" class="inline">
-                                            @csrf @method('DELETE')
-                                            <input type="hidden" name="model" value="DataPencegahan">
+                                    @if($data->status === 'pending')
+                                        <form action="{{ route('camat.status') }}" method="POST" class="inline">
+                                            @csrf
+                                            <input type="hidden" name="model" value="DataGizi">
                                             <input type="hidden" name="id" value="{{ $data->id }}">
+                                            <input type="hidden" name="new_status" value="approved">
                                             <input type="hidden" name="active_tab" x-bind:value="activeTab">
-                                            <button type="submit" class="px-3 py-1 text-xs font-medium text-white rounded-lg bg-red-600 hover:bg-red-700">Hapus</button>
+                                            <button type="submit" class="px-3 py-1 text-xs font-medium text-white rounded-lg bg-green-600 hover:bg-green-700">Approve</button>
+                                        </form>
+                                    @elseif($data->status === 'approved')
+                                        <form action="{{ route('camat.status') }}" method="POST" class="inline">
+                                            @csrf
+                                            <input type="hidden" name="model" value="DataGizi">
+                                            <input type="hidden" name="id" value="{{ $data->id }}">
+                                            <input type="hidden" name="new_status" value="pending">
+                                            <input type="hidden" name="active_tab" x-bind:value="activeTab">
+                                            <button type="submit" class="px-3 py-1 text-xs font-medium text-white rounded-lg bg-yellow-600 hover:bg-yellow-700">Tarik</button>
+                                        </form>
+                                    @elseif($data->status === 'published')
+                                        <form action="{{ route('camat.status') }}" method="POST" class="inline">
+                                            @csrf
+                                            <input type="hidden" name="model" value="DataGizi">
+                                            <input type="hidden" name="id" value="{{ $data->id }}">
+                                            <input type="hidden" name="new_status" value="approved">
+                                            <input type="hidden" name="active_tab" x-bind:value="activeTab">
+                                            <button type="submit" class="px-3 py-1 text-xs font-medium text-white rounded-lg bg-yellow-600 hover:bg-yellow-700">Tarik</button>
                                         </form>
                                     @endif
+                                    
+                                    <form action="{{ route('camat.destroy') }}" method="POST" onsubmit="return confirm('Anda yakin ingin menghapus data ini?');" class="inline">
+                                        @csrf @method('DELETE')
+                                        <input type="hidden" name="model" value="DataGizi">
+                                        <input type="hidden" name="id" value="{{ $data->id }}">
+                                        <input type="hidden" name="active_tab" x-bind:value="activeTab">
+                                        <button type="submit" class="px-3 py-1 text-xs font-medium text-white rounded-lg bg-red-600 hover:bg-red-700">Hapus</button>
+                                    </form>
                                 </div>
                             </div>
                         @empty
@@ -227,7 +252,7 @@
                                     </p>
                                 </div>
                                 <div class="flex flex-wrap items-center gap-2 sm:justify-end">
-                                    <button @click="openModal = true; modalData = {{ Js::from($data) }}; modalTitle = 'Detail Data Penanggulangan'" class="text-xs text-indigo-600 hover:underline px-2">Detail</button>
+                                    <button @click="openModal = true; modalData = {{ Js::from($data) }}; modalTitle = 'Detail Data Gizi'" class="text-xs text-indigo-600 hover:underline px-2">Detail</button>
                                     
                                     @if($data->status === 'published')
                                         <span class="inline-flex items-center gap-1 rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-700"><span class="h-1.5 w-1.5 rounded-full bg-green-600"></span>Published</span>
@@ -237,34 +262,42 @@
                                         <span class="inline-flex items-center gap-1 rounded-full bg-yellow-100 px-3 py-1 text-xs font-medium text-yellow-700"><span class="h-1.5 w-1.5 rounded-full bg-yellow-600"></span>Pending</span>
                                     @endif
                                     
-                                    @if($data->status !== 'published')
-                                        @if($data->status === 'pending')
-                                            <form action="{{ route('camat.status') }}" method="POST" class="inline">
-                                                @csrf
-                                                <input type="hidden" name="model" value="DataPenanggulangan">
-                                                <input type="hidden" name="id" value="{{ $data->id }}">
-                                                <input type="hidden" name="new_status" value="approved">
-                                                <input type="hidden" name="active_tab" x-bind:value="activeTab">
-                                                <button type="submit" class="px-3 py-1 text-xs font-medium text-white rounded-lg bg-green-600 hover:bg-green-700">Approve</button>
-                                            </form>
-                                        @elseif($data->status === 'approved')
-                                            <form action="{{ route('camat.status') }}" method="POST" class="inline">
-                                                @csrf
-                                                <input type="hidden" name="model" value="DataPenanggulangan">
-                                                <input type="hidden" name="id" value="{{ $data->id }}">
-                                                <input type="hidden" name="new_status" value="pending">
-                                                <input type="hidden" name="active_tab" x-bind:value="activeTab">
-                                                <button type="submit" class="px-3 py-1 text-xs font-medium text-white rounded-lg bg-yellow-600 hover:bg-yellow-700">Tarik</button>
-                                            </form>
-                                        @endif
-                                        <form action="{{ route('camat.destroy') }}" method="POST" onsubmit="return confirm('Anda yakin ingin menghapus data ini?');" class="inline">
-                                            @csrf @method('DELETE')
-                                            <input type="hidden" name="model" value="DataPenanggulangan">
+                                    @if($data->status === 'pending')
+                                        <form action="{{ route('camat.status') }}" method="POST" class="inline">
+                                            @csrf
+                                            <input type="hidden" name="model" value="DataGizi">
                                             <input type="hidden" name="id" value="{{ $data->id }}">
+                                            <input type="hidden" name="new_status" value="approved">
                                             <input type="hidden" name="active_tab" x-bind:value="activeTab">
-                                            <button type="submit" class="px-3 py-1 text-xs font-medium text-white rounded-lg bg-red-600 hover:bg-red-700">Hapus</button>
+                                            <button type="submit" class="px-3 py-1 text-xs font-medium text-white rounded-lg bg-green-600 hover:bg-green-700">Approve</button>
+                                        </form>
+                                    @elseif($data->status === 'approved')
+                                        <form action="{{ route('camat.status') }}" method="POST" class="inline">
+                                            @csrf
+                                            <input type="hidden" name="model" value="DataGizi">
+                                            <input type="hidden" name="id" value="{{ $data->id }}">
+                                            <input type="hidden" name="new_status" value="pending">
+                                            <input type="hidden" name="active_tab" x-bind:value="activeTab">
+                                            <button type="submit" class="px-3 py-1 text-xs font-medium text-white rounded-lg bg-yellow-600 hover:bg-yellow-700">Tarik</button>
+                                        </form>
+                                    @elseif($data->status === 'published')
+                                        <form action="{{ route('camat.status') }}" method="POST" class="inline">
+                                            @csrf
+                                            <input type="hidden" name="model" value="DataGizi">
+                                            <input type="hidden" name="id" value="{{ $data->id }}">
+                                            <input type="hidden" name="new_status" value="approved">
+                                            <input type="hidden" name="active_tab" x-bind:value="activeTab">
+                                            <button type="submit" class="px-3 py-1 text-xs font-medium text-white rounded-lg bg-yellow-600 hover:bg-yellow-700">Tarik</button>
                                         </form>
                                     @endif
+                                    
+                                    <form action="{{ route('camat.destroy') }}" method="POST" onsubmit="return confirm('Anda yakin ingin menghapus data ini?');" class="inline">
+                                        @csrf @method('DELETE')
+                                        <input type="hidden" name="model" value="DataGizi">
+                                        <input type="hidden" name="id" value="{{ $data->id }}">
+                                        <input type="hidden" name="active_tab" x-bind:value="activeTab">
+                                        <button type="submit" class="px-3 py-1 text-xs font-medium text-white rounded-lg bg-red-600 hover:bg-red-700">Hapus</button>
+                                    </form>
                                 </div>
                             </div>
                         @empty
