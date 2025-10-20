@@ -185,20 +185,20 @@
                                         @if($data->status === 'pending')
                                             <form action="{{ route('camat.status') }}" method="POST" class="inline">
                                                 @csrf
-            <input type="hidden" name="model" value="DataPencegahan">
-            <input type="hidden" name="id" value="{{ $data->id }}">
-            <input type="hidden" name="new_status" value="approved">
-            <input type="hidden" name="active_tab" x-bind:value="activeTab">
-            <button type="submit" class="px-3 py-1 text-xs font-medium text-white rounded-lg bg-green-600 hover:bg-green-700">Approve</button>
+                                                <input type="hidden" name="model" value="DataPencegahan">
+                                                <input type="hidden" name="id" value="{{ $data->id }}">
+                                                <input type="hidden" name="new_status" value="approved">
+                                                <input type="hidden" name="active_tab" x-bind:value="activeTab">
+                                                <button type="submit" class="px-3 py-1 text-xs font-medium text-white rounded-lg bg-green-600 hover:bg-green-700">Approve</button>
                                             </form>
                                         @elseif($data->status === 'approved')
                                             <form action="{{ route('camat.status') }}" method="POST" class="inline">
                                                 @csrf
-            <input type="hidden" name="model" value="DataPencegahan">
-            <input type="hidden" name="id" value="{{ $data->id }}">
-            <input type="hidden" name="new_status" value="pending">
-            <input type="hidden" name="active_tab" x-bind:value="activeTab">
-            <button type="submit" class="px-3 py-1 text-xs font-medium text-white rounded-lg bg-yellow-600 hover:bg-yellow-700">Tarik</button>
+                                                <input type="hidden" name="model" value="DataPencegahan">
+                                                <input type="hidden" name="id" value="{{ $data->id }}">
+                                                <input type="hidden" name="new_status" value="pending">
+                                                <input type="hidden" name="active_tab" x-bind:value="activeTab">
+                                                <button type="submit" class="px-3 py-1 text-xs font-medium text-white rounded-lg bg-yellow-600 hover:bg-yellow-700">Tarik</button>
                                             </form>
                                         @endif
                                         <form action="{{ route('camat.destroy') }}" method="POST" onsubmit="return confirm('Anda yakin ingin menghapus data ini?');" class="inline">

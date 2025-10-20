@@ -27,11 +27,11 @@
     </x-slot>
 
     {{-- ✅ PERBAIKAN 1: Tambahkan state untuk modal (openModal, modalData) --}}
-    <div class="py-8 bg-gradient-to-br from-slate-50 via-rose-50/30 to-slate-50" x-data="{ openModal: false, modalData: null }">
+    <div class="px-2 py-8 bg-gradient-to-br from-slate-50 via-rose-50/30 to-slate-50" x-data="{ openModal: false, modalData: null }">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             {{-- Alert Messages --}}
             @if (session('success'))
-                <div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 3000)" x-transition:leave="transition ease-in duration-300" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
+                <div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 5000)" x-transition:leave="transition ease-in duration-300" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
                      class="mb-6 flex items-center gap-3 rounded-xl bg-green-50 p-4 ring-1 ring-green-200">
                     <div class="flex-shrink-0"><svg class="h-5 w-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></div>
                     <div class="flex-1"><p class="text-sm font-medium text-green-900">{{ session('success') }}</p></div>
@@ -39,11 +39,23 @@
                 </div>
             @endif
             @if (session('error'))
-                <div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 3000)" x-transition:leave="transition ease-in duration-300" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
+                <div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 5000)" x-transition:leave="transition ease-in duration-300" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
                      class="mb-6 flex items-center gap-3 rounded-xl bg-red-50 p-4 ring-1 ring-red-200">
                     <div class="flex-shrink-0"><svg class="h-5 w-5 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></div>
                     <div class="flex-1"><p class="text-sm font-medium text-red-900">{{ session('error') }}</p></div>
                     <button @click="show = false" class="flex-shrink-0 text-red-600 hover:text-red-800"><svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg></button>
+                </div>
+            @endif
+            
+            {{-- ✅ Tampilkan error validasi form import --}}
+            @if ($errors->any())
+                <div class="mb-6 p-4 bg-red-50 text-red-800 rounded-xl ring-1 ring-red-200 text-sm">
+                    <p class="font-bold mb-2">Terjadi kesalahan validasi:</p>
+                    <ul class="list-disc list-inside">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
                 </div>
             @endif
 
@@ -59,6 +71,42 @@
                         Tambah Data
                     </a>
                 </div>
+
+                {{-- ✅ FORM IMPORT BARU DITAMBAHKAN DI SINI --}}
+                <div x-data="{ open: false }" class="mt-6">
+                    <button @click="open = !open" class="flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-gray-900">
+                        <svg x-show="!open" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
+                        <svg x-show="open" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+                        <span x-text="open ? 'Tutup Form Import' : 'Import dari Excel'"></span>
+                    </button>
+                    <div x-show="open" x-transition class="mt-4 p-4 bg-gray-50 rounded-xl border border-dashed">
+                        <form action="{{ route('gizi.import') }}" method="POST" enctype="multipart/form-data">
+                            @csrf
+                            {{-- ✅ Kita ubah dari 'sm:flex-row' menjadi 'sm:flex-col' atau biarkan saja --}}
+                            <div class="flex flex-col sm:flex-row sm:items-end gap-4">
+                                
+                                {{-- ✅ HAPUS SELURUH DIV UNTUK 'PERIODE' INI --}}
+                                {{-- <div class="flex-1">
+                                    <label for="periode" class="block text-sm font-medium text-gray-700">Periode Laporan</label>
+                                    <input type="month" name="periode" id="periode" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required>
+                                </div> --}}
+
+                                {{-- Biarkan input file ini --}}
+                                <div class="flex-1">
+                                    <label for="file" class="block text-sm font-medium text-gray-700">Pilih File Excel</label>
+                                    <input type="file" name="file" id="file" class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" required>
+                                </div>
+                                
+                                {{-- Biarkan tombol upload ini --}}
+                                <div class="flex-shrink-0">
+                                    <button type="submit" class="w-full sm:w-auto inline-flex justify-center items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-indigo-700">
+                                        Upload
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>  
 
                 {{-- Table --}}
                 <div class="mt-6 overflow-hidden rounded-xl border border-gray-200">

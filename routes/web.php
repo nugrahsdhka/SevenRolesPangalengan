@@ -44,6 +44,8 @@ Route::middleware('auth', 'verified')->group(function () {
     // Divisi Gizi
     Route::middleware(['role:Divisi Gizi'])->prefix('divisi-gizi')->name('gizi.')->group(function () {
         Route::resource('/', DivisiGiziController::class)->parameters(['' => 'data_gizi']);
+
+        Route::post('/import', [DivisiGiziController::class, 'import'])->name('import');
     });
 
 

@@ -3,7 +3,7 @@
         Tambah Data Penanggulangan
     </x-slot>
 
-    <div class="py-8 bg-gradient-to-br from-slate-50 via-rose-50/30 to-slate-50">
+    <div class="px-2 py-8 bg-gradient-to-br from-slate-50 via-rose-50/30 to-slate-50">
         <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
             <section class="rounded-2xl bg-white p-6 shadow-lg ring-1 ring-gray-900/5 sm:p-8">
                 {{-- Header --}}

@@ -27,7 +27,7 @@
     </x-slot>
 
     {{-- ✅ PERBAIKAN 1: Tambahkan state untuk modal (openModal, modalData) --}}
-    <div class="py-8 bg-gradient-to-br from-slate-50 via-rose-50/30 to-slate-50" x-data="{ openModal: false, modalData: null }">
+    <div class="px-2 py-8 bg-gradient-to-br from-slate-50 via-rose-50/30 to-slate-50" x-data="{ openModal: false, modalData: null }">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             {{-- Alert Messages --}}
             @if (session('success'))

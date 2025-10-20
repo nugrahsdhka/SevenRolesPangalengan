@@ -8,6 +8,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 
+// ✅ TAMBAHKAN 'USE' STATEMENT INI
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\DataGiziImport;
+
 class DivisiGiziController extends Controller
 {
     /**
@@ -92,5 +96,43 @@ class DivisiGiziController extends Controller
 
         $data_gizi->delete();
         return redirect()->route('gizi.index')->with('success', 'Data Gizi berhasil dihapus.');
+    }
+
+    // ✅ ==========================================================
+    //    TAMBAHKAN METHOD BARU INI UNTUK MENGHANDLE IMPORT EXCEL
+    // =============================================================
+    public function import(Request $request)
+    {
+        // 1. Validasi form HANYA untuk file
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls',
+            // 'periode' => 'required|date_format:Y-m', // <-- ✅ HAPUS INI
+        ]);
+
+        try {
+            $file = $request->file('file');
+            
+            // $periode = $request->input('periode') . '-01'; // <-- ✅ HAPUS INI
+
+            // 3. Jalankan proses import tanpa mengirim periode
+            Excel::import(new DataGiziImport(), $file); // <-- ✅ UBAH INI
+
+            // 4. Redirect kembali ke halaman index dengan pesan sukses
+            return redirect()->route('gizi.index')
+                ->with('success', 'Data Gizi berhasil di-import dari Excel.');
+
+        } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+             $failures = $e->failures();
+             // Ini sekarang akan menangkap error validasi DARI DALAM EXCEL
+             // (cth: jika format 'periode' salah atau 'judul' kosong)
+             $errorMessage = "Gagal import: " 
+                           . $failures[0]->errors()[0] 
+                           . " (pada baris " . $failures[0]->row() . ").";
+             return redirect()->route('gizi.index')->with('error', $errorMessage);
+        } catch (\Exception $e) {
+            // Tangani jika ada error umum lainnya
+            return redirect()->route('gizi.index')
+                ->with('error', 'Terjadi kesalahan saat import data: ' . $e->getMessage());
+        }
     }
 }
