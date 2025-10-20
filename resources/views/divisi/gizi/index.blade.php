@@ -72,34 +72,101 @@
                 </div>
 
                 {{-- ✅ FORM IMPORT BARU DITAMBAHKAN DI SINI --}}
-                <div x-data="{ open: false }" class="mt-6">
+                <div x-data="{ 
+                    open: false, 
+                    isDragging: false,
+                    fileName: '',
+                    handleFiles(files) {
+                        if (files.length > 0) {
+                            this.fileName = files[0].name;
+                            this.$refs.fileInput.files = files;
+                        }
+                    }
+                }" class="mt-6">
                     <button @click="open = !open" class="flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-gray-900">
-                        <svg x-show="!open" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
-                        <svg x-show="open" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+                        <svg x-show="!open" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                        </svg>
+                        <svg x-show="open" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
                         <span x-text="open ? 'Tutup Form Import' : 'Import dari Excel'"></span>
                     </button>
+                    
                     <div x-show="open" x-transition class="mt-4 p-4 bg-gray-50 rounded-xl border border-dashed">
                         <form action="{{ route('gizi.import') }}" method="POST" enctype="multipart/form-data">
                             @csrf
-                            {{-- ✅ Kita ubah dari 'sm:flex-row' menjadi 'sm:flex-col' atau biarkan saja --}}
-                            <div class="flex flex-col sm:flex-row sm:items-end gap-4">
-
-                                {{-- Biarkan input file ini --}}
-                                <div class="flex-1">
-                                    <label for="file" class="block text-sm font-medium text-gray-700">Pilih File Excel</label>
-                                    <input type="file" name="file" id="file" class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-rose-50 file:text-red-700 hover:file:bg-rose-100" required>
+                            
+                            <!-- Drag & Drop Area -->
+                            <div 
+                                @dragover.prevent="isDragging = true"
+                                @dragleave.prevent="isDragging = false"
+                                @drop.prevent="isDragging = false; handleFiles($event.dataTransfer.files)"
+                                :class="isDragging ? 'border-red-500 bg-red-50' : 'border-gray-300 bg-white'"
+                                class="relative border-2 border-dashed rounded-lg p-8 text-center transition-all duration-200 cursor-pointer hover:border-red-400"
+                                @click="$refs.fileInput.click()"
+                            >
+                                <!-- Icon Upload -->
+                                <div class="flex justify-center mb-4">
+                                    <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                                    </svg>
                                 </div>
                                 
-                                {{-- Biarkan tombol upload ini --}}
-                                <div class="flex-shrink-0">
-                                    <button type="submit" class="w-full sm:w-auto inline-flex justify-center items-center gap-2 rounded-lg bg-gradient-to-r from-red-600 to-rose-700 px-4 py-2 text-sm font-semibold text-white transition hover:bg-rose-800">
-                                        Upload
+                                <!-- Text -->
+                                <div x-show="!fileName">
+                                    <p class="text-sm text-gray-600 mb-1">
+                                        <span class="font-semibold text-red-600">Klik untuk upload</span> atau drag & drop
+                                    </p>
+                                    <p class="text-xs text-gray-500">Excel (XLSX, XLS, CSV) - Maks 2MB</p>
+                                </div>
+                                
+                                <!-- File Name Display -->
+                                <div x-show="fileName" class="flex items-center justify-center gap-2">
+                                    <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    <span class="text-sm font-medium text-gray-700" x-text="fileName"></span>
+                                    <button 
+                                        type="button"
+                                        @click.stop="fileName = ''; $refs.fileInput.value = ''"
+                                        class="text-red-600 hover:text-red-800"
+                                    >
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
                                     </button>
                                 </div>
+                                
+                                <!-- Hidden File Input -->
+                                <input 
+                                    type="file" 
+                                    name="file" 
+                                    x-ref="fileInput"
+                                    @change="handleFiles($event.target.files)"
+                                    class="hidden" 
+                                    accept=".xlsx,.xls,.csv"
+                                    required
+                                >
+                            </div>
+                            
+                            <!-- Upload Button -->
+                            <div class="mt-4 flex justify-end">
+                                <button 
+                                    type="submit" 
+                                    :disabled="!fileName"
+                                    :class="fileName ? 'bg-gradient-to-r from-red-600 to-rose-700 hover:from-red-700 hover:to-rose-800' : 'bg-gray-300 cursor-not-allowed'"
+                                    class="inline-flex justify-center items-center gap-2 rounded-lg px-6 py-2.5 text-sm font-semibold text-white transition"
+                                >
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                                    </svg>
+                                    Upload File
+                                </button>
                             </div>
                         </form>
                     </div>
-                </div>  
+                </div>
 
                 {{-- Table --}}
                 <div class="mt-6 overflow-hidden rounded-xl border border-gray-200">
