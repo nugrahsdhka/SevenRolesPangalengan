@@ -3,7 +3,7 @@
         Login
     </x-slot>
 
-    <div class="w-screen h-screen bg-gradient-to-r from-red-600 via-red-800 to-red-600 flex justify-center items-center">
+    <div class="p-2 w-screen h-screen bg-gradient-to-r from-red-600 via-red-800 to-red-600 flex justify-center items-center">
         <div class="w-full max-w-md">
             {{-- Card --}}
             <div class="rounded-2xl bg-white p-8 shadow-lg sm:p-10">

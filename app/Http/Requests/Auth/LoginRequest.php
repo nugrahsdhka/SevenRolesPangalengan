@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use App\Models\User; // ✅ 1. Tambahkan model User
+use Illuminate\Support\Facades\Hash; // ✅ 2. Tambahkan Hash
 
 class LoginRequest extends FormRequest
 {
@@ -22,7 +24,7 @@ class LoginRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * @return array<string, \Illuminate\Contracts\Validation\Rule|array|string>
      */
     public function rules(): array
     {
@@ -41,13 +43,33 @@ class LoginRequest extends FormRequest
     {
         $this->ensureIsNotRateLimited();
 
-        if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
+        // ✅ --- PERBAIKAN LOGIKA DIMULAI DI SINI ---
+        
+        // 1. Cari user berdasarkan email, TERMASUK yang sudah nonaktif (soft-deleted)
+        $user = User::withTrashed()->where('email', $this->input('email'))->first();
+
+        // 2. Cek jika user tidak ada ATAU password yang dimasukkan salah
+        if (! $user || ! Hash::check($this->input('password'), $user->password)) {
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
-                'email' => trans('auth.failed'),
+                'email' => trans('auth.failed'), // Ini adalah pesan "These credentials do not match..."
             ]);
         }
+
+        // 3. Cek jika user ada, password benar, TAPI akunnya dinonaktifkan
+        if ($user->trashed()) {
+            RateLimiter::hit($this->throttleKey());
+
+            throw ValidationException::withMessages([
+                'email' => 'Akun ini telah dinonaktifkan. Silakan hubungi administrator.', // ✅ Pesan kustom Anda
+            ]);
+        }
+
+        // 4. Jika lolos semua, loginkan user
+        Auth::login($user, $this->boolean('remember'));
+        
+        // --- PERBAIKAN LOGIKA SELESAI ---
 
         RateLimiter::clear($this->throttleKey());
     }
@@ -80,6 +102,6 @@ class LoginRequest extends FormRequest
      */
     public function throttleKey(): string
     {
-        return Str::transliterate(Str::lower($this->string('email')).'|'.$this->ip());
+        return Str::transliterate(Str::lower($this->input('email')).'|'.$this->ip());
     }
 }

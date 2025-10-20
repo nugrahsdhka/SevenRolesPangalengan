@@ -1,21 +1,29 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\UserController;
-use App\Http\Controllers\AdminController;
-use App\Http\Controllers\CamatController;
-use App\Http\Controllers\PublicController;
-use App\Http\Controllers\DivisiDesaController;
-use App\Http\Controllers\DivisiGiziController;
-use App\Http\Controllers\DivisiPencegahanController;
-use App\Http\Controllers\DivisiPenanggulanganController;
+
+// Auth
+use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Camat\CamatController;
+use App\Http\Controllers\Divisi\DivisiDesaController;
+use App\Http\Controllers\Divisi\DivisiGiziController;
+use App\Http\Controllers\Divisi\DivisiPencegahanController;
+use App\Http\Controllers\Divisi\DivisiPenanggulanganController;
+
+// Guest
+use App\Http\Controllers\Guest\HomeController;
+use App\Http\Controllers\Guest\PetaController;
+use App\Http\Controllers\Guest\DataWilayahController;
+use App\Http\Controllers\Guest\DataStuntingController;
+use App\Http\Controllers\Guest\AnalisisHotspotController;
 
 // Guest Route
-Route::get('/', [PublicController::class, 'home'])->name('welcome');
-Route::get('/data-stunting', [PublicController::class, 'dataStunting'])->name('data-stunting');
-Route::get('/data-wilayah', [PublicController::class, 'dataWilayah'])->name('data-wilayah');
-Route::get('/analisis-hotspot', [PublicController::class, 'analisisHotspot'])->name('analisis-hotspot');
-Route::get('/peta-faskes', [PublicController::class, 'peta'])->name('peta-faskes');
+Route::get('/', [HomeController::class, 'index'])->name('welcome');
+Route::get('/data-stunting', [DataStuntingController::class, 'index'])->name('data-stunting');
+Route::get('/data-wilayah', [DataWilayahController::class, 'index'])->name('data-wilayah');
+Route::get('/analisis-hotspot', [AnalisisHotspotController::class, 'index'])->name('analisis-hotspot');
+Route::get('/peta-faskes', [PetaController::class, 'index'])->name('peta-faskes');
 
 // Dashboard Redirect Logic
 Route::get('/dashboard', function () {
@@ -37,6 +45,7 @@ Route::middleware('auth', 'verified')->group(function () {
     Route::middleware(['role:Divisi Gizi'])->prefix('divisi-gizi')->name('gizi.')->group(function () {
         Route::resource('/', DivisiGiziController::class)->parameters(['' => 'data_gizi']);
     });
+
 
     // ✅ PERBAIKAN: Gunakan Route::resource untuk Divisi Pencegahan
     Route::middleware(['role:Divisi Pencegahan'])->prefix('divisi-pencegahan')->name('pencegahan.')->group(function () {
@@ -64,8 +73,14 @@ Route::middleware('auth', 'verified')->group(function () {
     Route::middleware(['role:IT Admin'])->prefix('admin')->name('admin.')->group(function () {
         Route::get('/published-data', [AdminController::class, 'publishedData'])->name('published.index');
         Route::post('/publish-data', [AdminController::class, 'publish'])->name('publish');
+
         Route::get('/users/create', [UserController::class, 'create'])->name('users.create');
         Route::post('/users', [UserController::class, 'store'])->name('users.store');
+        Route::get('/users', [UserController::class, 'index'])->name('users.index');
+
+        Route::delete('/users/{id}', [UserController::class, 'destroy'])->name('users.destroy');
+        Route::patch('/users/{id}/password', [UserController::class, 'updatePassword'])->name('users.password.update');
+        Route::patch('/users/{id}/restore', [UserController::class, 'restore'])->name('users.restore'); // ✅ RUTE BARU
     });
 });
 

@@ -1,17 +1,18 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Admin; // ✅ PERBAIKAN: Ubah namespace ini
 
+use App\Http\Controllers\Controller; // ✅ PERBAIKAN: Tambahkan ini
 use App\Models\DataDesa;
 use App\Models\DataGizi;
 use App\Models\DataPencegahan;
 use App\Models\DataPenanggulangan;
 use Illuminate\Http\Request;
 
-class AdminController extends Controller
+class AdminController extends Controller // ✅ PERBAIKAN: extends Controller
 {
     /**
-     * ✅ PERBAIKAN: Menampilkan SEMUA data dari setiap divisi.
+     * Menampilkan SEMUA data dari setiap divisi.
      */
     public function publishedData()
     {

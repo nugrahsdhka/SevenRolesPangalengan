@@ -38,15 +38,11 @@
 <body class="font-sans antialiased bg-gradient-to-br from-slate-50 via-gray-50 to-slate-100">
 
     {{-- ====== MODERN HEADER WITH GLASSMORPHISM ====== --}}
-    <header class="bg-red-700 text-white relative overflow-hidden">
-        {{-- Animated Background --}}
-        <div class="absolute inset-0 opacity-20">
-            <div class="absolute top-0 left-1/4 w-96 h-96 bg-red-500 rounded-full mix-blend-multiply filter blur-3xl animate-pulse"></div>
-            <div class="absolute bottom-0 right-1/4 w-96 h-96 bg-rose-400 rounded-full mix-blend-multiply filter blur-3xl animate-pulse" style="animation-delay: 2s;"></div>
-        </div>
-
+    <header class="text-red-100 relative overflow-hidden bg-gradient-to-br from-red-800 via-red-800 to-rose-700">
         {{-- Top Bar --}}
-        <div class="relative bg-red-800 py-3 border-b border-red-600/50">
+
+        {{-- Desktop View --}}
+        <div class="hidden md:block relative bg-red-800 py-3 border-b border-red-600/50">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <p class="text-center text-sm font-medium tracking-wide">
                     Sistem Informasi Data Stunting Kecamatan Pangalengan
@@ -54,17 +50,27 @@
             </div>
         </div>
 
+        {{-- Mobile View --}}
+        <div class="block md:hidden relative bg-red-800 py-3 border-b border-red-600/50">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <p class="text-center text-sm font-medium tracking-wide">
+                    Sistem Informasi
+                </p>
+                <p class="text-center text-sm font-medium tracking-wide">
+                    Data Stunting Kecamatan Pangalengan
+                </p>
+            </div>
+        </div>
+
         {{-- Main Header --}}
         <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            {{-- ✅ PERBAIKAN: flex-col lg:flex-row untuk menumpuk di mobile --}}
             <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
                 
                 {{-- Left: Logo & Info --}}
-                <div class="flex items-center gap-4 group">
+                <div class="flex flex-col md:flex-row items-center gap-6 group w-full">
                     <div class="relative flex-shrink-0">
-                        {{-- Rotating Ring Effect --}}
                         <div class="absolute inset-0 rounded-full bg-gradient-to-r from-red-400 to-rose-500 blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-500 animate-spin-slow"></div>
-                        
-                        {{-- Logo Container --}}
                         <div class="relative bg-red-600 p-3 rounded-full ring-4 ring-red-600/50 flex items-center justify-center transition-all duration-500 group-hover:ring-8 group-hover:ring-red-400/30 group-hover:scale-110 group-hover:rotate-6">
                             <img class="w-16 h-16 object-contain transition-transform duration-500 group-hover:scale-110 group-hover:-rotate-6" 
                                 src="{{ asset('img/logo-kab-bandung.png') }}" 
@@ -72,103 +78,98 @@
                         </div>
                     </div>
 
-                    <div class="relative bg-red-600/40 backdrop-blur-sm rounded-2xl px-6 py-4 border border-red-500/30 transition-all duration-500 hover:bg-red-600/60 hover:border-red-400/60 hover:shadow-2xl hover:shadow-red-500/20 hover:-translate-y-1 overflow-hidden group/card">
-                        {{-- Shine Effect --}}
-                        <div class="absolute inset-0 -translate-x-full group-hover/card:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
-                        
-                        <h1 class="text-xl font-bold relative z-10 transition-colors duration-300 group-hover/card:text-red-50">Rumah Stunting Pangalengan</h1>
+                    <div class="relative min-w-[140px] bg-red-600/40 backdrop-blur-sm rounded-2xl px-6 py-4 border border-red-500/30 overflow-hidden">
+                        <h1 class="text-xl font-bold relative z-10 text-white">Rumah Stunting Pangalengan</h1>
                         <p class="text-sm text-red-100 mt-0.5 relative z-10">Kabupaten Bandung • Provinsi Jawa Barat</p>
                         <div class="flex gap-3 mt-3 text-sm relative z-10">
-                            <span class="font-medium px-3 py-1 bg-white/10 rounded-lg transition-all duration-300 hover:bg-white/20 hover:scale-105">5 Faskes</span>
-                            <span class="font-medium px-3 py-1 bg-white/10 rounded-lg transition-all duration-300 hover:bg-white/20 hover:scale-105">13 Desa Terpetakan</span>
+                            <span class="font-medium px-3 py-1 bg-white/10 rounded-lg">5 Faskes</span>
+                            <span class="font-medium px-3 py-1 bg-white/10 rounded-lg">13 Desa Terpetakan</span>
                         </div>
                     </div>
                 </div>
 
                 {{-- Right: Stats Cards --}}
-                <div class="flex gap-4">
-                    <div class="group/stat relative bg-red-600/50 backdrop-blur-sm rounded-xl px-8 py-4 text-center min-w-[140px] border border-red-500/30 transition-all duration-500 hover:bg-red-600/70 hover:border-red-400/60 hover:shadow-2xl hover:shadow-red-500/20 hover:-translate-y-2 hover:scale-105 overflow-hidden">
-                        {{-- Glow Effect --}}
-                        <div class="absolute inset-0 bg-gradient-to-t from-red-400/0 via-red-300/10 to-red-400/0 opacity-0 group-hover/stat:opacity-100 transition-opacity duration-500"></div>
-                        
-                        {{-- Particles Effect --}}
-                        <div class="absolute top-0 left-1/2 w-1 h-1 bg-white rounded-full opacity-0 group-hover/stat:opacity-100 group-hover/stat:animate-ping"></div>
-                        
-                        <p class="text-xs text-red-100 uppercase tracking-wide relative z-10 transition-all duration-300 group-hover/stat:text-white group-hover/stat:font-bold">Total Desa</p>
-                        <p class="text-4xl font-bold mt-1 relative z-10 transition-all duration-300 group-hover/stat:scale-110 group-hover/stat:text-white">13</p>
+                <div class="flex flex-col sm:flex-row gap-4 w-full lg:w-auto">
+                    
+                    <div class="relative bg-red-600/50 backdrop-blur-sm rounded-xl px-8 py-4 text-center flex-1 min-w-[140px] border border-red-500/30 overflow-hidden">
+                        <p class="text-xs text-red-100 uppercase">Total Desa</p>
+                        <p class="text-4xl font-bold mt-1 text-white">13</p>
                     </div>
 
-                    <div class="group/stat relative bg-red-600/50 backdrop-blur-sm rounded-xl px-8 py-4 text-center min-w-[140px] border border-red-500/30 transition-all duration-500 hover:bg-red-600/70 hover:border-red-400/60 hover:shadow-2xl hover:shadow-red-500/20 hover:-translate-y-2 hover:scale-105 overflow-hidden" style="transition-delay: 50ms;">
-                        <div class="absolute inset-0 bg-gradient-to-t from-red-400/0 via-red-300/10 to-red-400/0 opacity-0 group-hover/stat:opacity-100 transition-opacity duration-500"></div>
-                        <div class="absolute top-0 left-1/2 w-1 h-1 bg-white rounded-full opacity-0 group-hover/stat:opacity-100 group-hover/stat:animate-ping" style="animation-delay: 0.1s;"></div>
-                        
-                        <p class="text-xs text-red-100 uppercase tracking-wide relative z-10 transition-all duration-300 group-hover/stat:text-white group-hover/stat:font-bold">Rata-rata (%)</p>
-                        <p class="text-4xl font-bold mt-1 relative z-10 transition-all duration-300 group-hover/stat:scale-110 group-hover/stat:text-white">27.8%</p>
+                    <div class="relative bg-red-600/50 backdrop-blur-sm rounded-xl px-8 py-4 text-center flex-1 min-w-[140px] border border-red-500/30 overflow-hidden">
+                        <p class="text-xs text-red-100 uppercase">Rata-rata (%)</p>
+                        <p class="text-4xl font-bold mt-1 text-white">27.8%</p>
                     </div>
 
-                    <div class="group/stat relative bg-red-600/50 backdrop-blur-sm rounded-xl px-8 py-4 text-center min-w-[140px] border border-red-500/30 transition-all duration-500 hover:bg-red-600/70 hover:border-red-400/60 hover:shadow-2xl hover:shadow-red-500/20 hover:-translate-y-2 hover:scale-105 overflow-hidden" style="transition-delay: 100ms;">
-                        <div class="absolute inset-0 bg-gradient-to-t from-red-400/0 via-red-300/10 to-red-400/0 opacity-0 group-hover/stat:opacity-100 transition-opacity duration-500"></div>
-                        <div class="absolute top-0 left-1/2 w-1 h-1 bg-white rounded-full opacity-0 group-hover/stat:opacity-100 group-hover/stat:animate-ping" style="animation-delay: 0.2s;"></div>
-                        
-                        <p class="text-xs text-red-100 uppercase tracking-wide relative z-10 transition-all duration-300 group-hover/stat:text-white group-hover/stat:font-bold">Faskes</p>
-                        <p class="text-4xl font-bold mt-1 relative z-10 transition-all duration-300 group-hover/stat:scale-110 group-hover/stat:text-white">5</p>
+                    <div class="relative bg-red-600/50 backdrop-blur-sm rounded-xl px-8 py-4 text-center flex-1 min-w-[140px] border border-red-500/30 overflow-hidden">
+                        <p class="text-xs text-red-100 uppercase">Faskes</p>
+                        <p class="text-4xl font-bold mt-1 text-white">5</p>
                     </div>
+                    
                 </div>
 
             </div>
 
             {{-- Bottom Section: Chart & Filter --}}
+            {{-- ✅ PERBAIKAN: flex-col lg:flex-row untuk menumpuk di mobile --}}
             <div class="mt-8 flex flex-col lg:flex-row items-start lg:items-end justify-between gap-6">
                 
                 {{-- Distribution Chart --}}
                 <div class="flex-1 w-full group/chart">
                     <p class="text-sm font-medium mb-2 transition-all duration-300 group-hover/chart:text-red-50">Distribusi Tingkat</p>
-                    <div class="relative w-full bg-gray-700 rounded-full h-5 overflow-hidden flex shadow-lg transition-all duration-500 group-hover/chart:h-6 group-hover/chart:shadow-2xl group-hover/chart:shadow-red-500/30">
-                        {{-- Animated Gradient Overlay --}}
+                    <div class="hidden relative w-full bg-gray-700 rounded-full h-5 overflow-hidden md:flex shadow-lg transition-all duration-500 group-hover/chart:h-6 group-hover/chart:shadow-2xl group-hover/chart:shadow-red-500/30">
+                        <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover/chart:translate-x-full transition-transform duration-2000"></div>
+                        <div class="relative bg-red-600 h-5 transition-all duration-500 group-hover/chart:h-6 group-hover/chart:bg-red-500 flex items-center justify-center" style="width: 54%"><span class="text-[10px] font-bold opacity-0 group-hover/chart:opacity-100 transition-opacity duration-300">54%</span></div>
+                        <div class="relative bg-orange-500 h-5 transition-all duration-500 group-hover/chart:h-6 group-hover/chart:bg-orange-400 flex items-center justify-center" style="width: 31%"><span class="text-[10px] font-bold opacity-0 group-hover/chart:opacity-100 transition-opacity duration-300">31%</span></div>
+                        <div class="relative bg-yellow-400 h-5 transition-all duration-500 group-hover/chart:h-6 group-hover/chart:bg-yellow-300 flex items-center justify-center" style="width: 15%"><span class="text-[10px] font-bold opacity-0 group-hover/chart:opacity-100 transition-opacity duration-300">15%</span></div>
+                        <div class="relative bg-green-500 h-5 transition-all duration-500 group-hover/chart:h-6 group-hover/chart:bg-green-400" style="width: 0%"></div>
+                    </div>
+
+                    <div class="relative w-full bg-gray-700 rounded-full h-5 overflow-hidden flex shadow-lg transition-all duration-500 group-hover/chart:h-6 group-hover/chart:shadow-2xl group-hover/chart:shadow-red-500/30 md:hidden">
                         <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover/chart:translate-x-full transition-transform duration-2000"></div>
                         
                         <div class="relative bg-red-600 h-5 transition-all duration-500 group-hover/chart:h-6 group-hover/chart:bg-red-500 flex items-center justify-center" style="width: 54%">
-                            <span class="text-[10px] font-bold opacity-0 group-hover/chart:opacity-100 transition-opacity duration-300">54%</span>
+                            <span class="text-[10px] font-bold text-white transition-opacity duration-300">54%</span>
                         </div>
+                        
                         <div class="relative bg-orange-500 h-5 transition-all duration-500 group-hover/chart:h-6 group-hover/chart:bg-orange-400 flex items-center justify-center" style="width: 31%">
-                            <span class="text-[10px] font-bold opacity-0 group-hover/chart:opacity-100 transition-opacity duration-300">31%</span>
+                            <span class="text-[10px] font-bold text-white transition-opacity duration-300">31%</span>
                         </div>
+                        
                         <div class="relative bg-yellow-400 h-5 transition-all duration-500 group-hover/chart:h-6 group-hover/chart:bg-yellow-300 flex items-center justify-center" style="width: 15%">
-                            <span class="text-[10px] font-bold opacity-0 group-hover/chart:opacity-100 transition-opacity duration-300">15%</span>
+                            <span class="text-[10px] font-bold text-white transition-opacity duration-300">15%</span>
                         </div>
+                        
                         <div class="relative bg-green-500 h-5 transition-all duration-500 group-hover/chart:h-6 group-hover/chart:bg-green-400" style="width: 0%"></div>
                     </div>
-                    <div class="flex items-center gap-4 mt-2 text-sm">
-                        <div class="flex items-center gap-1.5 transition-all duration-300 hover:scale-110 hover:font-bold cursor-pointer">
-                            <div class="w-3 h-3 rounded-sm bg-red-600 transition-all duration-300 hover:w-4 hover:h-4 hover:shadow-lg hover:shadow-red-500/50"></div>
-                            <span>High 54%</span>
+
+                    <div class="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2 text-sm">
+                        <div class="flex items-center gap-1.5">
+                            <div class="w-2 h-2 md:w-3 md:h-3 rounded-sm bg-red-600"></div>
+                            <span class="text-xs">High 54%</span>
                         </div>
-                        <div class="flex items-center gap-1.5 transition-all duration-300 hover:scale-110 hover:font-bold cursor-pointer">
-                            <div class="w-3 h-3 rounded-sm bg-orange-500 transition-all duration-300 hover:w-4 hover:h-4 hover:shadow-lg hover:shadow-orange-500/50"></div>
-                            <span>Medium 31%</span>
+                        <div class="flex items-center gap-1.5">
+                            <div class="w-2 h-2 md:w-3 md:h-3 rounded-sm bg-orange-500"></div>
+                            <span class="text-xs">Medium 31%</span>
                         </div>
-                        <div class="flex items-center gap-1.5 transition-all duration-300 hover:scale-110 hover:font-bold cursor-pointer">
-                            <div class="w-3 h-3 rounded-sm bg-yellow-400 transition-all duration-300 hover:w-4 hover:h-4 hover:shadow-lg hover:shadow-yellow-400/50"></div>
-                            <span>Low 15%</span>
+                        <div class="flex items-center gap-1.5">
+                            <div class="w-2 h-2 md:w-3 md:h-3 rounded-sm bg-yellow-400"></div>
+                            <span class="text-xs">Low 15%</span>
                         </div>
-                        <div class="flex items-center gap-1.5 transition-all duration-300 hover:scale-110 hover:font-bold cursor-pointer">
-                            <div class="w-3 h-3 rounded-sm bg-green-500 transition-all duration-300 hover:w-4 hover:h-4 hover:shadow-lg hover:shadow-green-500/50"></div>
-                            <span>Not Sig. 0%</span>
+                        <div class="flex items-center gap-1.5">
+                            <div class="w-2 h-2 md:w-3 md:h-3 rounded-sm bg-green-500"></div>
+                            <span class="text-xs">Not Sig. 0%</span>
                         </div>
                     </div>
                 </div>
 
                 {{-- Date Filter --}}
-                <div class="group/filter relative flex items-center gap-3 bg-red-600/30 backdrop-blur-sm rounded-xl px-4 py-3 border border-red-500/30 transition-all duration-500 hover:bg-red-600/50 hover:border-red-400/60 hover:shadow-2xl hover:shadow-red-500/20 overflow-hidden">
-                    {{-- Scanning Line Effect --}}
-                    <div class="absolute left-0 top-0 h-full w-1 bg-gradient-to-b from-transparent via-white to-transparent opacity-0 group-hover/filter:opacity-100 group-hover/filter:animate-scan"></div>
-                    
+                <div class="group/filter relative flex items-center gap-3 bg-red-600/30 backdrop-blur-sm rounded-xl px-4 py-3 border border-red-500/30 transition-all duration-500 hover:bg-red-600/50 hover:border-red-400/60 hover:shadow-2xl hover:shadow-red-500/20 overflow-hidden w-full lg:w-auto">
                     <input type="month" 
-                        class="relative z-10 bg-white text-gray-900 text-sm rounded-lg px-3 py-2 border-0 focus:ring-2 focus:ring-red-400 transition-all duration-300 hover:shadow-lg hover:scale-105" 
+                        class="relative z-10 bg-white text-gray-900 text-sm rounded-lg px-3 py-2 border-0 focus:ring-2 focus:ring-red-400 transition-all duration-300 hover:shadow-lg hover:scale-105 flex-1" 
                         placeholder="Pilih Bulan">
                     <button type="button" 
-                            class="relative z-10 px-6 py-2 bg-white text-red-700 text-sm font-semibold rounded-lg transition-all duration-300 hover:bg-red-50 hover:scale-110 hover:shadow-xl hover:shadow-red-500/30 active:scale-95 whitespace-nowrap overflow-hidden group/btn">
-                        {{-- Button Shine Effect --}}
+                            class="relative z-10 px-6 py-2 bg-white text-red-700 text-sm font-semibold rounded-lg transition-all duration-300 hover:bg-red-50 hover:scale-110 hover:shadow-xl hover:shadow-red-500/30 active:scale-95 whitespace-nowrap overflow-hidden group/btn flex-shrink-0">
                         <span class="absolute inset-0 -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-red-200/50 to-transparent"></span>
                         <span class="relative z-10">Terapkan</span>
                     </button>
@@ -178,36 +179,15 @@
         </div>
 
         <style>
-            @keyframes spin-slow {
-                from {
-                    transform: rotate(0deg);
-                }
-                to {
-                    transform: rotate(360deg);
-                }
-            }
-            
-            .animate-spin-slow {
-                animation: spin-slow 8s linear infinite;
-            }
-
-            @keyframes scan {
-                0% {
-                    transform: translateX(-100%);
-                }
-                100% {
-                    transform: translateX(1000%);
-                }
-            }
-
-            .animate-scan {
-                animation: scan 2s ease-in-out infinite;
-            }
+            @keyframes spin-slow { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+            .animate-spin-slow { animation: spin-slow 8s linear infinite; }
+            @keyframes scan { 0% { transform: translateX(-100%); } 100% { transform: translateX(1000%); } }
+            .animate-scan { animation: scan 2s ease-in-out infinite; }
         </style>
     </header>
 
     {{-- ====== MODERN NAVIGATION WITH GLASS EFFECT ====== --}}
-    @include('layouts.nav _public')
+    @include('layouts.nav_public')
 
     {{-- ====== MODERN CONTENT CARDS ====== --}}
     <main class="py-12">

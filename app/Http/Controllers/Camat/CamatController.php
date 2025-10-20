@@ -1,18 +1,16 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Camat; // ✅ PERBAIKAN: Ubah namespace ini
 
-use Illuminate\Http\Request;
+use App\Http\Controllers\Controller; // ✅ PERBAIKAN: Tambahkan ini
 use App\Models\DataGizi;
 use App\Models\DataPencegahan;
 use App\Models\DataPenanggulangan;
 use App\Models\DataDesa;
+use Illuminate\Http\Request;
 
-class CamatController extends Controller
+class CamatController extends Controller // ✅ PERBAIKAN: extends Controller
 {
-    /**
-     * ✅ PERBAIKAN: Menampilkan SEMUA data dari setiap divisi.
-     */
     public function index()
     {
         $allData = [
@@ -25,9 +23,6 @@ class CamatController extends Controller
         return view('camat.index', compact('allData'));
     }
 
-    /**
-     * Mengubah status data (Approve atau Un-approve).
-     */
     public function updateStatus(Request $request)
     {
         $request->validate([
@@ -50,9 +45,6 @@ class CamatController extends Controller
         return back()->with('success', $message)->with('active_tab', $request->active_tab);
     }
 
-    /**
-     * Menghapus data secara permanen.
-     */
     public function destroy(Request $request)
     {
         $request->validate([

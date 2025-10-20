@@ -4,23 +4,32 @@
     </x-slot>
 
     <x-slot name="header">
-        <div class="flex justify-between items-center">
-            <div class="flex gap-1 justify-center items-center">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4">
+            {{-- Kiri: Judul + Nama User --}}
+            <div class="flex items-center gap-1 min-w-0">
                 <h2 class="font-semibold text-xl text-gray-800 leading-tight">
                     {{ __('Divisi Pencegahan') }}
                 </h2>
                 <span class="text-gray-300">|</span>
-                <h2 class="font-semibold text-xs text-gray-800 leading-tight">
+                <h2 class="font-semibold text-xs text-gray-800 leading-tight truncate max-w-[12rem] sm:max-w-[16rem]">
                     {{ auth()->user()->name }}
                 </h2>
             </div>
-            <form method="POST" action="{{ route('logout') }}">
-                @csrf
-                <button type="submit" class="inline-flex items-center gap-2 rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-red-700">
-                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
-                    Log Out
-                </button>
-            </form>
+
+            {{-- Kanan: Tombol Aksi --}}
+            <div class="flex flex-wrap gap-2">
+                <form method="POST" action="{{ route('logout') }}">
+                    @csrf
+                    <button type="submit"
+                        class="inline-flex items-center gap-2 rounded-lg bg-red-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-red-700">
+                        <svg class="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                        </svg>
+                        <span class="hidden sm:inline">Log Out</span>
+                    </button>
+                </form>
+            </div>
         </div>
     </x-slot>
 

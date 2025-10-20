@@ -1,7 +1,7 @@
 <?php
+namespace App\Http\Controllers\Divisi;
 
-namespace App\Http\Controllers;
-
+use App\Http\Controllers\Controller;
 use App\Models\DataPenanggulangan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -10,7 +10,14 @@ class DivisiPenanggulanganController extends Controller
 {
     public function index()
     {
-        $data = DataPenanggulangan::where('user_id', Auth::id())->latest('periode')->paginate(10);
+        $currentUser = Auth::user();
+        $userRoleName = $currentUser->roles->first()->name;
+        $data = DataPenanggulangan::whereHas('user.roles', function ($query) use ($userRoleName) {
+            $query->where('name', $userRoleName);
+        })
+        ->with('user')
+        ->latest('periode')
+        ->paginate(10);
         return view('divisi.penanggulangan.index', compact('data'));
     }
 
@@ -34,18 +41,26 @@ class DivisiPenanggulanganController extends Controller
         return redirect()->route('penanggulangan.index')->with('success', 'Data Penanggulangan berhasil ditambahkan.');
     }
 
+    /**
+     * ✅ PERBAIKAN: Memeriksa berdasarkan Role, bukan ID User
+     */
     public function edit(DataPenanggulangan $data_penanggulangan)
     {
-        if ($data_penanggulangan->user_id !== Auth::id()) {
-            abort(403, 'AKSES DITOLAK');
+        $currentUserRoleName = Auth::user()->roles->first()->name;
+        if (!$data_penanggulangan->user->hasRole($currentUserRoleName)) {
+            abort(403, 'AKSES DITOLAK: Anda hanya bisa mengelola data dari divisi Anda sendiri.');
         }
         return view('divisi.penanggulangan.edit', ['data' => $data_penanggulangan]);
     }
 
+    /**
+     * ✅ PERBAIKAN: Memeriksa berdasarkan Role, bukan ID User
+     */
     public function update(Request $request, DataPenanggulangan $data_penanggulangan)
     {
-        if ($data_penanggulangan->user_id !== Auth::id()) {
-            abort(403, 'AKSES DITOLAK');
+        $currentUserRoleName = Auth::user()->roles->first()->name;
+        if (!$data_penanggulangan->user->hasRole($currentUserRoleName)) {
+            abort(403, 'AKSES DITOLAK: Anda hanya bisa mengelola data dari divisi Anda sendiri.');
         }
         $request->merge(['periode' => $request->periode . '-01']);
         $request->validate([
@@ -58,10 +73,14 @@ class DivisiPenanggulanganController extends Controller
         return redirect()->route('penanggulangan.index')->with('success', 'Data Penanggulangan berhasil diperbarui.');
     }
 
+    /**
+     * ✅ PERBAIKAN: Memeriksa berdasarkan Role, bukan ID User
+     */
     public function destroy(DataPenanggulangan $data_penanggulangan)
     {
-        if ($data_penanggulangan->user_id !== Auth::id()) {
-            abort(403, 'AKSES DITOLAK');
+        $currentUserRoleName = Auth::user()->roles->first()->name;
+        if (!$data_penanggulangan->user->hasRole($currentUserRoleName)) {
+            abort(403, 'AKSES DITOLAK: Anda hanya bisa mengelola data dari divisi Anda sendiri.');
         }
         $data_penanggulangan->delete();
         return redirect()->route('penanggulangan.index')->with('success', 'Data Penanggulangan berhasil dihapus.');

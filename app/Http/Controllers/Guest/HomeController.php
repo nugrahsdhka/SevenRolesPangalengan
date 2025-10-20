@@ -1,16 +1,17 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Guest;
 
 use App\Models\DataGizi;
 use App\Models\DataPencegahan;
 use App\Models\DataPenanggulangan;
 use App\Models\DataDesa;
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
-class PublicController extends Controller
+class HomeController extends Controller
 {
-    public function home()
+    public function index()
     {
         // LOGIKA BARU: Ambil data yang statusnya 'published'
         $publishedData = [
@@ -22,25 +23,4 @@ class PublicController extends Controller
 
         return view('public_view.home.welcome', compact('publishedData'));
     }
-
-    public function dataStunting() 
-    {
-        return view('public_view.dataStunting.index');
-    }
-
-    public function dataWilayah() 
-    {
-        return view('public_view.dataWilayah.index');
-    }
-
-    public function analisisHotspot() 
-    {
-        return view('public_view.analisisHotspot.index');
-    }
-
-    public function peta() 
-    {
-        return view('public_view.peta.index');
-    }
-
 }
