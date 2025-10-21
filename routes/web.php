@@ -48,20 +48,26 @@ Route::middleware('auth', 'verified')->group(function () {
         Route::post('/import', [DivisiGiziController::class, 'import'])->name('import');
     });
 
-
-    // ✅ PERBAIKAN: Gunakan Route::resource untuk Divisi Pencegahan
+    // Divisi Pencegahan
     Route::middleware(['role:Divisi Pencegahan'])->prefix('divisi-pencegahan')->name('pencegahan.')->group(function () {
         Route::resource('/', DivisiPencegahanController::class)->parameters(['' => 'data_pencegahan']);
+
+        // ✅ TAMBAHKAN RUTE INI
+        Route::post('/import', [DivisiPencegahanController::class, 'import'])->name('import');
     });
 
-    // ✅ PERBAIKAN: Gunakan Route::resource untuk Divisi Penanggulangan
+    // Divisi Penanggulangan
     Route::middleware(['role:Divisi Penanggulangan'])->prefix('divisi-penanggulangan')->name('penanggulangan.')->group(function () {
         Route::resource('/', DivisiPenanggulanganController::class)->parameters(['' => 'data_penanggulangan']);
+        
+        Route::post('/import', [DivisiPenanggulanganController::class, 'import'])->name('import');
     });
     
     // Divisi Desa
     Route::middleware(['role:Divisi Desa'])->prefix('divisi-desa')->name('desa.')->group(function () {
         Route::resource('/', DivisiDesaController::class)->parameters(['' => 'data_desa']);
+        
+        Route::post('/import', [DivisiDesaController::class, 'import'])->name('import');
     });
 
     // Camat
@@ -69,6 +75,8 @@ Route::middleware('auth', 'verified')->group(function () {
         Route::get('/review', [CamatController::class, 'index'])->name('review');
         Route::post('/status', [CamatController::class, 'updateStatus'])->name('status');
         Route::delete('/delete', [CamatController::class, 'destroy'])->name('destroy');
+
+        Route::post('/bulk-status', [CamatController::class, 'bulkUpdateStatus'])->name('bulk_status');
     });
 
     // IT Admin
@@ -83,6 +91,8 @@ Route::middleware('auth', 'verified')->group(function () {
         Route::delete('/users/{id}', [UserController::class, 'destroy'])->name('users.destroy');
         Route::patch('/users/{id}/password', [UserController::class, 'updatePassword'])->name('users.password.update');
         Route::patch('/users/{id}/restore', [UserController::class, 'restore'])->name('users.restore'); // ✅ RUTE BARU
+
+        Route::post('/bulk-publish', [AdminController::class, 'bulkPublish'])->name('bulk_publish');
     });
 });
 

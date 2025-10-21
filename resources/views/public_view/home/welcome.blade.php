@@ -68,7 +68,7 @@
             <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
                 
                 {{-- Left: Logo & Info --}}
-                <div class="flex flex-col md:flex-row items-center gap-6 group w-full">
+                <div class="flex flex-col lg:flex-row items-center gap-6 group w-full">
                     <div class="relative flex-shrink-0">
                         <div class="absolute inset-0 rounded-full bg-gradient-to-r from-red-400 to-rose-500 blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-500 animate-spin-slow"></div>
                         <div class="relative bg-red-600 p-3 rounded-full ring-4 ring-red-600/50 flex items-center justify-center transition-all duration-500 group-hover:ring-8 group-hover:ring-red-400/30 group-hover:scale-110 group-hover:rotate-6">
@@ -78,18 +78,19 @@
                         </div>
                     </div>
 
-                    <div class="relative min-w-[140px] bg-red-600/40 backdrop-blur-sm rounded-2xl px-6 py-4 border border-red-500/30 overflow-hidden">
+                    <div class="relative min-w-[160px] bg-red-600/40 backdrop-blur-sm rounded-2xl px-6 py-4 border border-red-500/30 overflow-hidden">
                         <h1 class="text-xl font-bold relative z-10 text-white">Rumah Stunting Pangalengan</h1>
                         <p class="text-sm text-red-100 mt-0.5 relative z-10">Kabupaten Bandung • Provinsi Jawa Barat</p>
                         <div class="flex gap-3 mt-3 text-sm relative z-10">
                             <span class="font-medium px-3 py-1 bg-white/10 rounded-lg">5 Faskes</span>
-                            <span class="font-medium px-3 py-1 bg-white/10 rounded-lg">13 Desa Terpetakan</span>
+                            <span class="font-medium px-3 py-1 bg-white/10 rounded-lg">13 Desa</span>
+                            <span class="block md:hidden font-medium px-3 py-1 bg-white/10 rounded-lg">27.8% Kasus</span>
                         </div>
                     </div>
                 </div>
 
                 {{-- Right: Stats Cards --}}
-                <div class="flex flex-col sm:flex-row gap-4 w-full lg:w-auto">
+                <div class="hidden md:flex flex-col sm:flex-row gap-4 w-full lg:w-auto">
                     
                     <div class="relative bg-red-600/50 backdrop-blur-sm rounded-xl px-8 py-4 text-center flex-1 min-w-[140px] border border-red-500/30 overflow-hidden">
                         <p class="text-xs text-red-100 uppercase">Total Desa</p>

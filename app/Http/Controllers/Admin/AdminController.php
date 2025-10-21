@@ -1,26 +1,27 @@
 <?php
 
-namespace App\Http\Controllers\Admin; // ✅ PERBAIKAN: Ubah namespace ini
+namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller; // ✅ PERBAIKAN: Tambahkan ini
+use App\Http\Controllers\Controller;
 use App\Models\DataDesa;
 use App\Models\DataGizi;
 use App\Models\DataPencegahan;
 use App\Models\DataPenanggulangan;
 use Illuminate\Http\Request;
 
-class AdminController extends Controller // ✅ PERBAIKAN: extends Controller
+class AdminController extends Controller
 {
     /**
      * Menampilkan SEMUA data dari setiap divisi.
      */
     public function publishedData()
     {
+        // ✅ PERBAIKAN: Urutkan data agar 'approved' muncul di atas 'published'
         $dataToReview = [
-            'gizi' => DataGizi::with('user')->latest()->get(),
-            'pencegahan' => DataPencegahan::with('user')->latest()->get(),
-            'penanggulangan' => DataPenanggulangan::with('user')->latest()->get(),
-            'desa' => DataDesa::with('user')->latest()->get(),
+            'gizi' => DataGizi::with('user')->whereIn('status', ['approved', 'published'])->orderByRaw("FIELD(status, 'approved', 'published')")->latest('periode')->get(),
+            'pencegahan' => DataPencegahan::with('user')->whereIn('status', ['approved', 'published'])->orderByRaw("FIELD(status, 'approved', 'published')")->latest('periode')->get(),
+            'penanggulangan' => DataPenanggulangan::with('user')->whereIn('status', ['approved', 'published'])->orderByRaw("FIELD(status, 'approved', 'published')")->latest('periode')->get(),
+            'desa' => DataDesa::with('user')->whereIn('status', ['approved', 'published'])->orderByRaw("FIELD(status, 'approved', 'published')")->latest('periode')->get(),
         ];
 
         return view('admin.published.index', compact('dataToReview'));
@@ -56,6 +57,58 @@ class AdminController extends Controller // ✅ PERBAIKAN: extends Controller
 
         $data->save();
         
+        return back()->with('success', $message)->with('active_tab', $request->active_tab);
+    }
+
+    /**
+     * ✅ METHOD BARU UNTUK AKSI MASSAL (BULK)
+     */
+    public function bulkPublish(Request $request)
+    {
+        $request->validate([
+            'model_type' => 'required|string|in:gizi,pencegahan,penanggulangan,desa',
+            'action' => 'required|string|in:publish_all,unpublish_all',
+            'active_tab' => 'required|string',
+        ]);
+
+        $modelMap = [
+            'gizi' => DataGizi::class,
+            'pencegahan' => DataPencegahan::class,
+            'penanggulangan' => DataPenanggulangan::class,
+            'desa' => DataDesa::class,
+        ];
+
+        $modelClass = $modelMap[$request->model_type] ?? null;
+
+        if (!$modelClass) {
+            return back()->with('error', 'Tipe data tidak valid.');
+        }
+
+        $currentStatus = '';
+        $newStatus = '';
+        $message = '';
+
+        if ($request->action === 'publish_all') {
+            $currentStatus = 'approved';
+            $newStatus = 'published';
+            $message = 'Semua data approved berhasil di-publish.';
+        } elseif ($request->action === 'unpublish_all') {
+            $currentStatus = 'published';
+            $newStatus = 'approved';
+            $message = 'Semua data published berhasil ditarik kembali.';
+        }
+
+        if ($currentStatus && $newStatus) {
+            try {
+                $affectedRows = $modelClass::where('status', $currentStatus)->update(['status' => $newStatus]);
+                if ($affectedRows == 0) {
+                     $message = 'Tidak ada data dengan status "' . $currentStatus . '" yang perlu diupdate.';
+                }
+            } catch (\Exception $e) {
+                 return back()->with('error', 'Terjadi kesalahan saat update massal: ' . $e->getMessage())->with('active_tab', $request->active_tab);
+            }
+        }
+
         return back()->with('success', $message)->with('active_tab', $request->active_tab);
     }
 }

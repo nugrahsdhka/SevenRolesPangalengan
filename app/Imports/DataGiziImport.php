@@ -41,15 +41,9 @@ class DataGiziImport implements ToModel, WithHeadingRow, WithValidation // ✅ 2
     public function rules(): array
     {
         return [
-            // 'judul' adalah nama header di Excel
-            'judul' => 'required|string|max:255',
-
-            // 'deskripsi' adalah nama header di Excel
-            'deskripsi' => 'required|string',
-
-            // 'periode' adalah nama header di Excel
-            // Kita validasi formatnya harus YYYY-MM (misal: 2025-10)
             'periode' => 'nullable|date_format:Y-m',
+            'judul' => 'required|string|max:255',
+            'deskripsi' => 'required|string',
         ];
     }
 }

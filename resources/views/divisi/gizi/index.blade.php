@@ -74,6 +74,7 @@
                 {{-- ✅ FORM IMPORT BARU DITAMBAHKAN DI SINI --}}
                 <div x-data="{ 
                     open: false, 
+                    showModal: false,
                     isDragging: false,
                     fileName: '',
                     handleFiles(files) {
@@ -83,16 +84,32 @@
                         }
                     }
                 }" class="mt-6">
-                    <button @click="open = !open" class="flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-gray-900">
-                        <svg x-show="!open" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                        </svg>
-                        <svg x-show="open" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                        <span x-text="open ? 'Tutup Form Import' : 'Import dari Excel'"></span>
-                    </button>
+                    <!-- Toggle Button & Info Button -->
+                    <div class="flex items-center gap-3">
+                        <button @click="open = !open" class="flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-gray-900">
+                            <svg x-show="!open" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                            </svg>
+                            <svg x-show="open" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                            <span x-text="open ? 'Tutup Form Import' : 'Import dari Excel'"></span>
+                        </button>
+                        
+                        <!-- Info Button -->
+                        <button 
+                            @click="showModal = true"
+                            type="button"
+                            class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-blue-700 bg-blue-50 rounded-lg hover:bg-blue-100 transition"
+                        >
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            Lihat Contoh Format
+                        </button>
+                    </div>
                     
+                    <!-- Upload Form -->
                     <div x-show="open" x-transition class="mt-4 p-4 bg-gray-50 rounded-xl border border-dashed">
                         <form action="{{ route('gizi.import') }}" method="POST" enctype="multipart/form-data">
                             @csrf
@@ -165,6 +182,99 @@
                                 </button>
                             </div>
                         </form>
+                    </div>
+
+                    <!-- Modal -->
+                    <div 
+                        x-show="showModal" 
+                        x-transition:enter="transition ease-out duration-300"
+                        x-transition:enter-start="opacity-0"
+                        x-transition:enter-end="opacity-100"
+                        x-transition:leave="transition ease-in duration-200"
+                        x-transition:leave-start="opacity-100"
+                        x-transition:leave-end="opacity-0"
+                        class="fixed inset-0 z-50 overflow-y-auto" 
+                        style="display: none;"
+                    >
+                        <!-- Backdrop -->
+                        <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:p-0">
+                            <div 
+                                @click="showModal = false"
+                                class="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75"
+                            ></div>
+
+                            <!-- Modal Content -->
+                            <div 
+                                x-transition:enter="transition ease-out duration-300"
+                                x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                                x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+                                x-transition:leave="transition ease-in duration-200"
+                                x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+                                x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                                class="relative inline-block w-full max-w-4xl px-4 pt-5 pb-4 overflow-hidden text-left align-bottom transition-all transform bg-white rounded-lg shadow-xl sm:my-8 sm:align-middle sm:p-6"
+                            >
+                                <!-- Header -->
+                                <div class="flex items-center justify-between mb-4">
+                                    <div class="flex items-center gap-2">
+                                        <div class="flex items-center justify-center w-10 h-10 bg-blue-100 rounded-full">
+                                            <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <h3 class="text-lg font-semibold text-gray-900">Format Excel Import Data Gizi</h3>
+                                            <p class="text-sm text-gray-500">Pastikan file Excel Anda mengikuti format di bawah ini</p>
+                                        </div>
+                                    </div>
+                                    <button 
+                                        @click="showModal = false"
+                                        class="text-gray-400 hover:text-gray-600 transition"
+                                    >
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                    </button>
+                                </div>
+
+                                <!-- Image Example -->
+                                <div class="border border-gray-200 rounded-lg overflow-hidden bg-gray-50 p-4">
+                                    <img 
+                                        src="{{ asset('img/contohFormatExcel/divisiGizi.png') }}" 
+                                        alt="Contoh Format Excel" 
+                                        class="w-full h-auto rounded-lg shadow-sm"
+                                    >
+                                    <p class="text-xs text-gray-500 text-center mt-3">Screenshot contoh format Excel yang benar</p>
+                                </div>
+
+                                <!-- Notes -->
+                                <div class="mt-4 p-4 bg-amber-50 border border-amber-200 rounded-lg">
+                                    <div class="flex gap-2">
+                                        <svg class="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                        </svg>
+                                        <div class="text-sm">
+                                            <p class="font-semibold text-amber-800 mb-1">Catatan Penting:</p>
+                                            <ul class="list-disc list-inside text-amber-700 space-y-1">
+                                                <li>Header (baris pertama) harus sesuai dengan contoh di atas</li>
+                                                <li>Jangan ada kolom yang kosong</li>
+                                                <li>Format file: .xlsx, .xls, atau .csv</li>
+                                                <li>Maksimal ukuran file: 2MB</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Footer -->
+                                <div class="mt-6 flex justify-end">
+                                    <button 
+                                        @click="showModal = false"
+                                        class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition"
+                                    >
+                                        Mengerti
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 

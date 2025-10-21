@@ -6,6 +6,11 @@ use App\Models\DataPenanggulangan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
+// ✅ TAMBAHKAN USE STATEMENT INI
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\DataPenanggulanganImport;
+use Illuminate\Support\Str;
+
 class DivisiPenanggulanganController extends Controller
 {
     public function index()
@@ -84,5 +89,28 @@ class DivisiPenanggulanganController extends Controller
         }
         $data_penanggulangan->delete();
         return redirect()->route('penanggulangan.index')->with('success', 'Data Penanggulangan berhasil dihapus.');
+    }
+
+    // ✅ METHOD IMPORT BARU
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls',
+        ]);
+
+        try {
+            Excel::import(new DataPenanggulanganImport(), $request->file('file'));
+
+            return redirect()->route('penanggulangan.index')->with('success', 'Data Penanggulangan berhasil di-import dari Excel.');
+
+        } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+             $failures = $e->failures();
+             $errorMessage = "Gagal import pada baris " . $failures[0]->row() . ". "
+                           . "Error: " . $failures[0]->errors()[0]
+                           . " (Nilai: '" . ($failures[0]->values()[$failures[0]->attribute()] ?? '') . "')";
+             return redirect()->route('penanggulangan.index')->with('error', $errorMessage);
+        } catch (\Exception $e) {
+            return redirect()->route('penanggulangan.index')->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
     }
 }

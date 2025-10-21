@@ -7,6 +7,11 @@ use App\Models\DataPencegahan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
+// ✅ TAMBAHKAN USE STATEMENT INI
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\DataPencegahanImport;
+use Illuminate\Support\Str;
+
 class DivisiPencegahanController extends Controller
 {
     public function index()
@@ -42,10 +47,7 @@ class DivisiPencegahanController extends Controller
         DataPencegahan::create($data);
         return redirect()->route('pencegahan.index')->with('success', 'Data Pencegahan berhasil ditambahkan.');
     }
-
-    /**
-     * ✅ PERBAIKAN: Memeriksa berdasarkan Role, bukan ID User
-     */
+    
     public function edit(DataPencegahan $data_pencegahan)
     {
         $currentUserRoleName = Auth::user()->roles->first()->name;
@@ -54,10 +56,7 @@ class DivisiPencegahanController extends Controller
         }
         return view('divisi.pencegahan.edit', ['data' => $data_pencegahan]);
     }
-
-    /**
-     * ✅ PERBAIKAN: Memeriksa berdasarkan Role, bukan ID User
-     */
+    
     public function update(Request $request, DataPencegahan $data_pencegahan)
     {
         $currentUserRoleName = Auth::user()->roles->first()->name;
@@ -75,10 +74,7 @@ class DivisiPencegahanController extends Controller
         $data_pencegahan->update($request->all());
         return redirect()->route('pencegahan.index')->with('success', 'Data Pencegahan berhasil diperbarui.');
     }
-
-    /**
-     * ✅ PERBAIKAN: Memeriksa berdasarkan Role, bukan ID User
-     */
+    
     public function destroy(DataPencegahan $data_pencegahan)
     {
         $currentUserRoleName = Auth::user()->roles->first()->name;
@@ -87,5 +83,28 @@ class DivisiPencegahanController extends Controller
         }
         $data_pencegahan->delete();
         return redirect()->route('pencegahan.index')->with('success', 'Data Pencegahan berhasil dihapus.');
+    }
+
+    // ✅ METHOD IMPORT BARU
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls',
+        ]);
+
+        try {
+            Excel::import(new DataPencegahanImport(), $request->file('file'));
+
+            return redirect()->route('pencegahan.index')->with('success', 'Data Pencegahan berhasil di-import dari Excel.');
+
+        } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+             $failures = $e->failures();
+             $errorMessage = "Gagal import pada baris " . $failures[0]->row() . ". "
+                           . "Error: " . $failures[0]->errors()[0]
+                           . " (Nilai: '" . ($failures[0]->values()[$failures[0]->attribute()] ?? '') . "')";
+             return redirect()->route('pencegahan.index')->with('error', $errorMessage);
+        } catch (\Exception $e) {
+            return redirect()->route('pencegahan.index')->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
     }
 }
