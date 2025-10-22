@@ -26,7 +26,7 @@ class RoleAndUserSeeder extends Seeder
         $userGizi = User::create([
             'name' => 'User Gizi',
             'email' => 'gizi@test.com',
-            'password' => Hash::make('123456'),
+            'password' => Hash::make('gizi123456'),
             'email_verified_at' => now(),
         ]);
         $userGizi->assignRole($roleGizi);
@@ -34,7 +34,7 @@ class RoleAndUserSeeder extends Seeder
         $userPencegahan = User::create([
             'name' => 'User Pencegahan',
             'email' => 'pencegahan@test.com',
-            'password' => Hash::make('123456'),
+            'password' => Hash::make('pencegahan123456'),
             'email_verified_at' => now(),
         ]);
         $userPencegahan->assignRole($rolePencegahan);
@@ -42,7 +42,7 @@ class RoleAndUserSeeder extends Seeder
         $userPenanggulangan = User::create([
             'name' => 'User Penanggulangan',
             'email' => 'penanggulangan@test.com',
-            'password' => Hash::make('123456'),
+            'password' => Hash::make('penanggulangan123456'),
             'email_verified_at' => now(),
         ]);
         $userPenanggulangan->assignRole($rolePenanggulangan);
@@ -50,7 +50,7 @@ class RoleAndUserSeeder extends Seeder
         $userDesa = User::create([
             'name' => 'User Desa',
             'email' => 'desa@test.com',
-            'password' => Hash::make('123456'),
+            'password' => Hash::make('desa123456'),
             'email_verified_at' => now(),
         ]);
         $userDesa->assignRole($roleDesa);
@@ -58,7 +58,7 @@ class RoleAndUserSeeder extends Seeder
         $userCamat = User::create([
             'name' => 'User Camat',
             'email' => 'camat@test.com',
-            'password' => Hash::make('123456'),
+            'password' => Hash::make('camat123456'),
             'email_verified_at' => now(),
         ]);
         $userCamat->assignRole($roleCamat);
@@ -66,7 +66,7 @@ class RoleAndUserSeeder extends Seeder
         $userAdmin = User::create([
             'name' => 'User IT Admin',
             'email' => 'admin@test.com',
-            'password' => Hash::make('123456'),
+            'password' => Hash::make('admin123456'),
             'email_verified_at' => now(),
         ]);
         $userAdmin->assignRole($roleAdmin);

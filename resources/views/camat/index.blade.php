@@ -4,31 +4,96 @@
     </x-slot>
 
     <x-slot name="header">
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-            {{-- Kiri: Judul dan Nama User --}}
-            <div class="flex gap-1 justify-center items-center">
-                <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+        <div class="flex justify-between items-center gap-4">
+            {{-- Kiri: Judul Divisi + Nama User --}}
+            <div class="flex items-center gap-2 min-w-0 flex-1">
+                <h2 class="font-semibold text-lg sm:text-xl text-gray-800 leading-tight whitespace-nowrap">
                     {{ __('Camat') }}
-                </h2>
-                <span class="text-gray-300">|</span>
-                <h2 class="font-semibold text-xs text-gray-800 leading-tight">
-                    {{ auth()->user()->name }}
                 </h2>
             </div>
 
-            {{-- Kanan: Grup Tombol Aksi --}}
-            <div class="flex flex-wrap gap-2">
-                <a href="{{ route('welcome') }}" class="inline-flex items-center gap-2 rounded-lg bg-gray-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-gray-700">
-                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9.75L12 3l9 6.75M4.5 10.5V21h15V10.5M9 21v-6h6v6" /></svg>
-                    <span class="hidden sm:inline">Home</span>
-                </a>
-                <form method="POST" action="{{ route('logout') }}">
-                    @csrf
-                    <button type="submit" class="inline-flex items-center gap-2 rounded-lg bg-red-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-red-700">
-                        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
-                        <span class="hidden sm:inline">Log Out</span>
-                    </button>
-                </form>
+            {{-- Kanan: Dropdown Menu User (Lingkaran Profile) --}}
+            <div class="relative" x-data="{ open: false }">
+                {{-- Tombol Trigger Dropdown (Lingkaran Profile) --}}
+                <button @click="open = !open" 
+                        @click.away="open = false" 
+                        class="flex items-center justify-center h-10 w-10 rounded-full bg-red-600 text-white font-semibold text-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all hover:scale-105 flex-shrink-0"
+                        type="button"
+                        aria-expanded="false"
+                        aria-haspopup="true"
+                        title="{{ auth()->user()->name }}">
+                    {{-- Inisial Nama User (Huruf pertama dari setiap kata) --}}
+                    @php
+                        $words = explode(' ', trim(auth()->user()->name));
+                        $initials = '';
+                        foreach ($words as $word) {
+                            if (!empty($word)) {
+                                $initials .= strtoupper(substr($word, 0, 1));
+                            }
+                        }
+                        // Ambil huruf pertama dan terakhir jika lebih dari 2 kata
+                        if (strlen($initials) > 2) {
+                            $initials = substr($initials, 0, 1) . substr($initials, -1);
+                        }
+                    @endphp
+                    {{ $initials }}
+                </button>
+
+                {{-- Dropdown Menu --}}
+                <div x-show="open" 
+                    x-transition:enter="transition ease-out duration-200"
+                    x-transition:enter-start="opacity-0 scale-95"
+                    x-transition:enter-end="opacity-100 scale-100"
+                    x-transition:leave="transition ease-in duration-150"
+                    x-transition:leave-start="opacity-100 scale-100"
+                    x-transition:leave-end="opacity-0 scale-95"
+                    @keydown.escape.window="open = false"
+                    class="absolute right-0 mt-2 w-56 rounded-lg bg-white shadow-lg ring-1 ring-black ring-opacity-5 z-50 overflow-hidden"
+                    style="display: none;">
+                    <div class="py-1">
+                        {{-- Info User Header --}}
+                        <div class="px-4 py-3 border-b border-gray-100">
+                            <p class="text-sm font-medium text-gray-900 truncate">{{ auth()->user()->name }}</p>
+                            <p class="text-xs text-gray-500 truncate">{{ auth()->user()->email }}</p>
+                        </div>
+
+                        {{-- Menu Profil --}}
+                        <a href="{{ route('profile.index') }}" 
+                        class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 16a5.986 5.986 0 004.546-2.084A5 5 0 0012 11z" clip-rule="evenodd" />
+                            </svg>
+                            <span class="font-medium">Profil Saya</span>
+                        </a>
+
+                        {{-- Divider --}}
+                        <div class="border-t border-gray-100 my-1"></div>
+
+                        {{-- Home --}}
+                        <a href="{{ route('welcome') }}" 
+                        class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                            <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                              <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
+                            </svg>
+                            <span class="font-medium">Home</span>
+                        </a>
+
+                        {{-- Divider --}}
+                        <div class="border-t border-gray-100 my-1"></div>
+
+                        {{-- Menu Logout --}}
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <button type="submit" 
+                                    class="flex w-full items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors">
+                                <svg class="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                                </svg>
+                                <span class="font-medium">Log Out</span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
             </div>
         </div>
     </x-slot>
@@ -111,12 +176,12 @@
                     {{-- Konten Gizi --}}
                     <div x-show="activeTab === 'gizi'">
                         {{-- TOMBOL AKSI MASSAL GIZI --}}
-                        <div class="mb-4 flex w-full gap-2 justify-end">
+                        <div class="mb-4 flex flex-col sm:flex-row gap-2 justify-end">
                             @if($allData['gizi']->contains('status', 'pending'))
-                                <form action="{{ route('camat.bulk_status') }}" method="POST" class="w-full inline" onsubmit="return confirm('Anda yakin ingin Approve semua data Pending di tab ini?');"> @csrf <input type="hidden" name="model_type" value="gizi"> <input type="hidden" name="action" value="approve_all"> <input type="hidden" name="active_tab" x-bind:value="activeTab"> <button type="submit" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg bg-green-100 px-3 py-2 text-xs font-semibold text-green-700 transition hover:bg-green-200"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> Approve Semua Pending</button> </form>
+                                <form action="{{ route('camat.bulk_status') }}" method="POST" class="inline" onsubmit="return confirm('Anda yakin ingin Approve semua data Pending di tab ini?');"> @csrf <input type="hidden" name="model_type" value="gizi"> <input type="hidden" name="action" value="approve_all"> <input type="hidden" name="active_tab" x-bind:value="activeTab"> <button type="submit" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg bg-green-100 px-3 py-2 text-xs font-semibold text-green-700 transition hover:bg-green-200"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> Approve Semua Pending</button> </form>
                             @endif
-                            @if($allData['gizi']->contains('status', 'approved'))
-                                <form action="{{ route('camat.bulk_status') }}" method="POST" class="w-full inline" onsubmit="return confirm('Anda yakin ingin Tarik (Unapprove) semua data Approved di tab ini? Data Published tidak akan terpengaruh.');"> @csrf <input type="hidden" name="model_type" value="gizi"> <input type="hidden" name="action" value="unapprove_all"> <input type="hidden" name="active_tab" x-bind:value="activeTab"> <button type="submit" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg bg-yellow-100 px-3 py-2 text-xs font-semibold text-yellow-700 transition hover:bg-yellow-200"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg> Tarik Semua Approved</button> </form>
+                             @if($allData['gizi']->contains('status', 'approved'))
+                                <form action="{{ route('camat.bulk_status') }}" method="POST" class="inline" onsubmit="return confirm('Anda yakin ingin Tarik (Unapprove) semua data Approved di tab ini? Data Published tidak akan terpengaruh.');"> @csrf <input type="hidden" name="model_type" value="gizi"> <input type="hidden" name="action" value="unapprove_all"> <input type="hidden" name="active_tab" x-bind:value="activeTab"> <button type="submit" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg bg-yellow-100 px-3 py-2 text-xs font-semibold text-yellow-700 transition hover:bg-yellow-200"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg> Tarik Semua Approved</button> </form>
                             @endif
                         </div>
                         @forelse ($allData['gizi'] as $data)

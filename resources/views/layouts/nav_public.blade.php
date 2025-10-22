@@ -22,7 +22,13 @@
                 <x-nav-link :href="route('peta-faskes')" :active="request()->routeIs('peta-faskes')">
                     {{ __('Peta Faskes') }}
                 </x-nav-link>
-
+                
+                @auth                 
+                    <div class="border-l-2 border-gray-300 border-spacing-3"></div>   
+                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
+                        {{ __('Back To Dashboard') }}
+                    </x-nav-link>
+                @endauth
             </div>
         </div>
     </div>
@@ -63,7 +69,14 @@
             <x-dropdown-link :href="route('peta-faskes')" :active="request()->routeIs('peta-faskes')">
                 {{ __('Peta Faskes') }}
             </x-dropdown-link>
-                
+
+            @auth                
+                <div class="border-b-2 border-gray-100"></div>
+
+                <x-dropdown-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
+                    {{ __('Back To Dashboard') }}
+                </x-dropdown-link>
+            @endauth
         </x-slot:content>
     </x-dropdown>
 </nav>

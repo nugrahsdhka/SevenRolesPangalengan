@@ -3,7 +3,7 @@
 @if ($active ?? false)
     {{-- TAMPILAN JIKA LINK SEDANG AKTIF --}}
     {{-- ✅ PERBAIKAN: Padding diubah dari px-6 menjadi pl-8 pr-6 --}}
-    <a {{ $attributes->merge(['class' => 'w-full group relative inline-flex items-center py-2 pl-8 pr-6 pt-1 text-md font-bold text-red-700 transition-all duration-300']) }}>
+    <a {{ $attributes->merge(['class' => 'w-full group relative inline-flex items-center py-2 pl-8 pr-6 pt-1 mt-1 text-md font-bold text-red-700 transition-all duration-300']) }}>
         
         <span class="relative z-10 whitespace-nowrap">{{ $slot }}</span>
         
@@ -16,7 +16,7 @@
 @else
     {{-- TAMPILAN JIKA LINK TIDAK AKTIF --}}
     {{-- ✅ PERBAIKAN: Padding diubah dari px-6 menjadi pl-8 pr-6 --}}
-    <a {{ $attributes->merge(['class' => 'w-full group relative inline-flex items-center py-2 pl-8 pr-6 pt-1 text-md font-semibold text-gray-600 hover:text-gray-900 transition-all duration-300']) }}>
+    <a {{ $attributes->merge(['class' => 'w-full group relative inline-flex items-center py-2 pl-8 pr-6 pt-1 mt-1 text-md font-semibold text-gray-600 hover:text-gray-900 transition-all duration-300']) }}>
         
         <span class="relative z-10 whitespace-nowrap">{{ $slot }}</span>
         

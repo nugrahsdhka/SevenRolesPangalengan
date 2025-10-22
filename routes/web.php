@@ -10,6 +10,7 @@ use App\Http\Controllers\Divisi\DivisiDesaController;
 use App\Http\Controllers\Divisi\DivisiGiziController;
 use App\Http\Controllers\Divisi\DivisiPencegahanController;
 use App\Http\Controllers\Divisi\DivisiPenanggulanganController;
+use App\Http\Controllers\Profile\ProfileController;
 
 // Guest
 use App\Http\Controllers\Guest\HomeController;
@@ -94,6 +95,10 @@ Route::middleware('auth', 'verified')->group(function () {
 
         Route::post('/bulk-publish', [AdminController::class, 'bulkPublish'])->name('bulk_publish');
     });
+
+    Route::get('/profile', [ProfileController::class, 'index'])->name('profile.index'); // Halaman Tampilan
+    Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit'); // Halaman Edit Form
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
 });
 
 require __DIR__.'/auth.php';

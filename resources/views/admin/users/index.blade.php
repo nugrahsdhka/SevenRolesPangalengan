@@ -4,36 +4,23 @@
     </x-slot>
 
     <x-slot name="header">
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4">
-            {{-- Kiri: Judul + Nama User --}}
-            <div class="flex items-center gap-1 min-w-0">
-                <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                    {{ __('Manajemen User dan Role') }}
-                </h2>
-                <span class="text-gray-300">|</span>
-                <h2 class="font-semibold text-xs text-gray-800 leading-tight truncate max-w-[12rem] sm:max-w-[16rem]">
-                    {{ auth()->user()->name }}
+        <div class="flex justify-between items-center gap-4">
+            {{-- Kiri: Judul Divisi + Nama User --}}
+            <div class="flex items-center gap-2 min-w-0 flex-1">
+                <h2 class="font-semibold text-lg sm:text-xl text-gray-800 leading-tight whitespace-nowrap">
+                    {{ __('Admin') }}
                 </h2>
             </div>
 
-            {{-- Kanan: Tombol (wrap bila tidak muat) --}}
-            <div class="flex flex-wrap gap-2">
-                <a href="{{ route('admin.published.index') }}"
-                class="inline-flex items-center rounded-lg bg-red-600 p-2 gap-1 sm:p-2.5 text-sm font-semibold text-white transition hover:bg-red-700">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0"
-                        viewBox="0 0 24 24" fill="none" aria-label="Back">
-                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
-                        <path d="M13.5 16.5L9 12l4.5-4.5" fill="none"
-                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                    <span class="hidden sm:inline">Home Admin</span>
-                </a>
-            </div>
+            {{-- Kanan: Dropdown Menu User (Lingkaran Profile) --}}
+            <a href="{{ route('admin.published.index') }}" class="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-semibold text-gray-700 transition hover:bg-gray-50 shadow-sm">
+                 <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+                Kembali
+            </a>
         </div>
     </x-slot>
 
-
-    <div class="py-8 bg-gradient-to-br from-slate-50 via-rose-50/30 to-slate-50" x-data="{ openModal: false, selectedUser: null }">
+    <div class="px-2 py-8 bg-gradient-to-br from-slate-50 via-rose-50/30 to-slate-50" x-data="{ openModal: false, selectedUser: null }">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             {{-- Alert (Sudah Responsif) --}}
             @if (session('success'))
