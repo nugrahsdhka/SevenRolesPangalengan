@@ -12,19 +12,70 @@ use Illuminate\Http\Request;
 class AdminController extends Controller
 {
     /**
-     * Menampilkan SEMUA data dari setiap divisi.
+     * Menampilkan SEMUA data dari setiap divisi dengan paginasi.
      */
-    public function publishedData()
+    // ✅ MODIFIKASI: Tambahkan (Request $request)
+    public function publishedData(Request $request)
     {
-        // ✅ PERBAIKAN: Urutkan data agar 'approved' muncul di atas 'published'
+        // Tentukan jumlah item per halaman
+        $perPage = 10; // Anda bisa sesuaikan angka ini
+
+        // ✅ MODIFIKASI: Ubah ->get() menjadi ->paginate() dengan page name unik
         $dataToReview = [
-            'gizi' => DataGizi::with('user')->whereIn('status', ['approved', 'published'])->orderByRaw("FIELD(status, 'approved', 'published')")->latest('periode')->get(),
-            'pencegahan' => DataPencegahan::with('user')->whereIn('status', ['approved', 'published'])->orderByRaw("FIELD(status, 'approved', 'published')")->latest('periode')->get(),
-            'penanggulangan' => DataPenanggulangan::with('user')->whereIn('status', ['approved', 'published'])->orderByRaw("FIELD(status, 'approved', 'published')")->latest('periode')->get(),
-            'desa' => DataDesa::with('user')->whereIn('status', ['approved', 'published'])->orderByRaw("FIELD(status, 'approved', 'published')")->latest('periode')->get(),
+            'gizi' => DataGizi::with('user')
+                ->whereIn('status', ['approved', 'published'])
+                ->orderByRaw("FIELD(status, 'approved', 'published')")
+                ->latest('periode')
+                ->paginate($perPage, ['*'], 'gizi_page'), // <-- Unik
+
+            'pencegahan' => DataPencegahan::with('user')
+                ->whereIn('status', ['approved', 'published'])
+                ->orderByRaw("FIELD(status, 'approved', 'published')")
+                ->latest('periode')
+                ->paginate($perPage, ['*'], 'pencegahan_page'), // <-- Unik
+
+            'penanggulangan' => DataPenanggulangan::with('user')
+                ->whereIn('status', ['approved', 'published'])
+                ->orderByRaw("FIELD(status, 'approved', 'published')")
+                ->latest('periode')
+                ->paginate($perPage, ['*'], 'penanggulangan_page'), // <-- Unik
+
+            'desa' => DataDesa::with('user')
+                ->whereIn('status', ['approved', 'published'])
+                ->orderByRaw("FIELD(status, 'approved', 'published')")
+                ->latest('periode')
+                ->paginate($perPage, ['*'], 'desa_page'), // <-- Unik
         ];
 
-        return view('admin.published.index', compact('dataToReview'));
+        // ✅ TAMBAHAN: Cek status untuk tombol bulk action (cek ke seluruh tabel)
+        $bulkActionData = [
+            'gizi' => [
+                'has_approved' => DataGizi::where('status', 'approved')->exists(),
+                'has_published' => DataGizi::where('status', 'published')->exists(),
+            ],
+            'pencegahan' => [
+                'has_approved' => DataPencegahan::where('status', 'approved')->exists(),
+                'has_published' => DataPencegahan::where('status', 'published')->exists(),
+            ],
+            'penanggulangan' => [
+                'has_approved' => DataPenanggulangan::where('status', 'approved')->exists(),
+                'has_published' => DataPenanggulangan::where('status', 'published')->exists(),
+            ],
+            'desa' => [
+                'has_approved' => DataDesa::where('status', 'approved')->exists(),
+                'has_published' => DataDesa::where('status', 'published')->exists(),
+            ],
+        ];
+
+        // ✅ TAMBAHAN: Logika untuk menentukan active tab
+        // Prioritas:
+        // 1. Dari request (klik link paginasi ?active_tab=...)
+        // 2. Dari session (redirect setelah update/delete)
+        // 3. Default 'gizi'
+        $activeTab = $request->input('active_tab', session('active_tab', 'gizi'));
+
+        // Kirim semua data ke view
+        return view('admin.published.index', compact('dataToReview', 'bulkActionData', 'activeTab'));
     }
 
     /**

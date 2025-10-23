@@ -5,7 +5,7 @@
 
     <x-slot name="header">
         <div class="flex justify-between items-center">
-             <h2 class="font-semibold text-xl text-red-800 leading-tight">
+             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
                 {{ __('Edit Profil & Password') }}
             </h2>
              <a href="{{ route('profile.index') }}" class="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-semibold text-gray-700 transition hover:bg-gray-50 shadow-sm">

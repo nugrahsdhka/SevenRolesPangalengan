@@ -41,15 +41,15 @@
 
                 {{-- Dropdown Menu --}}
                 <div x-show="open" 
-                    x-transition:enter="transition ease-out duration-200"
-                    x-transition:enter-start="opacity-0 scale-95"
-                    x-transition:enter-end="opacity-100 scale-100"
-                    x-transition:leave="transition ease-in duration-150"
-                    x-transition:leave-start="opacity-100 scale-100"
-                    x-transition:leave-end="opacity-0 scale-95"
-                    @keydown.escape.window="open = false"
-                    class="absolute right-0 mt-2 w-56 rounded-lg bg-white shadow-lg ring-1 ring-black ring-opacity-5 z-50 overflow-hidden"
-                    style="display: none;">
+                     x-transition:enter="transition ease-out duration-200"
+                     x-transition:enter-start="opacity-0 scale-95"
+                     x-transition:enter-end="opacity-100 scale-100"
+                     x-transition:leave="transition ease-in duration-150"
+                     x-transition:leave-start="opacity-100 scale-100"
+                     x-transition:leave-end="opacity-0 scale-95"
+                     @keydown.escape.window="open = false"
+                     class="absolute right-0 mt-2 w-56 rounded-lg bg-white shadow-lg ring-1 ring-black ring-opacity-5 z-50 overflow-hidden"
+                     style="display: none;">
                     <div class="py-1">
                         {{-- Info User Header --}}
                         <div class="px-4 py-3 border-b border-gray-100">
@@ -59,7 +59,7 @@
 
                         {{-- Menu Profil --}}
                         <a href="{{ route('profile.index') }}" 
-                        class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                           class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
                                 <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 16a5.986 5.986 0 004.546-2.084A5 5 0 0012 11z" clip-rule="evenodd" />
                             </svg>
@@ -71,7 +71,7 @@
 
                         {{-- User --}}
                         <a href="{{ route('admin.users.index') }}" 
-                        class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                           class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor" aria-label="User"> <path d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5Zm0 2c-5.33 0-9 2.67-9 6a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1c0-3.33-3.67-6-9-6Z"/> </svg>
                             <span class="font-medium">User</span>
                         </a>
@@ -81,7 +81,7 @@
 
                         {{-- Create User --}}
                         <a href="{{ route('admin.users.create') }}" 
-                        class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                           class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
                             <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                               <path d="M8 9a3 3 0 100-6 3 3 0 000 6zM8 11a6 6 0 016 6H2a6 6 0 016-6zM16 7a1 1 0 10-2 0v1h-1a1 1 0 100 2h1v1a1 1 0 102 0v-1h1a1 1 0 100-2h-1V7z" />
                             </svg>
@@ -93,7 +93,7 @@
 
                         {{-- Home --}}
                         <a href="{{ route('welcome') }}" 
-                        class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                           class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
                             <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                               <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
                             </svg>
@@ -139,7 +139,8 @@
             @endif
 
             {{-- Main Card --}}
-            <section x-data="{ activeTab: '{{ session('active_tab', 'gizi') }}' }" class="rounded-2xl bg-white shadow-lg ring-1 ring-gray-900/5 overflow-hidden">
+            {{-- ✅ MODIFIKASI: Gunakan $activeTab dari controller --}}
+            <section x-data="{ activeTab: '{{ $activeTab }}' }" class="rounded-2xl bg-white shadow-lg ring-1 ring-gray-900/5 overflow-hidden">
                 <div class="flex flex-col justify-center items-center py-2 border border-b ">
                     <h1 class="text-md font-bold text-red-700">Penerbitan Data</h1>
                     <p class="text-sm font-bold text-red-700">
@@ -168,7 +169,8 @@
                     <div x-show="activeTab === 'gizi'">
                         {{-- TOMBOL AKSI MASSAL GIZI --}}
                         <div class="mb-4 flex flex-col sm:flex-row gap-2 justify-end">
-                            @if($dataToReview['gizi']->contains('status', 'approved'))
+                            {{-- ✅ MODIFIKASI: Gunakan $bulkActionData --}}
+                            @if($bulkActionData['gizi']['has_approved'])
                                 <form action="{{ route('admin.bulk_publish') }}" method="POST" class="inline" onsubmit="return confirm('Anda yakin ingin PUBLISH semua data Approved di tab ini?');"> @csrf <input type="hidden" name="model_type" value="gizi"> <input type="hidden" name="action" value="publish_all"> <input type="hidden" name="active_tab" x-bind:value="activeTab"> <button type="submit" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg bg-green-100 px-3 py-2 text-xs font-semibold text-green-700 transition hover:bg-green-200">
                                     <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                       <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -176,13 +178,15 @@
                                     Publish Semua Approved</button>
                                 </form>
                             @endif
-                            @if($dataToReview['gizi']->contains('status', 'published'))
+                            {{-- ✅ MODIFIKASI: Gunakan $bulkActionData --}}
+                            @if($bulkActionData['gizi']['has_published'])
                                 <form action="{{ route('admin.bulk_publish') }}" method="POST" class="inline" onsubmit="return confirm('Anda yakin ingin TARIK semua data Published di tab ini?');"> @csrf <input type="hidden" name="model_type" value="gizi"> <input type="hidden" name="action" value="unpublish_all"> <input type="hidden" name="active_tab" x-bind:value="activeTab"> <button type="submit" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg bg-yellow-100 px-3 py-2 text-xs font-semibold text-yellow-700 transition hover:bg-yellow-200">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
                                     Tarik Semua Published</button>
                                 </form>
                             @endif
                         </div>
+                        
                         @forelse ($dataToReview['gizi'] as $data)
                             <div class="py-4 border-b border-black/10 last:border-0 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
                                 <div class="min-w-0"> <p class="font-semibold text-gray-800 truncate">{{ $data->judul }}</p> <p class="text-xs text-gray-500 mt-1 truncate"> Diinput oleh: <span class="font-medium">{{ $data->user->name }}</span> | Periode: {{ $data->periode->format('F Y') }} </p> </div>
@@ -194,15 +198,22 @@
                                     @endif
                                 </div>
                             </div>
-                        @empty <p class="text-sm text-gray-500 pt-4 text-center">Tidak ada data Gizi untuk diproses.</p>
+                        @empty 
+                            <p class="text-sm text-gray-500 pt-4 text-center">Tidak ada data Gizi untuk diproses.</p>
                         @endforelse
+
+                        {{-- ✅ IMPLEMENTASI: Paginasi Kustom Gizi --}}
+                        <div class="mt-6">
+                            <x-custom-pagination :data="$dataToReview['gizi']->appends(['active_tab' => 'gizi'])" />
+                        </div>
                     </div>
 
                     {{-- Konten Pencegahan --}}
                     <div x-show="activeTab === 'pencegahan'" style="display: none;">
                         {{-- TOMBOL AKSI MASSAL PENCEGAHAN --}}
                         <div class="mb-4 flex flex-col sm:flex-row gap-2 justify-end">
-                            @if($dataToReview['pencegahan']->contains('status', 'approved'))
+                            {{-- ✅ MODIFIKASI: Gunakan $bulkActionData --}}
+                            @if($bulkActionData['pencegahan']['has_approved'])
                                 <form action="{{ route('admin.bulk_publish') }}" method="POST" class="inline" onsubmit="return confirm('Anda yakin ingin PUBLISH semua data Approved di tab ini?');"> @csrf <input type="hidden" name="model_type" value="pencegahan"> <input type="hidden" name="action" value="publish_all"> <input type="hidden" name="active_tab" x-bind:value="activeTab"> <button type="submit" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg bg-green-100 px-3 py-2 text-xs font-semibold text-green-700 transition hover:bg-green-200">
                                     <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                       <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -210,13 +221,15 @@
                                     Publish Semua Approved</button>
                                 </form>
                             @endif
-                            @if($dataToReview['pencegahan']->contains('status', 'published'))
+                            {{-- ✅ MODIFIKASI: Gunakan $bulkActionData --}}
+                            @if($bulkActionData['pencegahan']['has_published'])
                                 <form action="{{ route('admin.bulk_publish') }}" method="POST" class="inline" onsubmit="return confirm('Anda yakin ingin TARIK semua data Published di tab ini?');"> @csrf <input type="hidden" name="model_type" value="pencegahan"> <input type="hidden" name="action" value="unpublish_all"> <input type="hidden" name="active_tab" x-bind:value="activeTab"> <button type="submit" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg bg-yellow-100 px-3 py-2 text-xs font-semibold text-yellow-700 transition hover:bg-yellow-200">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
                                     Tarik Semua Published</button>
                                 </form>
                             @endif
                         </div>
+                        
                         @forelse ($dataToReview['pencegahan'] as $data)
                             <div class="py-4 border-b border-black/10 last:border-0 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
                                 <div class="min-w-0"> <p class="font-semibold text-gray-800 truncate">{{ $data->judul_kegiatan }}</p> <p class="text-xs text-gray-500 mt-1 truncate"> Diinput oleh: <span class="font-medium">{{ $data->user->name }}</span> | Periode: {{ $data->periode->format('F Y') }} </p> </div>
@@ -228,15 +241,22 @@
                                     @endif
                                 </div>
                             </div>
-                        @empty <p class="text-sm text-gray-500 pt-4 text-center">Tidak ada data Pencegahan untuk diproses.</p>
+                        @empty 
+                            <p class="text-sm text-gray-500 pt-4 text-center">Tidak ada data Pencegahan untuk diproses.</p>
                         @endforelse
+
+                        {{-- ✅ IMPLEMENTASI: Paginasi Kustom Pencegahan --}}
+                        <div class="mt-6">
+                            <x-custom-pagination :data="$dataToReview['pencegahan']->appends(['active_tab' => 'pencegahan'])" />
+                        </div>
                     </div>
 
                     {{-- Konten Penanggulangan --}}
                     <div x-show="activeTab === 'penanggulangan'" style="display: none;">
                         {{-- TOMBOL AKSI MASSAL PENANGGULANGAN --}}
                         <div class="mb-4 flex flex-col sm:flex-row gap-2 justify-end">
-                             @if($dataToReview['penanggulangan']->contains('status', 'approved'))
+                             {{-- ✅ MODIFIKASI: Gunakan $bulkActionData --}}
+                            @if($bulkActionData['penanggulangan']['has_approved'])
                                 <form action="{{ route('admin.bulk_publish') }}" method="POST" class="inline" onsubmit="return confirm('Anda yakin ingin PUBLISH semua data Approved di tab ini?');"> @csrf <input type="hidden" name="model_type" value="penanggulangan"> <input type="hidden" name="action" value="publish_all"> <input type="hidden" name="active_tab" x-bind:value="activeTab"> <button type="submit" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg bg-green-100 px-3 py-2 text-xs font-semibold text-green-700 transition hover:bg-green-200">
                                     <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                       <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -244,13 +264,15 @@
                                     Publish Semua Approved</button>
                                 </form>
                             @endif
-                            @if($dataToReview['penanggulangan']->contains('status', 'published'))
+                            {{-- ✅ MODIFIKASI: Gunakan $bulkActionData --}}
+                            @if($bulkActionData['penanggulangan']['has_published'])
                                 <form action="{{ route('admin.bulk_publish') }}" method="POST" class="inline" onsubmit="return confirm('Anda yakin ingin TARIK semua data Published di tab ini?');"> @csrf <input type="hidden" name="model_type" value="penanggulangan"> <input type="hidden" name="action" value="unpublish_all"> <input type="hidden" name="active_tab" x-bind:value="activeTab"> <button type="submit" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg bg-yellow-100 px-3 py-2 text-xs font-semibold text-yellow-700 transition hover:bg-yellow-200">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
                                     Tarik Semua Published</button>
                                 </form>
                             @endif
                         </div>
+                        
                         @forelse ($dataToReview['penanggulangan'] as $data)
                             <div class="py-4 border-b border-black/10 last:border-0 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
                                 <div class="min-w-0"> <p class="font-semibold text-gray-800 truncate">{{ $data->jenis_bencana }} ({{$data->jumlah_korban}} korban)</p> <p class="text-xs text-gray-500 mt-1 truncate"> Diinput oleh: <span class="font-medium">{{ $data->user->name }}</span> | Periode: {{ $data->periode->format('F Y') }} </p> </div>
@@ -262,15 +284,22 @@
                                     @endif
                                 </div>
                             </div>
-                        @empty <p class="text-sm text-gray-500 pt-4 text-center">Tidak ada data Penanggulangan untuk diproses.</p>
+                        @empty 
+                            <p class="text-sm text-gray-500 pt-4 text-center">Tidak ada data Penanggulangan untuk diproses.</p>
                         @endforelse
+
+                        {{-- ✅ IMPLEMENTASI: Paginasi Kustom Penanggulangan --}}
+                        <div class="mt-6">
+                            <x-custom-pagination :data="$dataToReview['penanggulangan']->appends(['active_tab' => 'penanggulangan'])" />
+                        </div>
                     </div>
 
                     {{-- Konten Desa --}}
                     <div x-show="activeTab === 'desa'" style="display: none;">
                         {{-- TOMBOL AKSI MASSAL DESA --}}
                         <div class="mb-4 flex flex-col sm:flex-row gap-2 justify-end">
-                             @if($dataToReview['desa']->contains('status', 'approved'))
+                             {{-- ✅ MODIFIKASI: Gunakan $bulkActionData --}}
+                            @if($bulkActionData['desa']['has_approved'])
                                 <form action="{{ route('admin.bulk_publish') }}" method="POST" class="inline" onsubmit="return confirm('Anda yakin ingin PUBLISH semua data Approved di tab ini?');"> @csrf <input type="hidden" name="model_type" value="desa"> <input type="hidden" name="action" value="publish_all"> <input type="hidden" name="active_tab" x-bind:value="activeTab"> <button type="submit" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg bg-green-100 px-3 py-2 text-xs font-semibold text-green-700 transition hover:bg-green-200">
                                     <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                       <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -278,13 +307,15 @@
                                     Publish Semua Approved</button>
                                 </form>
                             @endif
-                            @if($dataToReview['desa']->contains('status', 'published'))
+                            {{-- ✅ MODIFIKASI: Gunakan $bulkActionData --}}
+                            @if($bulkActionData['desa']['has_published'])
                                 <form action="{{ route('admin.bulk_publish') }}" method="POST" class="inline" onsubmit="return confirm('Anda yakin ingin TARIK semua data Published di tab ini?');"> @csrf <input type="hidden" name="model_type" value="desa"> <input type="hidden" name="action" value="unpublish_all"> <input type="hidden" name="active_tab" x-bind:value="activeTab"> <button type="submit" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg bg-yellow-100 px-3 py-2 text-xs font-semibold text-yellow-700 transition hover:bg-yellow-200">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
                                     Tarik Semua Published</button>
                                 </form>
                             @endif
                         </div>
+                        
                         @forelse ($dataToReview['desa'] as $data)
                             <div class="py-4 border-b border-black/10 last:border-0 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
                                 <div class="min-w-0"> <p class="font-semibold text-gray-800 truncate">{{ $data->nama_desa }}</p> <p class="text-xs text-gray-500 mt-1 truncate"> Penduduk: {{ number_format($data->jumlah_penduduk) }} | Stunting: <span class="font-bold text-red-600">{{ $data->jumlah_kasus_stunting }}</span> </p> <p class="text-xs text-gray-500 mt-1 truncate"> Diinput oleh: <span class="font-medium">{{ $data->user->name }}</span> | Periode: {{ $data->periode->format('F Y') }} </p> </div>
@@ -296,8 +327,14 @@
                                     @endif
                                 </div>
                             </div>
-                        @empty <p class="text-sm text-gray-500 pt-4 text-center">Tidak ada data Desa untuk diproses.</p>
+                        @empty 
+                            <p class="text-sm text-gray-500 pt-4 text-center">Tidak ada data Desa untuk diproses.</p>
                         @endforelse
+
+                        {{-- ✅ IMPLEMENTASI: Paginasi Kustom Desa --}}
+                        <div class="mt-6">
+                            <x-custom-pagination :data="$dataToReview['desa']->appends(['active_tab' => 'desa'])" />
+                        </div>
                     </div>
                 </div>
             </section>

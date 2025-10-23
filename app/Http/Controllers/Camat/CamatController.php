@@ -7,24 +7,76 @@ use App\Models\DataGizi;
 use App\Models\DataPencegahan;
 use App\Models\DataPenanggulangan;
 use App\Models\DataDesa;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB; // <-- Tambahkan ini
+use Illuminate\Http\Request; // Pastikan ini ada di atas
+use Illuminate\Support\Facades\DB;
 
 class CamatController extends Controller
 {
-    public function index()
+    // ✅ MODIFIKASI: Tambahkan (Request $request)
+    public function index(Request $request)
     {
-        // Sortir berdasarkan status agar pending/approved muncul di atas
+        // Tentukan jumlah item per halaman
+        $perPage = 10; // Anda bisa sesuaikan angka ini
+
+        // ✅ MODIFIKASI: Ubah ->get() menjadi ->paginate() dengan page name unik
         $allData = [
-            'gizi' => DataGizi::with('user')->orderByRaw("FIELD(status, 'pending', 'approved', 'published')")->latest('periode')->get(),
-            'pencegahan' => DataPencegahan::with('user')->orderByRaw("FIELD(status, 'pending', 'approved', 'published')")->latest('periode')->get(),
-            'penanggulangan' => DataPenanggulangan::with('user')->orderByRaw("FIELD(status, 'pending', 'approved', 'published')")->latest('periode')->get(),
-            'desa' => DataDesa::with('user')->orderByRaw("FIELD(status, 'pending', 'approved', 'published')")->latest('periode')->get(),
+            'gizi' => DataGizi::with('user')
+                ->orderByRaw("FIELD(status, 'pending', 'approved', 'published')")
+                ->latest('periode')
+                ->paginate($perPage, ['*'], 'gizi_page'), // <-- Unik
+
+            'pencegahan' => DataPencegahan::with('user')
+                ->orderByRaw("FIELD(status, 'pending', 'approved', 'published')")
+                ->latest('periode')
+                ->paginate($perPage, ['*'], 'pencegahan_page'), // <-- Unik
+
+            'penanggulangan' => DataPenanggulangan::with('user')
+                ->orderByRaw("FIELD(status, 'pending', 'approved', 'published')")
+                ->latest('periode')
+                ->paginate($perPage, ['*'], 'penanggulangan_page'), // <-- Unik
+
+            'desa' => DataDesa::with('user')
+                ->orderByRaw("FIELD(status, 'pending', 'approved', 'published')")
+                ->latest('periode')
+                ->paginate($perPage, ['*'], 'desa_page'), // <-- Unik
         ];
 
-        return view('camat.index', compact('allData'));
+        // ✅ TAMBAHAN: Cek status untuk tombol bulk action (cek ke seluruh tabel)
+        $bulkActionData = [
+            'gizi' => [
+                'has_pending' => DataGizi::where('status', 'pending')->exists(),
+                'has_approved' => DataGizi::where('status', 'approved')->exists(),
+            ],
+            'pencegahan' => [
+                'has_pending' => DataPencegahan::where('status', 'pending')->exists(),
+                'has_approved' => DataPencegahan::where('status', 'approved')->exists(),
+            ],
+            'penanggulangan' => [
+                'has_pending' => DataPenanggulangan::where('status', 'pending')->exists(),
+                'has_approved' => DataPenanggulangan::where('status', 'approved')->exists(),
+            ],
+            'desa' => [
+                'has_pending' => DataDesa::where('status', 'pending')->exists(),
+                'has_approved' => DataDesa::where('status', 'approved')->exists(),
+            ],
+        ];
+
+        // ✅ TAMBAHAN: Logika untuk menentukan active tab
+        // Prioritas:
+        // 1. Dari request (klik link paginasi ?active_tab=...)
+        // 2. Dari session (redirect setelah update/delete)
+        // 3. Default 'gizi'
+        $activeTab = $request->input('active_tab', session('active_tab', 'gizi'));
+
+        // Kirim semua data ke view
+        return view('camat.index', compact('allData', 'bulkActionData', 'activeTab'));
     }
 
+    // ... (Method updateStatus, destroy, dan bulkUpdateStatus tetap sama) ...
+    // ... (Pastikan method bulkUpdateStatus Anda sudah benar seperti di atas) ...
+    
+    // ... [Method updateStatus, destroy, dan bulkUpdateStatus Anda] ...
+    // ... (Tidak perlu diubah) ...
     public function updateStatus(Request $request)
     {
         $request->validate([
@@ -71,8 +123,7 @@ class CamatController extends Controller
 
         return back()->with('success', 'Data berhasil dihapus secara permanen.')->with('active_tab', $request->active_tab);
     }
-
-    // ✅ METHOD BARU UNTUK BULK UPDATE
+ 
     public function bulkUpdateStatus(Request $request)
     {
         $request->validate([
@@ -123,7 +174,7 @@ class CamatController extends Controller
                      $message = 'Tidak ada data dengan status "' . $currentStatus . '" yang perlu diupdate.';
                 }
             } catch (\Exception $e) {
-                 return back()->with('error', 'Terjadi kesalahan saat update massal: ' . $e->getMessage())->with('active_tab', $request->active_tab);
+                return back()->with('error', 'Terjadi kesalahan saat update massal: ' . $e->getMessage())->with('active_tab', $request->active_tab);
             }
         }
 

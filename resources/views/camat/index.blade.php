@@ -41,15 +41,15 @@
 
                 {{-- Dropdown Menu --}}
                 <div x-show="open" 
-                    x-transition:enter="transition ease-out duration-200"
-                    x-transition:enter-start="opacity-0 scale-95"
-                    x-transition:enter-end="opacity-100 scale-100"
-                    x-transition:leave="transition ease-in duration-150"
-                    x-transition:leave-start="opacity-100 scale-100"
-                    x-transition:leave-end="opacity-0 scale-95"
-                    @keydown.escape.window="open = false"
-                    class="absolute right-0 mt-2 w-56 rounded-lg bg-white shadow-lg ring-1 ring-black ring-opacity-5 z-50 overflow-hidden"
-                    style="display: none;">
+                     x-transition:enter="transition ease-out duration-200"
+                     x-transition:enter-start="opacity-0 scale-95"
+                     x-transition:enter-end="opacity-100 scale-100"
+                     x-transition:leave="transition ease-in duration-150"
+                     x-transition:leave-start="opacity-100 scale-100"
+                     x-transition:leave-end="opacity-0 scale-95"
+                     @keydown.escape.window="open = false"
+                     class="absolute right-0 mt-2 w-56 rounded-lg bg-white shadow-lg ring-1 ring-black ring-opacity-5 z-50 overflow-hidden"
+                     style="display: none;">
                     <div class="py-1">
                         {{-- Info User Header --}}
                         <div class="px-4 py-3 border-b border-gray-100">
@@ -59,7 +59,7 @@
 
                         {{-- Menu Profil --}}
                         <a href="{{ route('profile.index') }}" 
-                        class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                           class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
                                 <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 16a5.986 5.986 0 004.546-2.084A5 5 0 0012 11z" clip-rule="evenodd" />
                             </svg>
@@ -71,7 +71,7 @@
 
                         {{-- Home --}}
                         <a href="{{ route('welcome') }}" 
-                        class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                           class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
                             <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                               <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
                             </svg>
@@ -148,7 +148,8 @@
                 </div>
             @endif
 
-            <div x-data="{ activeTab: '{{ session('active_tab', 'gizi') }}', openModal: false, modalData: null, modalTitle: '' }" class="bg-white shadow-lg rounded-2xl ring-1 ring-black/5 overflow-hidden">
+            {{-- Menggunakan $activeTab dari controller --}}
+            <div x-data="{ activeTab: '{{ $activeTab }}', openModal: false, modalData: null, modalTitle: '' }" class="bg-white shadow-lg rounded-2xl ring-1 ring-black/5 overflow-hidden">
 
                 {{-- Navigasi Tab (scrollable di mobile, tetap rata di desktop) --}}
                 <div class="border-b border-gray-200">
@@ -177,13 +178,14 @@
                     <div x-show="activeTab === 'gizi'">
                         {{-- TOMBOL AKSI MASSAL GIZI --}}
                         <div class="mb-4 flex flex-col sm:flex-row gap-2 justify-end">
-                            @if($allData['gizi']->contains('status', 'pending'))
+                            @if($bulkActionData['gizi']['has_pending'])
                                 <form action="{{ route('camat.bulk_status') }}" method="POST" class="inline" onsubmit="return confirm('Anda yakin ingin Approve semua data Pending di tab ini?');"> @csrf <input type="hidden" name="model_type" value="gizi"> <input type="hidden" name="action" value="approve_all"> <input type="hidden" name="active_tab" x-bind:value="activeTab"> <button type="submit" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg bg-green-100 px-3 py-2 text-xs font-semibold text-green-700 transition hover:bg-green-200"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> Approve Semua Pending</button> </form>
                             @endif
-                             @if($allData['gizi']->contains('status', 'approved'))
+                            @if($bulkActionData['gizi']['has_approved'])
                                 <form action="{{ route('camat.bulk_status') }}" method="POST" class="inline" onsubmit="return confirm('Anda yakin ingin Tarik (Unapprove) semua data Approved di tab ini? Data Published tidak akan terpengaruh.');"> @csrf <input type="hidden" name="model_type" value="gizi"> <input type="hidden" name="action" value="unapprove_all"> <input type="hidden" name="active_tab" x-bind:value="activeTab"> <button type="submit" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg bg-yellow-100 px-3 py-2 text-xs font-semibold text-yellow-700 transition hover:bg-yellow-200"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg> Tarik Semua Approved</button> </form>
                             @endif
                         </div>
+                        
                         @forelse ($allData['gizi'] as $data)
                             <div class="py-4 border-b border-black/10 last:border-0 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
                                 <div class="min-w-0"> <p class="font-semibold text-gray-800 truncate">{{ $data->judul }}</p> <p class="text-xs text-gray-500 mt-1 truncate"> Diinput oleh: <span class="font-medium">{{ $data->user->name }}</span> | Periode: {{ $data->periode->format('F Y') }} </p> </div>
@@ -200,21 +202,29 @@
                                     @endif
                                 </div>
                             </div>
-                        @empty <p class="text-sm text-gray-500 pt-4 text-center">Tidak ada data Gizi untuk direview.</p>
+                        @empty 
+                            <p class="text-sm text-gray-500 pt-4 text-center">Tidak ada data Gizi untuk direview.</p>
                         @endforelse
+
+                        {{-- ✅ IMPLEMENTASI: Paginasi Kustom Gizi --}}
+                        <div class="mt-6">
+                            {{-- Kita teruskan paginator instance yang sudah ditambahi query 'active_tab' --}}
+                            <x-custom-pagination :data="$allData['gizi']->appends(['active_tab' => 'gizi'])" />
+                        </div>
                     </div>
 
                     {{-- Konten Pencegahan --}}
                     <div x-show="activeTab === 'pencegahan'" style="display: none;">
                          {{-- TOMBOL AKSI MASSAL PENCEGAHAN --}}
                         <div class="mb-4 flex flex-col sm:flex-row gap-2 justify-end">
-                            @if($allData['pencegahan']->contains('status', 'pending'))
+                            @if($bulkActionData['pencegahan']['has_pending'])
                                 <form action="{{ route('camat.bulk_status') }}" method="POST" class="inline" onsubmit="return confirm('Anda yakin ingin Approve semua data Pending di tab ini?');"> @csrf <input type="hidden" name="model_type" value="pencegahan"> <input type="hidden" name="action" value="approve_all"> <input type="hidden" name="active_tab" x-bind:value="activeTab"> <button type="submit" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg bg-green-100 px-3 py-2 text-xs font-semibold text-green-700 transition hover:bg-green-200"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> Approve Semua Pending</button> </form>
                             @endif
-                             @if($allData['pencegahan']->contains('status', 'approved'))
+                            @if($bulkActionData['pencegahan']['has_approved'])
                                 <form action="{{ route('camat.bulk_status') }}" method="POST" class="inline" onsubmit="return confirm('Anda yakin ingin Tarik (Unapprove) semua data Approved di tab ini? Data Published tidak akan terpengaruh.');"> @csrf <input type="hidden" name="model_type" value="pencegahan"> <input type="hidden" name="action" value="unapprove_all"> <input type="hidden" name="active_tab" x-bind:value="activeTab"> <button type="submit" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg bg-yellow-100 px-3 py-2 text-xs font-semibold text-yellow-700 transition hover:bg-yellow-200"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg> Tarik Semua Approved</button> </form>
                             @endif
                         </div>
+                        
                         @forelse ($allData['pencegahan'] as $data)
                             <div class="py-4 border-b border-black/10 last:border-0 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
                                 <div class="min-w-0"> <p class="font-semibold text-gray-800 truncate">{{ $data->judul_kegiatan }}</p> <p class="text-xs text-gray-500 mt-1 truncate"> Diinput oleh: <span class="font-medium">{{ $data->user->name }}</span> | Periode: {{ $data->periode->format('F Y') }} </p> </div>
@@ -231,26 +241,32 @@
                                     @endif
                                 </div>
                             </div>
-                        @empty <p class="text-sm text-gray-500 pt-4 text-center">Tidak ada data Pencegahan untuk direview.</p>
+                        @empty 
+                            <p class="text-sm text-gray-500 pt-4 text-center">Tidak ada data Pencegahan untuk direview.</p>
                         @endforelse
+
+                        {{-- ✅ IMPLEMENTASI: Paginasi Kustom Pencegahan --}}
+                        <div class="mt-6">
+                            <x-custom-pagination :data="$allData['pencegahan']->appends(['active_tab' => 'pencegahan'])" />
+                        </div>
                     </div>
 
                     {{-- Konten Penanggulangan --}}
                     <div x-show="activeTab === 'penanggulangan'" style="display: none;">
                         {{-- TOMBOL AKSI MASSAL PENANGGULANGAN --}}
                         <div class="mb-4 flex flex-col sm:flex-row gap-2 justify-end">
-                            @if($allData['penanggulangan']->contains('status', 'pending'))
+                            @if($bulkActionData['penanggulangan']['has_pending'])
                                 <form action="{{ route('camat.bulk_status') }}" method="POST" class="inline" onsubmit="return confirm('Anda yakin ingin Approve semua data Pending di tab ini?');"> @csrf <input type="hidden" name="model_type" value="penanggulangan"> <input type="hidden" name="action" value="approve_all"> <input type="hidden" name="active_tab" x-bind:value="activeTab"> <button type="submit" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg bg-green-100 px-3 py-2 text-xs font-semibold text-green-700 transition hover:bg-green-200"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> Approve Semua Pending</button> </ form>
                             @endif
-                            @if($allData['penanggulangan']->contains('status', 'approved'))
+                            @if($bulkActionData['penanggulangan']['has_approved'])
                                 <form action="{{ route('camat.bulk_status') }}" method="POST" class="inline" onsubmit="return confirm('Anda yakin ingin Tarik (Unapprove) semua data Approved di tab ini? Data Published tidak akan terpengaruh.');"> @csrf <input type="hidden" name="model_type" value="penanggulangan"> <input type="hidden" name="action" value="unapprove_all"> <input type="hidden" name="active_tab" x-bind:value="activeTab"> <button type="submit" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg bg-yellow-100 px-3 py-2 text-xs font-semibold text-yellow-700 transition hover:bg-yellow-200"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg> Tarik Semua Approved</button> </ form>
                             @endif
                         </div>
+                        
                         @forelse ($allData['penanggulangan'] as $data)
                             <div class="py-4 border-b border-black/10 last:border-0 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
                                 <div class="min-w-0"> <p class="font-semibold text-gray-800 truncate">{{ $data->jenis_bencana }} ({{$data->jumlah_korban}} korban)</p> <p class="text-xs text-gray-500 mt-1 truncate"> Diinput oleh: <span class="font-medium">{{ $data->user->name }}</span> | Periode: {{ $data->periode->format('F Y') }} </p> </div>
                                 <div class="flex flex-wrap items-center gap-2 sm:justify-end">
-                                    {{-- ✅ PERBAIKAN: Tambahkan type="button" --}}
                                     <button type="button" @click="openModal = true; modalData = {{ Js::from($data) }}; modalTitle = 'Detail Data Penanggulangan'" class="text-xs text-indigo-600 hover:underline px-2">Detail</button>
                                     @if($data->status === 'published') <span class="inline-flex items-center gap-1 rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-700"><span class="h-1.5 w-1.5 rounded-full bg-green-600"></span>Published</span> @elseif($data->status === 'approved') <span class="inline-flex items-center gap-1 rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-700"><span class="h-1.5 w-1.5 rounded-full bg-blue-600"></span>Approved</span> @else <span class="inline-flex items-center gap-1 rounded-full bg-yellow-100 px-3 py-1 text-xs font-medium text-yellow-700"><span class="h-1.5 w-1.5 rounded-full bg-yellow-600"></span>Pending</span> @endif
                                     {{-- Tombol Aksi Penanggulangan --}}
@@ -263,18 +279,24 @@
                                     @endif
                                 </div>
                             </div>
-                        @empty <p class="text-sm text-gray-500 pt-4 text-center">Tidak ada data Penanggulangan untuk direview.</p>
+                        @empty 
+                            <p class="text-sm text-gray-500 pt-4 text-center">Tidak ada data Penanggulangan untuk direview.</p>
                         @endforelse
+
+                        {{-- ✅ IMPLEMENTASI: Paginasi Kustom Penanggulangan --}}
+                        <div class="mt-6">
+                            <x-custom-pagination :data="$allData['penanggulangan']->appends(['active_tab' => 'penanggulangan'])" />
+                        </div>
                     </div>
 
                     {{-- Konten Desa --}}
                         <div x-show="activeTab === 'desa'" style="display: none;">
                         {{-- TOMBOL AKSI MASSAL DESA --}}
                         <div class="mb-4 flex flex-col sm:flex-row gap-2 justify-end">
-                            @if($allData['desa']->contains('status', 'pending'))
+                            @if($bulkActionData['desa']['has_pending'])
                                 <form action="{{ route('camat.bulk_status') }}" method="POST" class="inline" onsubmit="return confirm('Anda yakin ingin Approve semua data Pending di tab ini?');"> @csrf <input type="hidden" name="model_type" value="desa"> <input type="hidden" name="action" value="approve_all"> <input type="hidden" name="active_tab" x-bind:value="activeTab"> <button type="submit" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg bg-green-100 px-3 py-2 text-xs font-semibold text-green-700 transition hover:bg-green-200"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> Approve Semua Pending</button> </ form>
                             @endif
-                            @if($allData['desa']->contains('status', 'approved'))
+                            @if($bulkActionData['desa']['has_approved'])
                                 <form action="{{ route('camat.bulk_status') }}" method="POST" class="inline" onsubmit="return confirm('Anda yakin ingin Tarik (Unapprove) semua data Approved di tab ini? Data Published tidak akan terpengaruh.');"> @csrf <input type="hidden" name="model_type" value="desa"> <input type="hidden" name="action" value="unapprove_all"> <input type="hidden" name="active_tab" x-bind:value="activeTab"> <button type="submit" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg bg-yellow-100 px-3 py-2 text-xs font-semibold text-yellow-700 transition hover:bg-yellow-200"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg> Tarik Semua Approved</button> </ form>
                             @endif
                         </div>
@@ -283,7 +305,6 @@
                             <div class="py-4 border-b border-black/10 last:border-0 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
                                 <div class="min-w-0"> <p class="font-semibold text-gray-800 truncate">{{ $data->nama_desa }}</p> <p class="text-xs text-gray-500 mt-1 truncate"> Diinput oleh: <span class="font-medium">{{ $data->user->name }}</span> | Periode: {{ $data->periode->format('F Y') }} </p> </div>
                                 <div class="flex flex-wrap items-center gap-2 sm:justify-end">
-                                    {{-- ✅ PERBAIKAN: Tambahkan type="button" --}}
                                     <button type="button" @click="openModal = true; modalData = {{ Js::from($data) }}; modalTitle = 'Detail Data Desa'" class="text-xs text-indigo-600 hover:underline px-2">Detail</button>
                                     @if($data->status === 'published') <span class="inline-flex items-center gap-1 rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-700"><span class="h-1.5 w-1.5 rounded-full bg-green-600"></span>Published</span> @elseif($data->status === 'approved') <span class="inline-flex items-center gap-1 rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-700"><span class="h-1.5 w-1.5 rounded-full bg-blue-600"></span>Approved</span> @else <span class="inline-flex items-center gap-1 rounded-full bg-yellow-100 px-3 py-1 text-xs font-medium text-yellow-700"><span class="h-1.5 w-1.5 rounded-full bg-yellow-600"></span>Pending</span> @endif
 
@@ -299,39 +320,44 @@
                             </div>
                         @empty <p class="text-sm text-gray-500 pt-4 text-center">Tidak ada data Desa untuk direview.</p>
                         @endforelse
+
+                        {{-- ✅ IMPLEMENTASI: Paginasi Kustom Desa --}}
+                        <div class="mt-6">
+                            <x-custom-pagination :data="$allData['desa']->appends(['active_tab' => 'desa'])" />
+                        </div>
                     </div>
                 </div>
 
                 {{-- Modal Detail --}}
                 <div x-show="openModal" @keydown.escape.window="openModal = false" class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true" style="display: none;">
-                      <div class="flex items-end justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
-                        <div x-show="openModal" @click="openModal = false" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
-                        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-                        <div x-show="openModal" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100" x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100" x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                             class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all w-full max-w-lg sm:my-8 sm:align-middle sm:max-w-2xl">
-                            <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                                <div class="sm:flex sm:items-start">
-                                    <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
-                                        <h3 class="text-lg leading-6 font-bold text-gray-900" id="modal-title" x-text="modalTitle"></h3>
-                                        <div class="mt-4 text-sm text-gray-600 space-y-4">
-                                            <template x-if="modalData">
-                                                <div class="space-y-3 max-h-[70vh] sm:max-h-[60vh] overflow-y-auto pr-1 sm:pr-4">
-                                                    <template x-if="modalTitle === 'Detail Data Gizi'"> <div> <p class="font-semibold text-gray-800">Judul:</p> <p x-text="modalData.judul"></p> <p class="font-semibold text-gray-800 mt-2">Deskripsi:</p> <p class="preserve-lines" x-text="modalData.deskripsi"></p> </div> </template>
-                                                    <template x-if="modalTitle === 'Detail Data Pencegahan'"> <div> <p><span class="font-semibold text-gray-800">Judul Kegiatan:</span> <span x-text="modalData.judul_kegiatan"></span></p> <p><span class="font-semibold text-gray-800">Lokasi:</span> <span x-text="modalData.lokasi"></span></p> <p><span class="font-semibold text-gray-800">Tanggal Kegiatan:</span> <span x-text="new Date(modalData.tanggal_kegiatan).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })"></span></p> <p class="font-semibold text-gray-800 mt-2">Laporan Singkat:</p> <p class="preserve-lines" x-text="modalData.laporan_singkat"></p> </div> </template>
-                                                    <template x-if="modalTitle === 'Detail Data Penanggulangan'"> <div> <p><span class="font-semibold text-gray-800">Jenis Bencana:</span> <span x-text="modalData.jenis_bencana"></span></p> <p><span class="font-semibold text-gray-800">Jumlah Korban:</span> <span x-text="modalData.jumlah_korban"></span></p> <p class="font-semibold text-gray-800 mt-2">Tindakan:</p> <p class="preserve-lines" x-text="modalData.tindakan"></p> </div> </template>
-                                                    <template x-if="modalTitle === 'Detail Data Desa'"> <div> <p><span class="font-semibold text-gray-800">Nama Desa:</span> <span x-text="modalData.nama_desa"></span></p> <p><span class="font-semibold text-gray-800">Jumlah Penduduk:</span> <span x-text="new Intl.NumberFormat('id-ID').format(modalData.jumlah_penduduk)"></span></p> <p><span class="font-semibold text-gray-800">Luas Wilayah:</span> <span x-text="new Intl.NumberFormat('id-ID').format(modalData.luas_wilayah)"></span> m²</p> <p><span class="font-semibold text-gray-800">Jumlah Kasus Stunting:</span> <span x-text="modalData.jumlah_kasus_stunting" class="font-bold text-red-600"></span></p> <p class="font-semibold text-gray-800 mt-2">Potensi Desa:</p> <p class="preserve-lines" x-text="modalData.potensi_desa"></p> </div> </template>
-                                                    <div class="border-t pt-3 mt-3"> <p><span class="font-semibold text-gray-800">Periode Laporan:</span> <span x-text="new Date(modalData.periode).toLocaleString('id-ID', { month: 'long', year: 'numeric' })"></span></p> </div>
-                                                </div>
-                                            </template>
+                        <div class="flex items-end justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+                            <div x-show="openModal" @click="openModal = false" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+                            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+                            <div x-show="openModal" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100" x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100" x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                                 class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all w-full max-w-lg sm:my-8 sm:align-middle sm:max-w-2xl">
+                                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                                    <div class="sm:flex sm:items-start">
+                                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+                                            <h3 class="text-lg leading-6 font-bold text-gray-900" id="modal-title" x-text="modalTitle"></h3>
+                                            <div class="mt-4 text-sm text-gray-600 space-y-4">
+                                                <template x-if="modalData">
+                                                    <div class="space-y-3 max-h-[70vh] sm:max-h-[60vh] overflow-y-auto pr-1 sm:pr-4">
+                                                        <template x-if="modalTitle === 'Detail Data Gizi'"> <div> <p class="font-semibold text-gray-800">Judul:</p> <p x-text="modalData.judul"></p> <p class="font-semibold text-gray-800 mt-2">Deskripsi:</p> <p class="preserve-lines" x-text="modalData.deskripsi"></p> </div> </template>
+                                                        <template x-if="modalTitle === 'Detail Data Pencegahan'"> <div> <p><span class="font-semibold text-gray-800">Judul Kegiatan:</span> <span x-text="modalData.judul_kegiatan"></span></p> <p><span class="font-semibold text-gray-800">Lokasi:</span> <span x-text="modalData.lokasi"></span></p> <p><span class="font-semibold text-gray-800">Tanggal Kegiatan:</span> <span x-text="new Date(modalData.tanggal_kegiatan).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })"></span></p> <p class="font-semibold text-gray-800 mt-2">Laporan Singkat:</p> <p class="preserve-lines" x-text="modalData.laporan_singkat"></p> </div> </template>
+                                                        <template x-if="modalTitle === 'Detail Data Penanggulangan'"> <div> <p><span class="font-semibold text-gray-800">Jenis Bencana:</span> <span x-text="modalData.jenis_bencana"></span></p> <p><span class="font-semibold text-gray-800">Jumlah Korban:</span> <span x-text="modalData.jumlah_korban"></span></p> <p class="font-semibold text-gray-800 mt-2">Tindakan:</p> <p class="preserve-lines" x-text="modalData.tindakan"></p> </div> </template>
+                                                        <template x-if="modalTitle === 'Detail Data Desa'"> <div> <p><span class="font-semibold text-gray-800">Nama Desa:</span> <span x-text="modalData.nama_desa"></span></p> <p><span class="font-semibold text-gray-800">Jumlah Penduduk:</span> <span x-text="new Intl.NumberFormat('id-ID').format(modalData.jumlah_penduduk)"></span></p> <p><span class="font-semibold text-gray-800">Luas Wilayah:</span> <span x-text="new Intl.NumberFormat('id-ID').format(modalData.luas_wilayah)"></span> m²</p> <p><span class="font-semibold text-gray-800">Jumlah Kasus Stunting:</span> <span x-text="modalData.jumlah_kasus_stunting" class="font-bold text-red-600"></span></p> <p class="font-semibold text-gray-800 mt-2">Potensi Desa:</p> <p class="preserve-lines" x-text="modalData.potensi_desa"></p> </div> </template>
+                                                        <div class="border-t pt-3 mt-3"> <p><span class="font-semibold text-gray-800">Periode Laporan:</span> <span x-text="new Date(modalData.periode).toLocaleString('id-ID', { month: 'long', year: 'numeric' })"></span></p> </div>
+                                                    </div>
+                                                </template>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                                <button @click="openModal = false" type="button" class="mt-3 sm:mt-0 sm:ml-3 w-full sm:w-auto inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base sm:text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"> Tutup </button>
+                                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                                    <button @click="openModal = false" type="button" class="mt-3 sm:mt-0 sm:ml-3 w-full sm:w-auto inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base sm:text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"> Tutup </button>
+                                </div>
                             </div>
                         </div>
-                    </div>
                 </div>
 
             </div>
