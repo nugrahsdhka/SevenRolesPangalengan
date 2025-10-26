@@ -45,7 +45,9 @@ Route::middleware('auth', 'verified')->group(function () {
     // Divisi Gizi
     Route::middleware(['role:Divisi Gizi'])->prefix('divisi-gizi')->name('gizi.')->group(function () {
         Route::resource('/', DivisiGiziController::class)->parameters(['' => 'data_gizi']);
+        Route::post('/aggregated-delete', [DivisiGiziController::class, 'destroyAggregated'])->name('destroyAggregated');
 
+        Route::get('/gizi/desa/{desa}', [DivisiGiziController::class, 'detail'])->name('detail');
         Route::post('/import', [DivisiGiziController::class, 'import'])->name('import');
     });
 
@@ -53,7 +55,6 @@ Route::middleware('auth', 'verified')->group(function () {
     Route::middleware(['role:Divisi Pencegahan'])->prefix('divisi-pencegahan')->name('pencegahan.')->group(function () {
         Route::resource('/', DivisiPencegahanController::class)->parameters(['' => 'data_pencegahan']);
 
-        // ✅ TAMBAHKAN RUTE INI
         Route::post('/import', [DivisiPencegahanController::class, 'import'])->name('import');
     });
 
@@ -74,9 +75,12 @@ Route::middleware('auth', 'verified')->group(function () {
     // Camat
     Route::middleware(['role:Camat'])->prefix('camat')->name('camat.')->group(function () {
         Route::get('/review', [CamatController::class, 'index'])->name('review');
+        
+        // TAMBAHKAN ROUTE INI
+        Route::get('/review/gizi/{desa_kelurahan}', [CamatController::class, 'showGiziDetail'])->name('review.gizi.detail');
+
         Route::post('/status', [CamatController::class, 'updateStatus'])->name('status');
         Route::delete('/delete', [CamatController::class, 'destroy'])->name('destroy');
-
         Route::post('/bulk-status', [CamatController::class, 'bulkUpdateStatus'])->name('bulk_status');
     });
 
@@ -84,6 +88,8 @@ Route::middleware('auth', 'verified')->group(function () {
     Route::middleware(['role:IT Admin'])->prefix('admin')->name('admin.')->group(function () {
         Route::get('/published-data', [AdminController::class, 'publishedData'])->name('published.index');
         Route::post('/publish-data', [AdminController::class, 'publish'])->name('publish');
+
+        Route::get('/published-data/gizi/{desa_kelurahan}', [AdminController::class, 'showGiziDetail'])->name('published.gizi.detail');
 
         Route::get('/users/create', [UserController::class, 'create'])->name('users.create');
         Route::post('/users', [UserController::class, 'store'])->name('users.store');

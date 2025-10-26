@@ -8,9 +8,6 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('data_gizis', function (Blueprint $table) {
-            $table->date('periode')->after('user_id');
-        });
         Schema::table('data_pencegahans', function (Blueprint $table) {
             $table->date('periode')->after('user_id');
         });
@@ -24,9 +21,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::table('data_gizis', function (Blueprint $table) {
-            $table->dropColumn('periode');
-        });
         Schema::table('data_pencegahans', function (Blueprint $table) {
             $table->dropColumn('periode');
         });

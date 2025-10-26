@@ -14,7 +14,7 @@
                     </div>
                     <div class="flex flex-col justify-start items-start">
                         <h3 class="text-lg font-bold text-red-700">Formulir Edit Data Gizi</h3>
-                        <p class="text-xs font-bold text-red-700">Lengkapi Form di Bawah</p>
+                        <p class="text-xs font-bold text-red-700">Perbarui Form di Bawah</p>
                     </div>
                 </div>
 
@@ -24,47 +24,102 @@
                     @method('PUT') {{-- Method untuk update --}}
 
                     <div class="space-y-5">
-                        {{-- Periode --}}
+                        
+                        {{-- Desa/Kelurahan --}}
                         <div>
-                            <x-input-label for="periode" :value="__('Periode Laporan')" class="text-sm font-medium text-gray-700" />
-                            <x-text-input id="periode" 
-                                class="mt-2 block w-full rounded-lg border-gray-300 bg-gray-50 px-4 py-2.5 transition focus:border-red-500 focus:bg-white focus:ring-2 focus:ring-red-500/20" 
-                                type="month" 
-                                name="periode" 
-                                :value="old('periode', $data->periode->format('Y-m'))" 
-                                required 
-                                autofocus />
-                            <x-input-error :messages="$errors->get('periode')" class="mt-2" />
-                        </div>
-
-                        {{-- Judul Data --}}
-                        <div>
-                            <x-input-label for="judul" :value="__('Judul Data')" class="text-sm font-medium text-gray-700" />
-                            <x-text-input id="judul" 
+                            <x-input-label for="desa_kelurahan" :value="__('Desa/Kelurahan')" class="text-sm font-medium text-gray-700" />
+                            <x-text-input id="desa_kelurahan" 
                                 class="mt-2 block w-full rounded-lg border-gray-300 bg-gray-50 px-4 py-2.5 transition focus:border-red-500 focus:bg-white focus:ring-2 focus:ring-red-500/20" 
                                 type="text" 
-                                name="judul" 
-                                :value="old('judul', $data->judul)" 
-                                placeholder="Contoh: Jadwal Posyandu Bulanan"
-                                required />
-                            <x-input-error :messages="$errors->get('judul')" class="mt-2" />
+                                name="desa_kelurahan" 
+                                :value="old('desa_kelurahan', $data->desa_kelurahan)" 
+                                placeholder="Contoh: Kelurahan Sukasari"
+                                required 
+                                autofocus />
+                            <x-input-error :messages="$errors->get('desa_kelurahan')" class="mt-2" />
                         </div>
 
-                        {{-- Deskripsi Lengkap --}}
-                        <div>
-                            <x-input-label for="deskripsi" :value="__('Deskripsi Lengkap')" class="text-sm font-medium text-gray-700" />
-                            <textarea id="deskripsi" 
-                                name="deskripsi" 
-                                rows="5"
-                                placeholder="Jelaskan detail informasi gizi di sini..."
-                                class="mt-2 block w-full rounded-lg border-gray-300 bg-gray-50 px-4 py-3 transition focus:border-red-500 focus:bg-white focus:ring-2 focus:ring-red-500/20">{{ old('deskripsi', $data->deskripsi) }}</textarea>
-                            <x-input-error :messages="$errors->get('deskripsi')" class="mt-2" />
+                        {{-- Berat & Tinggi --}}
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <x-input-label for="berat" :value="__('Berat (kg)')" class="text-sm font-medium text-gray-700" />
+                                <x-text-input id="berat" 
+                                    class="mt-2 block w-full rounded-lg border-gray-300 bg-gray-50 px-4 py-2.5 transition focus:border-red-500 focus:bg-white focus:ring-2 focus:ring-red-500/20" 
+                                    type="number" 
+                                    name="berat" 
+                                    :value="old('berat', $data->berat)" 
+                                    step="0.01" min="0" max="999.99"
+                                    placeholder="Contoh: 10.5"
+                                    required />
+                                <x-input-error :messages="$errors->get('berat')" class="mt-2" />
+                            </div>
+                            <div>
+                                <x-input-label for="tinggi" :value="__('Tinggi (cm)')" class="text-sm font-medium text-gray-700" />
+                                <x-text-input id="tinggi" 
+                                    class="mt-2 block w-full rounded-lg border-gray-300 bg-gray-50 px-4 py-2.5 transition focus:border-red-500 focus:bg-white focus:ring-2 focus:ring-red-500/20" 
+                                    type="number" 
+                                    name="tinggi" 
+                                    :value="old('tinggi', $data->tinggi)" 
+                                    step="0.01" min="0" max="999.99"
+                                    placeholder="Contoh: 70.2"
+                                    required />
+                                <x-input-error :messages="$errors->get('tinggi')" class="mt-2" />
+                            </div>
                         </div>
+
+                        {{-- Data Opsional Hasil Kalkulasi --}}
+                        <div class="pt-4 border-t">
+                            <h4 class="text-md font-semibold text-gray-800">Hasil Status Gizi (Opsional)</h4>
+                            <p class="text-sm text-gray-500 mb-4">Kolom ini bisa dikosongkan jika belum dihitung.</p>
+                            
+                            {{-- BB/U --}}
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+                                <div>
+                                    <x-input-label for="status_bb_u" :value="__('Status BB/U')" />
+                                    <x-text-input id="status_bb_u" class="mt-2 block w-full rounded-lg border-gray-300 bg-gray-50 px-4 py-2.5 transition focus:border-red-500 focus:bg-white focus:ring-2 focus:ring-red-500/20" type="text" name="status_bb_u" :value="old('status_bb_u', $data->status_bb_u)" placeholder="Gizi Baik, Gizi Kurang..." />
+                                    <x-input-error :messages="$errors->get('status_bb_u')" class="mt-2" />
+                                </div>
+                                <div>
+                                    <x-input-label for="zs_bb_u" :value="__('Z-Score BB/U')" />
+                                    <x-text-input id="zs_bb_u" class="mt-2 block w-full rounded-lg border-gray-300 bg-gray-50 px-4 py-2.5 transition focus:border-red-500 focus:bg-white focus:ring-2 focus:ring-red-500/20" type="number" name="zs_bb_u" :value="old('zs_bb_u', $data->zs_bb_u)" step="0.01" min="-99.99" max="99.99" placeholder="Contoh: -2.15" />
+                                    <x-input-error :messages="$errors->get('zs_bb_u')" class="mt-2" />
+                                </div>
+                            </div>
+
+                            {{-- TB/U --}}
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+                                <div>
+                                    <x-input-label for="status_tb_u" :value="__('Status TB/U')" />
+                                    <x-text-input id="status_tb_u" class="mt-2 block w-full rounded-lg border-gray-300 bg-gray-50 px-4 py-2.5 transition focus:border-red-500 focus:bg-white focus:ring-2 focus:ring-red-500/20" type="text" name="status_tb_u" :value="old('status_tb_u', $data->status_tb_u)" placeholder="Normal, Stunted..." />
+                                    <x-input-error :messages="$errors->get('status_tb_u')" class="mt-2" />
+                                </div>
+                                <div>
+                                    <x-input-label for="zs_tb_u" :value="__('Z-Score TB/U')" />
+                                    <x-text-input id="zs_tb_u" class="mt-2 block w-full rounded-lg border-gray-300 bg-gray-50 px-4 py-2.5 transition focus:border-red-500 focus:bg-white focus:ring-2 focus:ring-red-500/20" type="number" name="zs_tb_u" :value="old('zs_tb_u', $data->zs_tb_u)" step="0.01" min="-99.99" max="99.99" placeholder="Contoh: -1.05" />
+                                    <x-input-error :messages="$errors->get('zs_tb_u')" class="mt-2" />
+                                </div>
+                            </div>
+
+                            {{-- BB/TB --}}
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <x-input-label for="status_bb_tb" :value="__('Status BB/TB')" />
+                                    <x-text-input id="status_bb_tb" class="mt-2 block w-full rounded-lg border-gray-300 bg-gray-50 px-4 py-2.5 transition focus:border-red-500 focus:bg-white focus:ring-2 focus:ring-red-500/20" type="text" name="status_bb_tb" :value="old('status_bb_tb', $data->status_bb_tb)" placeholder="Gizi Baik, Wasted..." />
+                                    <x-input-error :messages="$errors->get('status_bb_tb')" class="mt-2" />
+                                </div>
+                                <div>
+                                    <x-input-label for="zs_bb_tb" :value="__('Z-Score BB/TB')" />
+                                    <x-text-input id="zs_bb_tb" class="mt-2 block w-full rounded-lg border-gray-300 bg-gray-50 px-4 py-2.5 transition focus:border-red-500 focus:bg-white focus:ring-2 focus:ring-red-5OF0/20" type="number" name="zs_bb_tb" :value="old('zs_bb_tb', $data->zs_bb_tb)" step="0.01" min="-99.99" max="99.99" placeholder="Contoh: 0.5" />
+                                    <x-input-error :messages="$errors->get('zs_bb_tb')" class="mt-2" />
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
 
                     {{-- Action Buttons --}}
-                    <div class="flex items-center justify-end gap-3 border-t border-gray-200 pt-6">
-                        <a href="{{ route('gizi.index') }}" class="rounded-lg px-4 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-100">
+                    <div class="flex items-center justify-end gap-3 border-t border-gray-200 pt-6"> 
+                        <a href="{{ route('gizi.detail', ['desa' => $data->desa_kelurahan]) }}" class="rounded-lg px-4 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-100">
                             Batal
                         </a>
                         <x-primary-button class="rounded-lg bg-gradient-to-r from-red-600 to-rose-600 px-6 py-2.5 text-sm font-semibold shadow-md transition hover:from-red-700 hover:to-rose-700 hover:shadow-lg focus:ring-red-500">
