@@ -17,7 +17,7 @@ class AdminController extends Controller
      */
     public function publishedData(Request $request)
     {
-        $perPage = 10; 
+        $perPage = 20; 
 
         $dataToReview = [
             // ✅ MODIFIKASI: Query Gizi diubah menjadi Agregasi

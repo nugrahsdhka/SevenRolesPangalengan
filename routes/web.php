@@ -22,6 +22,7 @@ use App\Http\Controllers\Guest\AnalisisHotspotController;
 // Guest Route
 Route::get('/', [HomeController::class, 'index'])->name('welcome');
 Route::get('/data-stunting', [DataStuntingController::class, 'index'])->name('data-stunting');
+Route::get('/data-stunting/chart-data-zs', [DataStuntingController::class, 'getChartDataZs'])->name('data-stunting.chart-data-zs');
 Route::get('/data-wilayah', [DataWilayahController::class, 'index'])->name('data-wilayah');
 Route::get('/analisis-hotspot', [AnalisisHotspotController::class, 'index'])->name('analisis-hotspot');
 Route::get('/peta-faskes', [PetaController::class, 'index'])->name('peta-faskes');
