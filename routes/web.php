@@ -78,7 +78,8 @@ Route::middleware('auth', 'verified')->group(function () {
         Route::get('/review', [CamatController::class, 'index'])->name('review');
         
         // TAMBAHKAN ROUTE INI
-        Route::get('/review/gizi/{desa_kelurahan}', [CamatController::class, 'showGiziDetail'])->name('review.gizi.detail');
+        Route::get('/review/gizi/{desa_kelurahan}', [CamatController::class, 'showGiziDetail'])
+            ->name('gizi.detail');
 
         Route::post('/status', [CamatController::class, 'updateStatus'])->name('status');
         Route::delete('/delete', [CamatController::class, 'destroy'])->name('destroy');

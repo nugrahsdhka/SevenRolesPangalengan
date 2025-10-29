@@ -112,7 +112,7 @@ class AdminController extends Controller
 
         // 3. Tampilkan view baru
         // Menggunakan view admin/published/detailGizi.blade.php
-        return view('admin.published.detailGizi', compact('desaKelurahan', 'statistik', 'dataGizi'));
+        return view('detail.detailGizi', compact('desaKelurahan','statistik','dataGizi'));
     }
 
 

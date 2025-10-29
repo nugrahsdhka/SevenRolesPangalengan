@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Data Stunting — Pangalengan</title>
+    <title>RSP | Home</title>
 
     <link rel="icon" href="{{ asset('img/logo-kab-bandung.png') }}" type="image/png">
 
@@ -39,8 +39,6 @@
 
     {{-- ====== MODERN HEADER WITH GLASSMORPHISM ====== --}}
     <header class="text-red-100 relative overflow-hidden bg-gradient-to-br from-red-800 via-red-800 to-rose-700">
-        {{-- Top Bar --}}
-
         {{-- Desktop View --}}
         <div class="hidden md:block relative bg-red-800 py-3 border-b border-red-600/50">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -64,7 +62,6 @@
 
         {{-- Main Header --}}
         <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            {{-- ✅ PERBAIKAN: flex-col lg:flex-row untuk menumpuk di mobile --}}
             <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
                 
                 {{-- Left: Logo & Info --}}
@@ -82,9 +79,9 @@
                         <h1 class="text-xl font-bold relative z-10 text-white">Rumah Stunting Pangalengan</h1>
                         <p class="text-sm text-red-100 mt-0.5 relative z-10">Kabupaten Bandung • Provinsi Jawa Barat</p>
                         <div class="flex gap-3 mt-3 text-sm relative z-10">
-                            <span class="font-medium px-3 py-1 bg-white/10 rounded-lg">5 Faskes</span>
-                            <span class="font-medium px-3 py-1 bg-white/10 rounded-lg">13 Desa</span>
-                            <span class="block md:hidden font-medium px-3 py-1 bg-white/10 rounded-lg">27.8% Kasus</span>
+                            <span class="font-medium px-3 py-1 bg-white/10 rounded-lg">{{ $total_faskes ?? 0 }} Faskes</span>
+                            <span class="font-medium px-3 py-1 bg-white/10 rounded-lg">{{ $total_desa ?? 0 }} Desa</span>
+                            <span class="block md:hidden font-medium px-3 py-1 bg-white/10 rounded-lg">{{ number_format($rata_rata_kasus ?? 0, 1) }}% Stunting</span>
                         </div>
                     </div>
                 </div>
@@ -94,87 +91,226 @@
                     
                     <div class="relative bg-red-600/50 backdrop-blur-sm rounded-xl px-8 py-4 text-center flex-1 min-w-[140px] border border-red-500/30 overflow-hidden">
                         <p class="text-xs text-red-100 uppercase">Total Desa</p>
-                        <p class="text-4xl font-bold mt-1 text-white">13</p>
+                        <p class="text-4xl font-bold mt-1 text-white">{{ $total_desa ?? 0 }}</p>
                     </div>
 
                     <div class="relative bg-red-600/50 backdrop-blur-sm rounded-xl px-8 py-4 text-center flex-1 min-w-[140px] border border-red-500/30 overflow-hidden">
-                        <p class="text-xs text-red-100 uppercase">Rata-rata (%)</p>
-                        <p class="text-4xl font-bold mt-1 text-white">27.8%</p>
+                        <p class="text-xs text-red-100 uppercase">Stunting (%)</p>
+                        <p class="text-4xl font-bold mt-1 text-white">{{ number_format($rata_rata_kasus ?? 0, 1) }}%</p>
                     </div>
 
                     <div class="relative bg-red-600/50 backdrop-blur-sm rounded-xl px-8 py-4 text-center flex-1 min-w-[140px] border border-red-500/30 overflow-hidden">
                         <p class="text-xs text-red-100 uppercase">Faskes</p>
-                        <p class="text-4xl font-bold mt-1 text-white">5</p>
+                        <p class="text-4xl font-bold mt-1 text-white">{{ $total_faskes ?? 0 }}</p>
                     </div>
                     
                 </div>
 
             </div>
 
-            {{-- Bottom Section: Chart & Filter --}}
-            {{-- ✅ PERBAIKAN: flex-col lg:flex-row untuk menumpuk di mobile --}}
-            <div class="mt-8 flex flex-col lg:flex-row items-start lg:items-end justify-between gap-6">
-                
-                {{-- Distribution Chart --}}
-                <div class="flex-1 w-full group/chart">
-                    <p class="text-sm font-medium mb-2 transition-all duration-300 group-hover/chart:text-red-50">Distribusi Tingkat</p>
-                    <div class="hidden relative w-full bg-gray-700 rounded-full h-5 overflow-hidden md:flex shadow-lg transition-all duration-500 group-hover/chart:h-6 group-hover/chart:shadow-2xl group-hover/chart:shadow-red-500/30">
-                        <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover/chart:translate-x-full transition-transform duration-2000"></div>
-                        <div class="relative bg-red-600 h-5 transition-all duration-500 group-hover/chart:h-6 group-hover/chart:bg-red-500 flex items-center justify-center" style="width: 54%"><span class="text-[10px] font-bold opacity-0 group-hover/chart:opacity-100 transition-opacity duration-300">54%</span></div>
-                        <div class="relative bg-orange-500 h-5 transition-all duration-500 group-hover/chart:h-6 group-hover/chart:bg-orange-400 flex items-center justify-center" style="width: 31%"><span class="text-[10px] font-bold opacity-0 group-hover/chart:opacity-100 transition-opacity duration-300">31%</span></div>
-                        <div class="relative bg-yellow-400 h-5 transition-all duration-500 group-hover/chart:h-6 group-hover/chart:bg-yellow-300 flex items-center justify-center" style="width: 15%"><span class="text-[10px] font-bold opacity-0 group-hover/chart:opacity-100 transition-opacity duration-300">15%</span></div>
-                        <div class="relative bg-green-500 h-5 transition-all duration-500 group-hover/chart:h-6 group-hover/chart:bg-green-400" style="width: 0%"></div>
+            {{-- ===== DISTRIBUTION CHART ===== --}}
+            <div class="mt-6">
+                <div class="relative bg-red-700/30 backdrop-blur-sm rounded-2xl p-5 border border-red-600/40 overflow-hidden">
+                    {{-- Decorative gradient overlay --}}
+                    <div class="absolute inset-0 bg-gradient-to-br from-red-500/5 to-transparent pointer-events-none"></div>
+                    
+                    {{-- Header --}}
+                    <div class="relative flex items-center justify-between mb-4">
+                        <div>
+                            <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                                <svg class="w-2 h-2 md:w-4 md:h-4 text-red-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                                </svg>
+                                Distribusi Tinggi Badan
+                            </h3>
+                            <p class="text-xs text-red-200/80 mt-0.5">Tinggi Badan menurut Umur (TB/U)</p>
+                        </div>
+                        @if ($total_anak > 0)
+                            <div class="text-right bg-red-600/30 backdrop-blur-sm rounded-xl px-4 py-2 border border-red-500/30">
+                                <div class="text-2xl text-center font-bold text-white">{{ number_format($total_anak) }}</div>
+                                <div class="text-[10px] text-red-200/80 uppercase tracking-wide">Total Anak</div>
+                            </div>
+                        @endif
                     </div>
+                    
+                    {{-- ===== LOGIKA IF/ELSE DIMULAI DI SINI ===== --}}
+                    @if ($total_anak > 0)
 
-                    <div class="relative w-full bg-gray-700 rounded-full h-5 overflow-hidden flex shadow-lg transition-all duration-500 group-hover/chart:h-6 group-hover/chart:shadow-2xl group-hover/chart:shadow-red-500/30 md:hidden">
-                        <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover/chart:translate-x-full transition-transform duration-2000"></div>
-                        
-                        <div class="relative bg-red-600 h-5 transition-all duration-500 group-hover/chart:h-6 group-hover/chart:bg-red-500 flex items-center justify-center" style="width: 54%">
-                            <span class="text-[10px] font-bold text-white transition-opacity duration-300">54%</span>
+                        {{-- Bar Chart (Jika ADA Data) --}}
+                        <div class="relative mb-4">
+                            <div class="relative w-full bg-red-950/40 rounded-lg h-2.5 overflow-hidden flex border border-red-700/40 shadow-inner">
+                                @php
+                                    // Format persentase untuk ditampilkan
+                                    $distSangatPendek = number_format($distribusi['sangat_pendek'] ?? 0, 2);
+                                    $distPendek = number_format($distribusi['pendek'] ?? 0, 2);
+                                    $distNormal = number_format($distribusi['normal'] ?? 0, 2);
+                                    $distTinggi = number_format($distribusi['tinggi'] ?? 0, 2);
+                                @endphp
+                                
+                                @if (($distribusi['sangat_pendek'] ?? 0) > 0)
+                                    <div class="relative bg-gradient-to-r from-red-500 to-red-600 h-2.5 transition-all duration-700 hover:from-red-400 hover:to-red-500" 
+                                        style="width: {{ $distribusi['sangat_pendek'] ?? 0 }}%">
+                                        <div class="absolute inset-0 bg-white/10"></div>
+                                    </div>
+                                @endif
+                                
+                                @if (($distribusi['pendek'] ?? 0) > 0)
+                                    <div class="relative bg-gradient-to-r from-orange-400 to-orange-500 h-2.5 transition-all duration-700 hover:from-orange-300 hover:to-orange-400" 
+                                        style="width: {{ $distribusi['pendek'] ?? 0 }}%">
+                                        <div class="absolute inset-0 bg-white/10"></div>
+                                    </div>
+                                @endif
+                                
+                                @if (($distribusi['normal'] ?? 0) > 0)
+                                    <div class="relative bg-gradient-to-r from-emerald-400 to-emerald-500 h-2.5 transition-all duration-700 hover:from-emerald-300 hover:to-emerald-400" 
+                                        style="width: {{ $distribusi['normal'] ?? 0 }}%">
+                                        <div class="absolute inset-0 bg-white/10"></div>
+                                    </div>
+                                @endif
+                                
+                                @if (($distribusi['tinggi'] ?? 0) > 0)
+                                    <div class="relative bg-gradient-to-r from-blue-400 to-blue-500 h-2.5 transition-all duration-700 hover:from-blue-300 hover:to-blue-400" 
+                                        style="width: {{ $distribusi['tinggi'] ?? 0 }}%">
+                                        <div class="absolute inset-0 bg-white/10"></div>
+                                    </div>
+                                @endif
+                            </div>
                         </div>
-                        
-                        <div class="relative bg-orange-500 h-5 transition-all duration-500 group-hover/chart:h-6 group-hover/chart:bg-orange-400 flex items-center justify-center" style="width: 31%">
-                            <span class="text-[10px] font-bold text-white transition-opacity duration-300">31%</span>
-                        </div>
-                        
-                        <div class="relative bg-yellow-400 h-5 transition-all duration-500 group-hover/chart:h-6 group-hover/chart:bg-yellow-300 flex items-center justify-center" style="width: 15%">
-                            <span class="text-[10px] font-bold text-white transition-opacity duration-300">15%</span>
-                        </div>
-                        
-                        <div class="relative bg-green-500 h-5 transition-all duration-500 group-hover/chart:h-6 group-hover/chart:bg-green-400" style="width: 0%"></div>
-                    </div>
 
-                    <div class="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2 text-sm">
-                        <div class="flex items-center gap-1.5">
-                            <div class="w-2 h-2 md:w-3 md:h-3 rounded-sm bg-red-600"></div>
-                            <span class="text-xs">High 54%</span>
+                        {{-- Legend Cards (Jika ADA Data) --}}
+                        <div class="relative grid grid-cols-2 lg:grid-cols-4 gap-2.5">
+                            {{-- Sangat Pendek --}}
+                            <div class="group relative bg-white/10 backdrop-blur-sm rounded-xl p-3 border border-white/20 hover:bg-white/15 hover:border-white/30 transition-all duration-300 hover:scale-[1.02]">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-2 h-2 md:w-4 md:h-4 rounded-full bg-red-500 shadow-lg shadow-red-500/50 ring-2 ring-white/20"></div>
+                                        <div>
+                                            <div class="hidden md:block text-[10px] md:text-[13px] font-bold text-white">Sangat Pendek</div>
+                                            <div class="block md:hidden text-[10px] md:text-[13px] font-bold text-white">Sgt. Pendek</div>
+                                            <div class="text-[9px] md:text-[11px] text-red-200/70 mt-0.5">
+                                                {{ number_format($distribusi_counts['sangat_pendek'] ?? 0) }} anak
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="text-[10px] md:text-base font-bold text-white">{{ $distSangatPendek }}%</div>
+                                </div>
+                            </div>
+
+                            {{-- Pendek --}}
+                            <div class="group relative bg-white/10 backdrop-blur-sm rounded-xl p-3 border border-white/20 hover:bg-white/15 hover:border-white/30 transition-all duration-300 hover:scale-[1.02]">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-2 h-2 md:w-4 md:h-4 rounded-full bg-orange-400 shadow-lg shadow-orange-400/50 ring-2 ring-white/20"></div>
+                                        <div>
+                                            <div class="text-[10px] md:text-[13px] font-bold text-white">Pendek</div>
+                                            <div class="text-[9px] md:text-[11px] text-red-200/70 mt-0.5">
+                                                {{ number_format($distribusi_counts['pendek'] ?? 0) }} anak
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="text-[10px] md:text-base font-bold text-white">{{ $distPendek }}%</div>
+                                </div>
+                            </div>
+
+                            {{-- Normal --}}
+                            <div class="group relative bg-white/10 backdrop-blur-sm rounded-xl p-3 border border-white/20 hover:bg-white/15 hover:border-white/30 transition-all duration-300 hover:scale-[1.02]">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-2 h-2 md:w-4 md:h-4 rounded-full bg-emerald-500 shadow-lg shadow-emerald-500/50 ring-2 ring-white/20"></div>
+                                        <div>
+                                            <div class="text-[10px] md:text-[13px] font-bold text-white">Normal</div>
+                                            <div class="text-[9px] md:text-[11px] text-red-200/70 mt-0.5">
+                                                {{ number_format($distribusi_counts['normal'] ?? 0) }} anak
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="text-[10px] md:text-base font-bold text-white">{{ $distNormal }}%</div>
+                                </div>
+                            </div>
+
+                            {{-- Tinggi --}}
+                            <div class="group relative bg-white/10 backdrop-blur-sm rounded-xl p-3 border border-white/20 hover:bg-white/15 hover:border-white/30 transition-all duration-300 hover:scale-[1.02]">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-2 h-2 md:w-4 md:h-4 rounded-full bg-blue-500 shadow-lg shadow-blue-500/50 ring-2 ring-white/20"></div>
+                                        <div>
+                                            <div class="text-[10px] md:text-[13px] font-bold text-white">Tinggi</div>
+                                            <div class="text-[9px] md:text-[11px] text-red-200/70 mt-0.5">
+                                                {{ number_format($distribusi_counts['tinggi'] ?? 0) }} anak
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="text-[10px] md:text-base font-bold text-white">{{ $distTinggi }}%</div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="flex items-center gap-1.5">
-                            <div class="w-2 h-2 md:w-3 md:h-3 rounded-sm bg-orange-500"></div>
-                            <span class="text-xs">Medium 31%</span>
+
+                    @else
+
+                        {{-- Tampilan Bar Chart (Jika TIDAK Ada Data) --}}
+                        <div class="relative mb-4">
+                            <div class="relative w-full bg-red-950/40 rounded-lg h-2.5 overflow-hidden border border-dashed border-red-700/50"></div>
                         </div>
-                        <div class="flex items-center gap-1.5">
-                            <div class="w-2 h-2 md:w-3 md:h-3 rounded-sm bg-yellow-400"></div>
-                            <span class="text-xs">Low 15%</span>
+
+                        {{-- Tampilan Legend (Jika TIDAK Ada Data) --}}
+                        <div class="relative grid grid-cols-2 lg:grid-cols-4 gap-2.5 opacity-50">
+                            <div class="bg-white/5 backdrop-blur-sm rounded-xl p-3 border border-white/10">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-2 h-2 md:w-4 md:h-4 rounded-full bg-red-300/30"></div>
+                                        <div>
+                                            <div class="text-[10px] md:text-[13px] font-bold text-red-200/50">Sangat Pendek</div>
+                                            <div class="text-[9px] md:text-[11px] text-red-200/30 mt-0.5">— anak</div>
+                                        </div>
+                                    </div>
+                                    <div class="text-[10px] md:text-base font-bold text-red-200/50">—</div>
+                                </div>
+                            </div>
+
+                            <div class="bg-white/5 backdrop-blur-sm rounded-xl p-3 border border-white/10">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-2 h-2 md:w-4 md:h-4 rounded-full bg-red-300/30"></div>
+                                        <div>
+                                            <div class="text-[10px] md:text-[13px] font-bold text-red-200/50">Pendek</div>
+                                            <div class="text-[9px] md:text-[11px] text-red-200/30 mt-0.5">— anak</div>
+                                        </div>
+                                    </div>
+                                    <div class="text-[10px] md:text-base font-bold text-red-200/50">—</div>
+                                </div>
+                            </div>
+
+                            <div class="bg-white/5 backdrop-blur-sm rounded-xl p-3 border border-white/10">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-2 h-2 md:w-4 md:h-4 rounded-full bg-red-300/30"></div>
+                                        <div>
+                                            <div class="text-[10px] md:text-[13px] font-bold text-red-200/50">Normal</div>
+                                            <div class="text-[9px] md:text-[11px] text-red-200/30 mt-0.5">— anak</div>
+                                        </div>
+                                    </div>
+                                    <div class="text-[10px] md:text-base font-bold text-red-200/50">—</div>
+                                </div>
+                            </div>
+
+                            <div class="bg-white/5 backdrop-blur-sm rounded-xl p-3 border border-white/10">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-2 h-2 md:w-4 md:h-4 rounded-full bg-red-300/30"></div>
+                                        <div>
+                                            <div class="text-[10px] md:text-[13px] font-bold text-red-200/50">Tinggi</div>
+                                            <div class="text-[9px] md:text-[11px] text-red-200/30 mt-0.5">— anak</div>
+                                        </div>
+                                    </div>
+                                    <div class="text-[10px] md:text-base font-bold text-red-200/50">—</div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="flex items-center gap-1.5">
-                            <div class="w-2 h-2 md:w-3 md:h-3 rounded-sm bg-green-500"></div>
-                            <span class="text-xs">Not Sig. 0%</span>
-                        </div>
-                    </div>
+
+                    @endif
+                    {{-- ===== AKHIR LOGIKA IF/ELSE ===== --}}
                 </div>
-
-                {{-- Date Filter --}}
-                <div class="group/filter relative flex items-center gap-3 bg-red-600/30 backdrop-blur-sm rounded-xl px-4 py-3 border border-red-500/30 transition-all duration-500 hover:bg-red-600/50 hover:border-red-400/60 hover:shadow-2xl hover:shadow-red-500/20 overflow-hidden w-full lg:w-auto">
-                    <input type="month" 
-                        class="relative z-10 bg-white text-gray-900 text-sm rounded-lg px-3 py-2 border-0 focus:ring-2 focus:ring-red-400 transition-all duration-300 hover:shadow-lg hover:scale-105 flex-1" 
-                        placeholder="Pilih Bulan">
-                    <button type="button" 
-                            class="relative z-10 px-6 py-2 bg-white text-red-700 text-sm font-semibold rounded-lg transition-all duration-300 hover:bg-red-50 hover:scale-110 hover:shadow-xl hover:shadow-red-500/30 active:scale-95 whitespace-nowrap overflow-hidden group/btn flex-shrink-0">
-                        <span class="absolute inset-0 -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-red-200/50 to-transparent"></span>
-                        <span class="relative z-10">Terapkan</span>
-                    </button>
-                </div>
+            </div>
 
             </div>
         </div>

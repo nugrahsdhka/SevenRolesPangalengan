@@ -7,12 +7,28 @@
         <div class="flex justify-between items-center gap-4">
             {{-- Kiri: Judul --}}
             <div class="flex items-center gap-3 min-w-0 flex-1">
-                {{-- ✅ MODIFIKASI: Tombol Kembali ke route admin --}}
-                <a href="{{ route('admin.published.index') . '?active_tab=gizi' }}" class="flex-shrink-0 p-2 rounded-lg hover:bg-gray-100 transition">
+                @php
+                    // Prioritas: query ?from=..., lalu role user, lalu fallback ke previous()
+                    $from = request('from');
+                    if ($from === 'admin') {
+                        $backUrl = route('admin.published.index') . '?active_tab=gizi';
+                    } elseif ($from === 'camat') {
+                        $backUrl = route('camat.review') . '?active_tab=gizi';
+                    } elseif (auth()->user()->hasRole('IT Admin')) {
+                        $backUrl = route('admin.published.index') . '?active_tab=gizi';
+                    } elseif (auth()->user()->hasRole('Camat')) {
+                        $backUrl = route('camat.review') . '?active_tab=gizi';
+                    } else {
+                        $backUrl = url()->previous() ?: route('dashboard');
+                    }
+                @endphp
+
+                <a href="{{ $backUrl }}" class="flex-shrink-0 p-2 rounded-lg hover:bg-gray-100 transition" title="Kembali">
                     <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
                     </svg>
                 </a>
+
                 <div class="min-w-0">
                     <h2 class="font-semibold text-lg sm:text-xl text-gray-800 leading-tight truncate">
                         {{ strtoupper($desaKelurahan) }}
@@ -319,85 +335,116 @@
                 </div>
 
                 <div class="overflow-hidden rounded-xl border border-gray-200">
-                    <div class="overflow-x-auto">
-                        <table class="w-full">
-                            <thead class="bg-gray-50">
-                                <tr class="border-b border-gray-200">
-                                    <th scope="col" class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-700">No</th>
-                                    <th scope="col" class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-700">Tanggal Input</th>
-                                    <th scope="col" class="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-gray-700">Berat (kg)</th>
-                                    <th scope="col" class="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-gray-700">Tinggi (cm)</th>
-                                    <th scope="col" class="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-gray-700">BB/U</th>
-                                    <th scope="col" class="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-gray-700">ZS BB/U</th>
-                                    <th scope="col" class="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-gray-700">TB/U</th>
-                                    <th scope="col" class="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-gray-700">ZS TB/U</th>
-                                    <th scope="col" class="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-gray-700">BB/TB</th>
-                                    <th scope="col" class="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-gray-700">ZS BB/TB</th>
-                                    {{-- Kolom aksi tidak ada untuk admin view --}}
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-gray-200 bg-white">
-                                @forelse ($dataGizi as $index => $data)
-                                    <tr class="transition hover:bg-gray-50">
-                                        {{-- No --}}
-                                        <td class="whitespace-nowrap px-4 py-4 text-sm text-gray-600">
-                                            {{ $dataGizi->firstItem() + $index }}
-                                        </td>
-                                        {{-- Tanggal Input --}}
-                                        <td class="whitespace-nowrap px-4 py-4 text-sm text-gray-600">
-                                            {{ \Carbon\Carbon::parse($data->created_at)->isoFormat('D MMM YYYY, HH:mm') }}
-                                        </td>
-                                        {{-- Berat --}}
-                                        <td class="whitespace-nowrap px-4 py-4 text-sm text-gray-900 text-center font-medium">
-                                            {{ number_format($data->berat, 2) }}
-                                        </td>
-                                        {{-- Tinggi --}}
-                                        <td class="whitespace-nowrap px-4 py-4 text-sm text-gray-900 text-center font-medium">
-                                            {{ number_format($data->tinggi, 2) }}
-                                        </td>
-                                        {{-- BB/U --}}
-                                        <td class="whitespace-nowrap px-4 py-4 text-sm text-gray-600 text-center">
-                                            {{ $data->status_bb_u ?? '-' }}
-                                        </td>
-                                        {{-- ZS BB/U --}}
-                                        <td class="whitespace-nowrap px-4 py-4 text-sm text-center">
-                                            <span class="font-medium {{ $data->zs_bb_u < -2 ? 'text-red-600' : 'text-gray-900' }}">
-                                                {{ $data->zs_bb_u ? number_format($data->zs_bb_u, 2) : '-' }}
-                                            </span>
-                                        </td>
-                                        {{-- TB/U --}}
-                                        <td class="whitespace-nowrap px-4 py-4 text-sm text-gray-600 text-center">
-                                            {{ $data->status_tb_u ?? '-' }}
-                                        </td>
-                                        {{-- ZS TB/U --}}
-                                        <td class="whitespace-nowrap px-4 py-4 text-sm text-center">
-                                            <span class="font-medium {{ $data->zs_tb_u < -2 ? 'text-red-600' : 'text-gray-900' }}">
-                                                {{ $data->zs_tb_u ? number_format($data->zs_tb_u, 2) : '-' }}
-                                            </span>
-                                        </td>
-                                        {{-- BB/TB --}}
-                                        <td class="whitespace-nowrap px-4 py-4 text-sm text-gray-600 text-center">
-                                            {{ $data->status_bb_tb ?? '-' }}
-                                        </td>
-                                        {{-- ZS BB/TB --}}
-                                        <td class="whitespace-nowrap px-4 py-4 text-sm text-center">
-                                            <span class="font-medium {{ $data->zs_bb_tb < -2 ? 'text-red-600' : 'text-gray-900' }}">
-                                                {{ $data->zs_bb_tb ? number_format($data->zs_bb_tb, 2) : '-' }}
-                                            </span>
-                                        </td>
-                                    </tr>
-                                @empty
+                    <!-- Scroll horizontal hanya di mobile -->
+                    <div class="overflow-x-auto lg:overflow-x-visible">
+                        <!-- Body-only vertical scroll -->
+                        <div class="max-h-[500px] overflow-y-auto bg-white">
+                            <table class="w-full min-w-max lg:min-w-0">
+                                <!-- Lebar kolom: 60px, 180px, sisanya min 100px -->
+                                <colgroup>
+                                    <col class="w-[60px]" />
+                                    <col class="w-[180px]" />
+                                    <col class="min-w-[100px]" />
+                                    <col class="min-w-[100px]" />
+                                    <col class="min-w-[100px]" />
+                                    <col class="min-w-[100px]" />
+                                    <col class="min-w-[100px]" />
+                                    <col class="min-w-[100px]" />
+                                    <col class="min-w-[100px]" />
+                                    <col class="min-w-[100px]" />
+                                </colgroup>
+
+                                <thead class="bg-gray-50 border-b border-gray-200">
                                     <tr>
-                                        <td colspan="10" class="px-6 py-12 text-center">
-                                            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/>
-                                            </svg>
-                                            <p class="mt-4 text-sm text-gray-500">Belum ada data untuk desa ini</p>
-                                        </td>
+                                        <th scope="col" class="sticky top-0 z-10 bg-gray-50 px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-700">No</th>
+                                        <th scope="col" class="sticky top-0 z-10 bg-gray-50 px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-700">Tanggal Input</th>
+                                        <th scope="col" class="sticky top-0 z-10 bg-gray-50 px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-gray-700">Berat (kg)</th>
+                                        <th scope="col" class="sticky top-0 z-10 bg-gray-50 px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-gray-700">Tinggi (cm)</th>
+                                        <th scope="col" class="sticky top-0 z-10 bg-gray-50 px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-gray-700">BB/U</th>
+                                        <th scope="col" class="sticky top-0 z-10 bg-gray-50 px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-gray-700">ZS BB/U</th>
+                                        <th scope="col" class="sticky top-0 z-10 bg-gray-50 px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-gray-700">TB/U</th>
+                                        <th scope="col" class="sticky top-0 z-10 bg-gray-50 px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-gray-700">ZS TB/U</th>
+                                        <th scope="col" class="sticky top-0 z-10 bg-gray-50 px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-gray-700">BB/TB</th>
+                                        <th scope="col" class="sticky top-0 z-10 bg-gray-50 px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-gray-700">ZS BB/TB</th>
                                     </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
+                                </thead>
+
+                                <tbody class="divide-y divide-gray-200">
+                                    @forelse ($dataGizi as $index => $data)
+                                        <tr class="transition hover:bg-gray-50">
+                                            {{-- No --}}
+                                            <td class="whitespace-nowrap px-4 py-4 text-sm text-gray-600">
+                                                {{ $dataGizi->firstItem() + $index }}
+                                            </td>
+
+                                            {{-- Tanggal Input --}}
+                                            <td class="whitespace-nowrap px-4 py-4 text-sm text-gray-600">
+                                                {{ \Carbon\Carbon::parse($data->created_at)->isoFormat('D MMM YYYY, HH:mm') }}
+                                            </td>
+
+                                            {{-- Berat --}}
+                                            <td class="whitespace-nowrap px-4 py-4 text-sm text-gray-900 text-center font-medium">
+                                                {{ is_numeric($data->berat) ? number_format($data->berat, 2) : '-' }}
+                                            </td>
+
+                                            {{-- Tinggi --}}
+                                            <td class="whitespace-nowrap px-4 py-4 text-sm text-gray-900 text-center font-medium">
+                                                {{ is_numeric($data->tinggi) ? number_format($data->tinggi, 2) : '-' }}
+                                            </td>
+
+                                            {{-- BB/U --}}
+                                            <td class="whitespace-nowrap px-4 py-4 text-sm text-gray-600 text-center">
+                                                {{ $data->status_bb_u ?? '-' }}
+                                            </td>
+
+                                            {{-- ZS BB/U --}}
+                                            <td class="whitespace-nowrap px-4 py-4 text-sm text-center">
+                                                @php $z = $data->zs_bb_u; @endphp
+                                                <span class="font-medium {{ (is_numeric($z) && $z < -2) ? 'text-red-600' : 'text-gray-900' }}">
+                                                    {{ is_numeric($z) ? number_format($z, 2) : '-' }}
+                                                </span>
+                                            </td>
+
+                                            {{-- TB/U --}}
+                                            <td class="whitespace-nowrap px-4 py-4 text-sm text-gray-600 text-center">
+                                                {{ $data->status_tb_u ?? '-' }}
+                                            </td>
+
+                                            {{-- ZS TB/U --}}
+                                            <td class="whitespace-nowrap px-4 py-4 text-sm text-center">
+                                                @php $z = $data->zs_tb_u; @endphp
+                                                <span class="font-medium {{ (is_numeric($z) && $z < -2) ? 'text-red-600' : 'text-gray-900' }}">
+                                                    {{ is_numeric($z) ? number_format($z, 2) : '-' }}
+                                                </span>
+                                            </td>
+
+                                            {{-- BB/TB --}}
+                                            <td class="whitespace-nowrap px-4 py-4 text-sm text-gray-600 text-center">
+                                                {{ $data->status_bb_tb ?? '-' }}
+                                            </td>
+
+                                            {{-- ZS BB/TB --}}
+                                            <td class="whitespace-nowrap px-4 py-4 text-sm text-center">
+                                                @php $z = $data->zs_bb_tb; @endphp
+                                                <span class="font-medium {{ (is_numeric($z) && $z < -2) ? 'text-red-600' : 'text-gray-900' }}">
+                                                    {{ is_numeric($z) ? number_format($z, 2) : '-' }}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="10" class="px-6 py-12 text-center">
+                                                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+                                                </svg>
+                                                <p class="mt-4 text-sm text-gray-500">Belum ada data untuk desa ini</p>
+                                            </td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
 

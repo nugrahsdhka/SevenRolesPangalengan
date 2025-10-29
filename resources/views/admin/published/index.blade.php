@@ -391,12 +391,10 @@
                                 {{-- Status & Action Buttons (VERSI ADMIN) --}}
                                 <div class="flex flex-wrap items-center gap-2 sm:justify-end">
                                     {{-- Tombol Detail (ADMIN) --}}
-                                    <a href="{{ route('admin.published.gizi.detail', ['desa_kelurahan' => $data->desa_kelurahan]) }}">
-                                        <span class="text-xs text-blue-700 hover:text-blue-900 hover:underline">
-                                            <p>Detail</p>
-                                        </span>
+                                    <a href="{{ route('admin.published.gizi.detail', ['desa_kelurahan' => $data->desa_kelurahan, 'from' => 'admin']) }}">
+                                        <span class="text-xs text-blue-700 hover:text-blue-900 hover:underline">Detail</span>
                                     </a>
-                                    
+
                                     {{-- Badge Status --}}
                                     @if($data->status === 'published') 
                                         <span class="inline-flex items-center gap-1 rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-700 whitespace-nowrap">

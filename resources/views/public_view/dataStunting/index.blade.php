@@ -1,6 +1,6 @@
 <x-guest-layout>
     <x-slot name="title">
-        Data Stunting
+        RSP | Data Stunting
     </x-slot>
 
     {{-- Navigasi Publik --}}
@@ -88,10 +88,7 @@
                 {{-- Judul Tabel dan Tombol Info --}}
                 <div class="flex items-center justify-between mb-6">
                     <div>
-                    <h2 class="text-xl font-bold text-gray-900">Table Data Stunting</h2>
-                    <p class="text-sm text-gray-500 mt-1">
-                        Informasi lengkap tingkat stunting per desa
-                    </p>
+                    <h2 class="text-xl font-bold text-gray-900">Tabel Data Stunting</h2>
                     </div>
 
                     {{-- ✅ Tombol Info Dikasih ID --}}
@@ -117,39 +114,31 @@
 
                         {{-- THEAD --}}
                         <thead class="bg-gradient-to-r from-gray-50 to-gray-100">
-                        <tr class="uppercase">
-                            <th
-                            scope="col"
-                            class="px-6 py-4 text-left text-xs font-bold text-gray-700 tracking-wider"
-                            >
-                            <div class="flex items-center gap-2">
-                                desa
-                                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 11l5-5m0 0l5 5m-5-5v12" />
-                                </svg>
-                            </div>
-                            </th>
+                            <tr class="uppercase">
+                                <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-gray-700 tracking-wider">
+                                    desa
+                                </th>
 
-                            <th scope="col" class="px-6 py-4 text-center text-xs font-bold text-gray-700 tracking-wider">
-                            kasus stunting
-                            </th>
+                                <th scope="col" class="px-6 py-4 text-center text-xs font-bold text-gray-700 tracking-wider">
+                                    kasus stunting
+                                </th>
 
-                            <th scope="col" class="px-6 py-4 text-center text-xs font-bold text-gray-700 tracking-wider">
-                            total anak
-                            </th>
+                                <th scope="col" class="px-6 py-4 text-center text-xs font-bold text-gray-700 tracking-wider">
+                                    total anak
+                                </th>
 
-                            <th scope="col" class="px-6 py-4 text-center text-xs font-bold text-gray-700 tracking-wider">
-                            rata-rata zs tb/u
-                            </th>
+                                <th scope="col" class="px-6 py-4 text-center text-xs font-bold text-gray-700 tracking-wider">
+                                    rata-rata zs tb/u
+                                </th>
 
-                            <th scope="col" class="px-6 py-4 text-center text-xs font-bold text-gray-700 tracking-wider">
-                            status desa
-                            </th>
+                                <th scope="col" class="px-6 py-4 text-center text-xs font-bold text-gray-700 tracking-wider">
+                                    status desa
+                                </th>
 
-                            <th scope="col" class="px-6 py-4 text-right text-xs font-bold text-gray-700 tracking-wider">
-                            periode
-                            </th>
-                        </tr>
+                                <th scope="col" class="px-6 py-4 text-right text-xs font-bold text-gray-700 tracking-wider">
+                                    periode
+                                </th>
+                            </tr>
                         </thead>
 
                         {{-- TBODY --}}
@@ -162,14 +151,9 @@
                             <tr class="hover:bg-gradient-to-r hover:from-gray-50 hover:to-transparent transition-all duration-150 group">
                             {{-- Desa --}}
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="flex items-center">
-                                <div
-                                    class="w-2 h-2 bg-red-500 rounded-full mr-3 opacity-0 group-hover:opacity-100 transition-opacity"
-                                ></div>
                                 <span class="text-sm font-semibold text-gray-900">
                                     {{ $data->desa_kelurahan }}
                                 </span>
-                                </div>
                             </td>
 
                             {{-- Kasus Stunting --}}
@@ -188,26 +172,7 @@
 
                             {{-- Rata-rata ZS TB/U --}}
                             <td class="px-6 py-4 whitespace-nowrap text-center">
-                                <span
-                                class="inline-flex items-center px-3.5 py-1.5 rounded-full text-xs font-bold shadow-sm
-                                    @if (is_null($avgZsTbU) || $data->total_anak == 0)
-                                    bg-gradient-to-r from-gray-400 to-gray-500 text-white
-                                    @elseif ($avgZsTbU < -3)
-                                    bg-gradient-to-r from-red-500 to-red-600 text-white
-                                    @elseif ($avgZsTbU < -2)
-                                    bg-gradient-to-r from-orange-500 to-orange-600 text-white
-                                    @elseif ($avgZsTbU <= 2)
-                                    bg-gradient-to-r from-green-500 to-green-600 text-white
-                                    @else
-                                    bg-gradient-to-r from-blue-500 to-blue-600 text-white
-                                    @endif"
-                                >
-                                @if (is_null($avgZsTbU) || $data->total_anak == 0)
-                                    N/A
-                                @else
-                                    {{ number_format($avgZsTbU, 2) }}
-                                @endif
-                                </span>
+                                @include('components.zscore-badge', ['value' => $avgZsTbU])
                             </td>
 
                             {{-- Status Desa --}}
@@ -287,18 +252,16 @@
             </div>
         </div>
 
-        {{-- Modal Informasi Kolom Tabel (STYLE DISAMAKAN DENGAN CHART) --}}
+        {{-- Modal Informasi Kolom Tabel --}}
         <div id="infoModalOverlay" class="fixed inset-0 bg-gray-600 bg-opacity-75 overflow-y-auto h-full w-full z-50 flex items-center justify-center p-4 hidden">
             {{-- Kontainer Modal --}}
             <div
                 class="relative mx-auto border w-full max-w-md sm:max-w-lg md:max-w-xl shadow-lg rounded-xl bg-white transform transition-all duration-300 scale-95 opacity-0"
                 id="infoModalContent"
-                @click.away="closeInfoModal()" {{-- Alpine Opsional --}}
-                x-trap.inert="open" {{-- Alpine Opsional --}}
                 >
                 {{-- Modal Header --}}
                 <div class="flex justify-between items-center px-6 py-4 border-b border-gray-200">
-                    <p class="text-lg font-bold text-gray-800">Keterangan Kolom Tabel</p>
+                    <p class="text-lg font-bold text-gray-800">Keterangan Kolom Tabel Stunting</p>
                     <button id="closeInfoModalBtnHeader" class="text-gray-400 hover:text-gray-600 transition-colors duration-200">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                     </button>
@@ -306,52 +269,57 @@
 
                 {{-- Modal Body --}}
                 <div class="px-6 py-5 space-y-4 text-sm text-gray-700 max-h-[70vh] overflow-y-auto">
-                    <ul class="list-disc list-inside space-y-1 pl-4">
+                    <ul class="list-disc list-inside space-y-3 pl-4">
                         <li>
-                            <strong>Desa:</strong> Nama desa yang ada di Kecamatan Pangalengan.
+                            <strong>Desa:</strong> Nama desa/kelurahan yang datanya ditampilkan.
                         </li>
 
                         <li>
-                            <strong>Kasus Stunting:</strong> Jumlah anak yang terindikasi stunting berdasarkan ZS TB/U.
+                            <strong>Kasus Stunting:</strong> Jumlah anak di desa tersebut yang teridentifikasi stunting (memiliki Z-Score TB/U di bawah -2 SD).
                         </li>
 
                         <li>
-                            <strong>Total Anak:</strong> Jumlah anak yang mendapatkan pemeriksaan stunting di setiap desa.
+                            <strong>Total Anak:</strong> Jumlah total anak yang datanya diukur dan masuk dalam perhitungan di desa tersebut pada periode ini.
                         </li>
 
                         <li>
-                            <strong>Rata-Rata ZS TB/U:</strong> Rata-rata ZS TB/U dari setiap anak yang diperiksa di desa tersebut.
+                            <strong>Rata-Rata ZS TB/U:</strong> Rata-rata Z-Score (Standar Deviasi) untuk indikator <strong>Tinggi Badan menurut Umur (TB/U)</strong>. Ini adalah indikator utama untuk memantau stunting.
+                        </li>
+                        
+                        <li>
+                            <strong>Status Desa:</strong> Klasifikasi status stunting untuk desa tersebut (misalnya: Aman, Rawan, Waspada) berdasarkan data yang ada.
                         </li>
 
                         <li>
-                            <strong>Status Desa:</strong> Klasifikasi desa berdasarkan nilai rata-rata ZS TB/U. 
+                            <strong>Periode:</strong> Bulan dan tahun saat data ini diinputkan dan dipublikasi.
+                        </li>
+                        
+                        <li>
+                            <strong>Klasifikasi Warna Z-Score (TB/U):</strong> Menunjukkan tingkat keparahan stunting berdasarkan rata-rata Z-Score:
                             <ul class="ml-6 mt-1 space-y-1 text-xs list-none">
                                 <li>
                                     <span class="inline-block w-3 h-3 rounded-full mr-2 bg-blue-500 align-middle"></span>
-                                    <strong> Tinggi:</strong> (&gt; +2 SD)
+                                    <strong> Biru (Tinggi):</strong> Rata-rata &gt; +2 SD
                                 </li>
                                 <li>
                                     <span class="inline-block w-3 h-3 rounded-full mr-2 bg-green-500 align-middle"></span>
-                                    <strong>Normal:</strong> (-2 SD s/d +2 SD)
+                                    <strong>Hijau (Normal):</strong> Rata-rata -2 SD s/d +2 SD
                                 </li>
                                 <li>
                                     <span class="inline-block w-3 h-3 rounded-full mr-2 bg-orange-500 align-middle"></span>
-                                    <strong>Pendek:</strong> (-3 SD s/d &lt; -2 SD)
+                                    <strong>Oranye (Pendek):</strong> Rata-rata -3 SD s/d &lt; -2 SD
                                 </li>
                                 <li>
                                     <span class="inline-block w-3 h-3 rounded-full mr-2 bg-red-500 align-middle"></span>
-                                    <strong>Sangat Pendek:</strong> (&lt; -3 SD)
+                                    <strong>Merah (Sangat Pendek):</strong> Rata-rata &lt; -3 SD
                                 </li>
                                 <li>
                                     <span class="inline-block w-3 h-3 rounded-full mr-2 bg-gray-400 align-middle"></span>
-                                    <strong>N/A:</strong> (Data tidak cukup)
+                                    <strong>Abu-abu (N/A):</strong> Data tidak cukup
                                 </li>
                             </ul>
                         </li>
 
-                        <li>
-                            <strong>Periode:</strong> Bulan dan tahun saat data ini di inputkan.
-                        </li>
                     </ul>
 
                     <p class="mt-3 text-xs text-gray-500">
@@ -379,7 +347,6 @@
                 <div class="flex items-center justify-between mb-6">
                     <div>
                         <h2 class="text-xl font-bold text-gray-900">Chart Data Stunting</h2>
-                        <p class="text-sm text-gray-500 mt-1">Visualisasi data Z-Score dari desa paling tidak stunting ke paling stunting</p>
                     </div>
                     <button
                     id="openChartInfoModalBtn"
@@ -466,10 +433,6 @@
                         <li>
                             <span class="inline-block w-3 h-3 rounded-full mr-2 bg-red-500 align-middle"></span>
                             <strong>Merah:</strong> Sangat Pendek (&lt; -3 SD)
-                        </li>
-                        <li>
-                            <span class="inline-block w-3 h-3 rounded-full mr-2 bg-gray-400 align-middle"></span>
-                            <strong>Abu-abu:</strong> N/A (Data tidak cukup)
                         </li>
                         </ul>
                     </li>
@@ -802,18 +765,23 @@
             const sortedValues = dataPoints.map(d => d.value);
 
             // === Skala X dinamis (negatif) ===
-            const negs = sortedValues.filter(v => v !== null && v < 0);
-            let minValue = -4;
-            if (negs.length) {
-                const lowest = Math.min(...negs);
-                minValue = lowest - 0.2;
-            }
+            const finiteVals = sortedValues.filter(v => Number.isFinite(v));
+            const minValue = finiteVals.length ? Math.min(...finiteVals) - 0.2 : -4;
+            const maxValue = finiteVals.length ? Math.max(...finiteVals) + 0.2 : 0.5;
 
-            const chartValues = sortedValues.map(v => (v !== null && v >= 0) ? null : v);
+            const chartValues = sortedValues.map(v => (v === null ? null : Number(v)));
 
             // === Responsif ===
             const isMobile = window.innerWidth < 640;
             const isTablet = window.innerWidth >= 640 && window.innerWidth < 1024;
+
+            // Contoh: pakai target range yang kamu mau, tapi tetap aman ke data
+            const TARGET_MAX = 0.2;   // supaya ada tick 0.2
+            const TARGET_MIN = -0.4;  // supaya ada tick -0.4
+
+            // minValue = hasil perhitunganmu sebelumnya dari data (tetap dipakai)
+            const xMin = Math.min(TARGET_MIN, minValue ?? TARGET_MIN);
+            const xMax = Math.max(TARGET_MAX, 0); // biar minimal ada 0.2 & 0
 
             // === Warna bar dengan gradient ===
             function getBarColor(value) {
@@ -896,7 +864,7 @@
                         scales: {
                             x: {
                                 min: minValue,
-                                max: 0,
+                                max: xMax,
                                 reverse: true,
                                 position: 'top',
                                 grid: {
@@ -965,39 +933,7 @@
                                     }
                                 }
                             },
-                            datalabels: {
-                                display: ctx => {
-                                    const v = ctx.dataset.data[ctx.dataIndex];
-                                    return v !== null && !Number.isNaN(v);
-                                },
-                                anchor: 'end',
-                                align: (ctx) => {
-                                    // Kalau DATA_LABEL_ALIGN = 'left', align ke center vertikal
-                                    // Kalau 'right', tetap center
-                                    return DATA_LABEL_ALIGN === 'left' ? 'center' : 'center';
-                                },
-                                offset: DATA_LABEL_OFFSET,
-                                clamp: true,
-                                clip: false,
-                                color: '#111827',
-                                font: {
-                                    size: isMobile ? 10 : (isTablet ? 11 : 12),
-                                    weight: '800',
-                                    family: "'Figtree', sans-serif"
-                                },
-                                formatter: (_val, ctx) => {
-                                    const actual = sortedValues[ctx.dataIndex];
-                                    return Number.isFinite(actual) ? actual.toFixed(2) : '';
-                                },
-                                backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                                borderRadius: 4,
-                                padding: {
-                                    top: 3,
-                                    bottom: 3,
-                                    left: 6,
-                                    right: 6
-                                }
-                            },
+
                             avgLine: { values: sortedValues }
                         },
                         interaction: {

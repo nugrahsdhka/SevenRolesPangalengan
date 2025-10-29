@@ -274,6 +274,6 @@ class CamatController extends Controller
             ->paginate($perPage);
 
         // 3. Tampilkan view baru dengan data yang diperlukan
-        return view('camat.detailGizi', compact('desaKelurahan', 'statistik', 'dataGizi'));
+        return view('detail.detailGizi', compact('desaKelurahan','statistik','dataGizi'));
     }
 }

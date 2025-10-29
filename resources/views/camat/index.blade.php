@@ -402,7 +402,7 @@
                                 {{-- Status & Action Buttons --}}
                                 <div class="flex flex-wrap items-center gap-2 sm:justify-end">
                                     {{-- Tombol Detail --}}
-                                    <a href="{{ route('camat.review.gizi.detail', ['desa_kelurahan' => $data->desa_kelurahan]) }}">
+                                    <a href="{{ route('camat.gizi.detail', ['desa_kelurahan' => $data->desa_kelurahan]) }}">
                                         <span class="text-xs text-blue-700 hover:text-blue-900 hover:underline">
                                             <p>Detail</p>
                                         </span>
