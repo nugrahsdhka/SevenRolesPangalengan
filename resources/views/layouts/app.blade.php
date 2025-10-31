@@ -37,6 +37,7 @@
         </main>
     </div>
 
+    <x-goToTop />
     <!-- Per-page scripts (e.g., Chart.js, Leaflet JS, inisialisasi chart/map) -->
     @stack('scripts')
 </body>

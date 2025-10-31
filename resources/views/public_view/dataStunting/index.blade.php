@@ -337,7 +337,6 @@
         </div>
     </section>
 
-
     {{-- Konten Tab: CHART --}}
     <section id="tab-chart" class="{{ $currentView === 'chart' ? '' : 'hidden' }}">
         <div class="bg-gradient-to-br from-blue-50/30 via-white to-purple-50/20 shadow-2xl rounded-3xl overflow-hidden border border-gray-100/50">

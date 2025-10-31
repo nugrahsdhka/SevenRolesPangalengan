@@ -21,6 +21,7 @@
             {{ $slot }}
         </div>
 
+        <x-goToTop />
         @stack('scripts')
     </body>
 </html>

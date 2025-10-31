@@ -11,16 +11,13 @@ class HomeController extends Controller
 {
     public function index()
     {
-        // 1. Ambil semua data statistik dalam satu query
+        // 1. Ambil semua data statistik GLOBAL dalam satu query
         $stats = DataGizi::where('status', 'published')
             ->select(
                 // Data untuk Kartu Statistik
                 DB::raw('COUNT(*) as total_anak'),
                 DB::raw('SUM(CASE WHEN zs_tb_u < -2 THEN 1 ELSE 0 END) as total_kasus_stunting'),
                 DB::raw('COUNT(DISTINCT desa_kelurahan) as total_desa'),
-                
-                // ⚠️ ASUMSI: Ganti 'nama_faskes' jika nama kolom Anda berbeda
-                // DB::raw('COUNT(DISTINCT nama_faskes) as total_faskes'), 
                 
                 // Data untuk Distribution Bar (berdasarkan Z-Score TB/U)
                 DB::raw('SUM(CASE WHEN zs_tb_u < -3 THEN 1 ELSE 0 END) as sangat_pendek_count'), // Merah
@@ -30,16 +27,13 @@ class HomeController extends Controller
             )
             ->first();
 
-        // 2. Proses Statistik Dasar
-        $total_anak = $stats->total_anak ?? 0; // <-- KITA PERLU VARIABEL INI
+        // 2. Proses Statistik Dasar (GLOBAL)
+        $total_anak = $stats->total_anak ?? 0;
         $total_desa = $stats->total_desa ?? 0;
-        // $total_faskes = $stats->total_faskes ?? 0;
         $total_kasus_stunting = $stats->total_kasus_stunting ?? 0;
-
-        // Hitung Rata-rata Prevalensi Stunting
         $rata_rata_kasus = ($total_anak > 0) ? ($total_kasus_stunting / $total_anak) * 100 : 0;
 
-        // 3. Proses Data Distribusi (Persentase)
+        // 3. Proses Data Distribusi (GLOBAL)
         $distribusi = [
             'sangat_pendek' => ($total_anak > 0) ? ($stats->sangat_pendek_count / $total_anak) * 100 : 0,
             'pendek'        => ($total_anak > 0) ? ($stats->pendek_count / $total_anak) * 100 : 0,
@@ -47,22 +41,52 @@ class HomeController extends Controller
             'tinggi'        => ($total_anak > 0) ? ($stats->tinggi_count / $total_anak) * 100 : 0,
         ];
 
-        // Jumlah Anak per Kategori
         $distribusi_counts = [
             'sangat_pendek' => $stats->sangat_pendek_count ?? 0,
             'pendek'        => $stats->pendek_count ?? 0,
             'normal'        => $stats->normal_count ?? 0,
             'tinggi'        => $stats->tinggi_count ?? 0,
         ];
+       
+        // 4. Ambil Spoiler Data Stunting (Tidak berubah)
+        $spoilerDataStunting = DataGizi::where('status', 'published')
+            ->select(
+                'desa_kelurahan',
+                DB::raw('SUM(zs_tb_u) / COUNT(*) as avg_zs_tbu'),
+                DB::raw('SUM(CASE WHEN zs_tb_u < -2 THEN 1 ELSE 0 END) as total_kasus_stunting'),
+                DB::raw('COUNT(*) as total_anak')
+            )
+            ->groupBy('desa_kelurahan')
+            ->having(DB::raw('COUNT(*)'), '>', 0)
+            ->havingNotNull('avg_zs_tbu')
+            ->orderBy('avg_zs_tbu', 'asc')
+            ->limit(3)
+            ->get();
 
-        // 4. Kirim data ke view
-        return view('public_view.home.welcome', compact(
+        // 5. Ambil Spoiler Data Wilayah (3 Desa dengan update terbaru)
+        $spoilerDataWilayah = DataGizi::where('status', 'published')
+            ->select(
+                'desa_kelurahan',
+                DB::raw('MAX(created_at) as update_terbaru'),
+                DB::raw('COUNT(*) as total_anak_di_desa'),
+                DB::raw('AVG(berat) as avg_berat'), // <-- TAMBAHKAN INI
+                DB::raw('AVG(tinggi) as avg_tinggi') // <-- TAMBAHKAN INI
+            )
+            ->groupBy('desa_kelurahan')
+            ->orderBy('update_terbaru', 'desc') // Urutkan dari yang terbaru
+            ->limit(3)                        // Ambil 3 teratas
+            ->get();
+
+
+        // 6. Kirim semua data ke view
+        return view('public_view.home.welcome', compact( // Pastikan nama view ini benar
             'total_desa',
-            // 'total_faskes',
             'rata_rata_kasus',
             'distribusi',
             'distribusi_counts',
-            'total_anak' // <-- TAMBAHKAN INI
+            'total_anak',
+            'spoilerDataStunting',
+            'spoilerDataWilayah' // Data ini sekarang punya avg_berat & avg_tinggi
         ));
     }
 }
