@@ -82,7 +82,7 @@
 
     {{-- ===== Konten Tab: TABLE ===== --}}
     <section id="tab-table" class="{{ $currentView === 'table' ? '' : 'hidden' }}">
-        <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+        <div class="bg-white rounded-lg overflow-hidden">
             <div class="p-6">
 
                 {{-- Judul Tabel dan Tombol Info --}}
@@ -185,22 +185,22 @@
                                 @elseif ($avgZsTbU < -3)
                                 <span class="inline-flex items-center px-3.5 py-1.5 rounded-full text-xs font-bold shadow-sm
                                             bg-gradient-to-r from-red-500 to-red-600 text-white">
-                                    Sangat Pendek ({{ number_format($avgZsTbU, 2) }})
+                                    Sangat Pendek
                                 </span>
                                 @elseif ($avgZsTbU < -2)
                                 <span class="inline-flex items-center px-3.5 py-1.5 rounded-full text-xs font-bold shadow-sm
                                             bg-gradient-to-r from-orange-500 to-orange-600 text-white">
-                                    Pendek ({{ number_format($avgZsTbU, 2) }})
+                                    Pendek
                                 </span>
                                 @elseif ($avgZsTbU <= 2)
                                 <span class="inline-flex items-center px-3.5 py-1.5 rounded-full text-xs font-bold shadow-sm
                                             bg-gradient-to-r from-green-500 to-green-600 text-white">
-                                    Normal ({{ number_format($avgZsTbU, 2) }})
+                                    Normal
                                 </span>
                                 @else
                                 <span class="inline-flex items-center px-3.5 py-1.5 rounded-full text-xs font-bold shadow-sm
                                             bg-gradient-to-r from-blue-500 to-blue-600 text-white">
-                                    Tinggi ({{ number_format($avgZsTbU, 2) }})
+                                    Tinggi
                                 </span>
                                 @endif
                             </td>
@@ -339,7 +339,7 @@
 
     {{-- Konten Tab: CHART --}}
     <section id="tab-chart" class="{{ $currentView === 'chart' ? '' : 'hidden' }}">
-        <div class="bg-gradient-to-br from-blue-50/30 via-white to-purple-50/20 shadow-2xl rounded-3xl overflow-hidden border border-gray-100/50">
+        <div class="bg-gradient-to-br from-blue-50/30 via-white to-purple-50/20 rounded-3xl overflow-hidden border border-gray-100/50">
             <!-- Chart Container -->
             <div class="p-4 sm:p-8">
                 <!-- Header Section -->
@@ -362,7 +362,7 @@
                     </button>
                 </div>
 
-                <div class="bg-white rounded-2xl shadow-xl border border-gray-200/50 p-4 sm:p-6 backdrop-blur-sm">
+                <div class="bg-white rounded-2xl border border-gray-200/50 p-4 sm:p-6 backdrop-blur-sm">
                     <div class="relative h-[450px] sm:h-[550px] md:h-[650px]" id="chartContainer">
                         <canvas id="stuntingChart"></canvas>
                         <div id="chartMessage" class="absolute inset-0 flex flex-col items-center justify-center text-gray-500 hidden">

@@ -20,11 +20,22 @@ use App\Http\Controllers\Guest\DataStuntingController;
 use App\Http\Controllers\Guest\AnalisisHotspotController;
 
 // Guest Route
+// Home
 Route::get('/', [HomeController::class, 'index'])->name('welcome');
+
+// Data Stunting
 Route::get('/data-stunting', [DataStuntingController::class, 'index'])->name('data-stunting');
 Route::get('/data-stunting/chart-data-zs', [DataStuntingController::class, 'getChartDataZs'])->name('data-stunting.chart-data-zs');
+
+// Data Wilayah
 Route::get('/data-wilayah', [DataWilayahController::class, 'index'])->name('data-wilayah');
+
+// Analisis Hotspot
 Route::get('/analisis-hotspot', [AnalisisHotspotController::class, 'index'])->name('analisis-hotspot');
+Route::get('/analisis-hotspot/chart-data', [AnalisisHotspotController::class, 'getChartDataHotspot'])->name('analisis-hotspot.chart-data');
+Route::get('/api/hotspot', [AnalisisHotspotController::class, 'getChartDataHotspot'])->name('api.hotspot');
+
+// Peta
 Route::get('/peta-faskes', [PetaController::class, 'index'])->name('peta-faskes');
 
 // Dashboard Redirect Logic

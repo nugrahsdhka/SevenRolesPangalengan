@@ -11,6 +11,8 @@
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
+        @stack('styles')
+
         @vite(['resources/css/app.css', 'resources/js/app.js'])
 
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -23,5 +25,9 @@
 
         <x-goToTop />
         @stack('scripts')
+
+        <footer class="text-xs text-gray-500 text-center my-4">
+            &copy; {{ date('Y') }} Rumah Stunting Pangalengan. All rights reserved.
+        </footer>
     </body>
 </html>

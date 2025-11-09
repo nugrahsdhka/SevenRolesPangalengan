@@ -502,6 +502,88 @@
                         </a>
                     </div>
                     
+                    {{-- Analisis Hotspot --}}
+                    <div class="bg-white shadow-xl rounded-2xl ring-2 ring-red-100 hover:ring-red-200 transition-all duration-300 flex flex-col">
+                        
+                        <div class="p-6 flex-1">
+                            <h3 class="text-lg font-bold text-gray-900 border-b border-red-200 pb-2">
+                                Analisis Hotspot Stunting
+                            </h3>
+                            <p class="text-sm text-gray-600 mt-1">
+                                Visualisasi peta desa dengan rata-rata Z-Score TB/U dan kategori risiko stunting per wilayah.
+                            </p>
+
+                            {{-- Mini legend biar nyambung sama halaman Analisis Hotspot --}}
+                            <div class="mt-4 grid grid-cols-2 gap-2 text-xs">
+                                <div class="flex items-center gap-2">
+                                    <span class="inline-block w-3 h-3 rounded-full bg-red-500"></span>
+                                    <span class="text-gray-700 font-medium">Sangat Pendek</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="inline-block w-3 h-3 rounded-full bg-orange-500"></span>
+                                    <span class="text-gray-700 font-medium">Pendek</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="inline-block w-3 h-3 rounded-full bg-emerald-500"></span>
+                                    <span class="text-gray-700 font-medium">Normal</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="inline-block w-3 h-3 rounded-full bg-blue-500"></span>
+                                    <span class="text-gray-700 font-medium">Tinggi</span>
+                                </div>
+                            </div>
+
+                            <p class="mt-3 text-[11px] text-gray-500">
+                                Data diambil dari agregasi status gizi anak dan diplot ke batas desa di Kecamatan Pangalengan.
+                            </p>
+                        </div>
+
+                        {{-- ganti nama route sesuai yang kamu pakai untuk halaman analisis hotspot --}}
+                        <a href="{{ route('analisis-hotspot') }}" class="text-sm font-medium text-red-600 hover:text-red-700 transition-colors duration-200">
+                            <div class="bg-red-50 px-6 py-4 rounded-b-2xl shimmer-effect">
+                                Lihat Peta Hotspot &rarr;
+                            </div>
+                        </a>
+                    </div>
+
+                    {{-- Peta Faskes --}}
+                    <div class="bg-white shadow-xl rounded-2xl ring-2 ring-red-100 hover:ring-red-200 transition-all duration-300 flex flex-col">
+                        
+                        <div class="p-6 flex-1">
+                            <h3 class="text-lg font-bold text-gray-900 border-b border-red-200 pb-2">
+                                Peta Fasilitas Kesehatan
+                            </h3>
+                            <p class="text-sm text-gray-600 mt-1">
+                                Menampilkan lokasi puskesmas, klinik, dan fasilitas kesehatan lain di wilayah Kecamatan Pangalengan.
+                            </p>
+
+                            <div class="mt-4 space-y-2 text-sm">
+                                <div class="flex items-center gap-2">
+                                    <span class="inline-flex items-center justify-center h-8 w-8 rounded-full bg-red-500 text-white shadow-md">
+                                        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" />
+                                        </svg>
+                                    </span>
+                                    <div>
+                                        <p class="text-xs text-gray-500">Pin merah:</p>
+                                        <p class="text-xs font-semibold text-gray-800">Lokasi fasilitas kesehatan</p>
+                                    </div>
+                                </div>
+
+                                <p class="text-[11px] text-gray-500">
+                                    Peta menggunakan basemap OpenStreetMap dan layer batas desa yang sama dengan analisis hotspot.
+                                </p>
+                            </div>
+                        </div>
+
+                        {{-- ganti nama route sesuai yang kamu pakai untuk halaman peta faskes --}}
+                        <a href="{{ route('peta-faskes') }}" class="text-sm font-medium text-red-600 hover:text-red-700 transition-colors duration-200">
+                            <div class="bg-red-50 px-6 py-4 rounded-b-2xl shimmer-effect">
+                                Lihat Peta Fasilitas Kesehatan &rarr;
+                            </div>
+                        </a>
+                    </div>
                 </section>
         
             </div>
@@ -528,5 +610,9 @@
     </style>
 
     <x-goToTop />
+
+    <footer class="text-xs text-gray-500 text-center my-4">
+        &copy; {{ date('Y') }} Rumah Stunting Pangalengan. All rights reserved.
+    </footer>
 </body>
 </html>

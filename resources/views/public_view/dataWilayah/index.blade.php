@@ -38,7 +38,7 @@
 
     {{-- ===== Konten Tabel ===== --}}
     <section id="tab-table">
-        <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+        <div class="bg-white rounded-lg overflow-hidden">
             <div class="p-6">
 
                 {{-- Judul Tabel dan Tombol Info --}}

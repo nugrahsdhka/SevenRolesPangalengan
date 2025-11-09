@@ -1,0 +1,24 @@
+[
+  {
+    "nama_faskes": "Puskesmas Pangalengan",
+    "jenis": "Puskesmas",
+    "alamat": "Jl. Raya Pangalengan No. 12",
+    "lat": -7.1766000000000000,
+    "lng": 107.57108195491446
+    
+  },
+  {
+    "nama_faskes": "Posyandu Mekar Sari",
+    "jenis": "Posyandu",
+    "alamat": "Desa Margamulya",
+    "lat": -7.162,
+    "lng": 107.583
+  },
+  {
+    "nama_faskes": "Klinik Sehat Bersama",
+    "jenis": "Klinik",
+    "alamat": "Jl. Pasir Jambu No. 45",
+    "lat": -7.158,
+    "lng": 107.565
+  }
+]
