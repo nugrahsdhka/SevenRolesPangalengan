@@ -3,45 +3,83 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Auth\LoginRequest;
-use Illuminate\Http\RedirectResponse;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\View\View;
+use Illuminate\Validation\ValidationException;
 
 class AuthenticatedSessionController extends Controller
 {
     /**
-     * Display the login view.
+     * Tampilkan form login.
      */
-    public function create(): View
+    public function create()
     {
         return view('auth.login');
     }
 
     /**
-     * Handle an incoming authentication request.
+     * Proses login.
      */
-    public function store(LoginRequest $request): RedirectResponse
+    public function store(Request $request)
     {
-        $request->authenticate();
+        // Validasi input
+        $credentials = $request->validate([
+            'email'    => ['required', 'string', 'email'],
+            'password' => ['nullable', 'string'],
+        ]);
 
+        // Cari user berdasarkan email
+        $user = User::where('email', $credentials['email'])->first();
+
+        if (!$user) {
+            throw ValidationException::withMessages([
+                'email' => __('Email atau password tidak sesuai.'),
+            ]);
+        }
+
+        // Jika email BELUM terverifikasi
+        if (!$user->hasVerifiedEmail()) {
+            // Kalau sudah ada token & belum kadaluarsa → arahkan ke halaman verifikasi token
+            if (
+                $user->verification_token &&
+                $user->verification_token_expires_at &&
+                now()->lessThan($user->verification_token_expires_at)
+            ) {
+                return redirect()
+                    ->route('verification.token.show', ['email' => $user->email])
+                    ->with('status', 'Silakan masukkan token verifikasi yang telah dikirim ke email Anda.');
+            }
+
+            // Kalau belum punya token → arahkan ke halaman lengkapi registrasi
+            return redirect()
+                ->route('register.complete.show', ['email' => $user->email]);
+        }
+
+        // Kalau sudah terverifikasi → cek password
+        if (!Auth::attempt($credentials, $request->boolean('remember'))) {
+            throw ValidationException::withMessages([
+                'email' => __('Email atau password tidak sesuai.'),
+            ]);
+        }
+
+        // Regenerasi session (security)
         $request->session()->regenerate();
 
-        return redirect()->intended(route('dashboard', absolute: false));
+        // Redirect ke dashboard (yang sudah di-handle di web.php)
+        return redirect()->intended(route('dashboard'));
     }
 
     /**
-     * Destroy an authenticated session.
+     * Logout.
      */
-    public function destroy(Request $request): RedirectResponse
+    public function destroy(Request $request)
     {
         Auth::guard('web')->logout();
 
         $request->session()->invalidate();
-
         $request->session()->regenerateToken();
 
-        return redirect('/');
+        return redirect()->route('login');
     }
 }

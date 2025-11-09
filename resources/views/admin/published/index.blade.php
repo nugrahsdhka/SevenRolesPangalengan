@@ -91,6 +91,18 @@
                         {{-- Divider --}}
                         <div class="border-t border-gray-100 my-1"></div>
 
+                        {{-- Divider --}}
+                        <div class="border-t border-gray-100 my-1"></div>
+
+                        {{-- Kelola Faskes --}}
+                        <a href="{{ route('admin.faskes.index') }}" 
+                        class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 2a10 10 0 1 0 10 10A10.011 10.011 0 0 0 12 2Zm1 15h-2v-2h2Zm0-4h-2V7h2Z"/>
+                            </svg>
+                            <span class="font-medium">Kelola Faskes</span>
+                        </a>
+
                         {{-- Home --}}
                         <a href="{{ route('welcome') }}" 
                            class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
@@ -218,7 +230,7 @@
                                 </button>
 
                                 {{-- Data Pencegahan --}}
-                                <button @click="activeTab = 'pencegahan'; open = false"
+                                <button @click="activeTab = 'pencegahan'; open = false" disabled
                                         :class="{ 'bg-red-50 text-red-700': activeTab === 'pencegahan', 'text-gray-700 hover:bg-gray-50': activeTab !== 'pencegahan' }"
                                         class="w-full flex items-center gap-3 px-4 py-3 text-left border-b border-gray-100 transition">
                                     <svg class="h-5 w-5 flex-shrink-0" :class="{ 'text-red-600': activeTab === 'pencegahan', 'text-gray-400': activeTab !== 'pencegahan' }" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -231,7 +243,7 @@
                                 </button>
 
                                 {{-- Data Penanggulangan --}}
-                                <button @click="activeTab = 'penanggulangan'; open = false"
+                                <button @click="activeTab = 'penanggulangan'; open = false" disabled
                                         :class="{ 'bg-red-50 text-red-700': activeTab === 'penanggulangan', 'text-gray-700 hover:bg-gray-50': activeTab !== 'penanggulangan' }"
                                         class="w-full flex items-center gap-3 px-4 py-3 text-left border-b border-gray-100 transition">
                                     <svg class="h-5 w-5 flex-shrink-0" :class="{ 'text-red-600': activeTab === 'penanggulangan', 'text-gray-400': activeTab !== 'penanggulangan' }" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -244,7 +256,7 @@
                                 </button>
 
                                 {{-- Data Desa --}}
-                                <button @click="activeTab = 'desa'; open = false"
+                                <button @click="activeTab = 'desa'; open = false" disabled
                                         :class="{ 'bg-red-50 text-red-700': activeTab === 'desa', 'text-gray-700 hover:bg-gray-50': activeTab !== 'desa' }"
                                         class="w-full flex items-center gap-3 px-4 py-3 text-left transition">
                                     <svg class="h-5 w-5 flex-shrink-0" :class="{ 'text-red-600': activeTab === 'desa', 'text-gray-400': activeTab !== 'desa' }" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -271,7 +283,7 @@
                                 <span>Data Gizi</span>
                             </button>
                             
-                            <button @click="activeTab = 'pencegahan'" 
+                            <button @click="activeTab = 'pencegahan'"  disabled
                                     :class="{ 'border-red-600 text-red-600': activeTab === 'pencegahan', 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300': activeTab !== 'pencegahan' }" 
                                     class="w-1/4 py-4 px-1 text-center border-b-2 font-medium text-sm focus:outline-none flex justify-center items-center gap-2">
                                 <svg class="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -280,7 +292,7 @@
                                 <span>Data Pencegahan</span>
                             </button>
                             
-                            <button @click="activeTab = 'penanggulangan'" 
+                            <button @click="activeTab = 'penanggulangan'" disabled
                                     :class="{ 'border-red-600 text-red-600': activeTab === 'penanggulangan', 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300': activeTab !== 'penanggulangan' }" 
                                     class="w-1/4 py-4 px-1 text-center border-b-2 font-medium text-sm focus:outline-none flex justify-center items-center gap-2">
                                 <svg class="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -289,7 +301,7 @@
                                 <span>Data Penanggulangan</span>
                             </button>
                             
-                            <button @click="activeTab = 'desa'" 
+                            <button @click="activeTab = 'desa'" disabled
                                     :class="{ 'border-red-600 text-red-600': activeTab === 'desa', 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300': activeTab !== 'desa' }" 
                                     class="w-1/4 py-4 px-1 text-center border-b-2 font-medium text-sm focus:outline-none flex justify-center items-center gap-2">
                                 <svg class="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -302,7 +314,7 @@
                 </div>
 
                 {{-- Konten Tab --}}
-                <div class="p-4 sm:p-6 lg:p-8">
+                <div class="p-4 sm:p-6 lg:p-8 h-[180px] md:h-full">
                     {{-- Konten Gizi --}}
                     <div x-show="activeTab === 'gizi'">
                         {{-- TOMBOL AKSI MASSAL GIZI (DARI KODE ASLI ADMIN) --}}

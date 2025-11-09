@@ -245,9 +245,9 @@
                 </div>
 
                 {{-- Paginasi Tabel --}}
-                <div class="mt-6 p-6 border-t border-gray-100">
+                {{-- <div class="mt-6 p-6 border-t border-gray-100">
                     {{ $dataStunting->links() }}
-                </div>
+                </div> --}}
 
             </div>
         </div>

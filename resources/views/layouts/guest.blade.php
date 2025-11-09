@@ -23,11 +23,22 @@
             {{ $slot }}
         </div>
 
-        <x-goToTop />
-        @stack('scripts')
+        @php
+            // Route yang tidak perlu footer
+            $hideFooterRoutes = [
+                'login',
+                'register.complete.show',
+                'verification.token.show',
+            ];
+        @endphp
 
-        <footer class="text-xs text-gray-500 text-center my-4">
-            &copy; {{ date('Y') }} Rumah Stunting Pangalengan. All rights reserved.
-        </footer>
+        @if (!in_array(Route::currentRouteName(), $hideFooterRoutes))
+            <footer class="text-xs text-gray-500 text-center mb-4">
+                &copy; {{ date('Y') }} Rumah Stunting Pangalengan. All rights reserved.
+            </footer>
+        @endif
+
+        <x-goToTop />
+        @stack('scripts')   
     </body>
 </html>

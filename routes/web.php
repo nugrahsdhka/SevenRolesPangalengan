@@ -11,6 +11,7 @@ use App\Http\Controllers\Divisi\DivisiGiziController;
 use App\Http\Controllers\Divisi\DivisiPencegahanController;
 use App\Http\Controllers\Divisi\DivisiPenanggulanganController;
 use App\Http\Controllers\Profile\ProfileController;
+use App\Http\Controllers\Admin\FaskesController;
 
 // Guest
 use App\Http\Controllers\Guest\HomeController;
@@ -103,6 +104,13 @@ Route::middleware('auth', 'verified')->group(function () {
         Route::post('/publish-data', [AdminController::class, 'publish'])->name('publish');
 
         Route::get('/published-data/gizi/{desa_kelurahan}', [AdminController::class, 'showGiziDetail'])->name('published.gizi.detail');
+
+        Route::patch('faskes/{faskes}/toggle-active', [FaskesController::class, 'toggleActive'])
+            ->name('faskes.toggle-active');
+
+        Route::resource('faskes', FaskesController::class)
+            ->parameters(['faskes' => 'faskes'])
+            ->names('faskes');
 
         Route::get('/users/create', [UserController::class, 'create'])->name('users.create');
         Route::post('/users', [UserController::class, 'store'])->name('users.store');

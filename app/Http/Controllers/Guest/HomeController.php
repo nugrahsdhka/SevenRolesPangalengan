@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Http\Controllers\Guest; // Sesuaikan dengan namespace Anda
+namespace App\Http\Controllers\Guest;
 
 use App\Http\Controllers\Controller;
-use App\Models\DataGizi; // Pastikan model DataGizi di-import
+use App\Models\DataGizi;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB; // Pastikan DB di-import
+use App\Models\Faskes;
+use Illuminate\Support\Facades\DB;
 
 class HomeController extends Controller
 {
@@ -14,16 +15,13 @@ class HomeController extends Controller
         // 1. Ambil semua data statistik GLOBAL dalam satu query
         $stats = DataGizi::where('status', 'published')
             ->select(
-                // Data untuk Kartu Statistik
                 DB::raw('COUNT(*) as total_anak'),
                 DB::raw('SUM(CASE WHEN zs_tb_u < -2 THEN 1 ELSE 0 END) as total_kasus_stunting'),
                 DB::raw('COUNT(DISTINCT desa_kelurahan) as total_desa'),
-                
-                // Data untuk Distribution Bar (berdasarkan Z-Score TB/U)
-                DB::raw('SUM(CASE WHEN zs_tb_u < -3 THEN 1 ELSE 0 END) as sangat_pendek_count'), // Merah
-                DB::raw('SUM(CASE WHEN zs_tb_u >= -3 AND zs_tb_u < -2 THEN 1 ELSE 0 END) as pendek_count'), // Oranye
-                DB::raw('SUM(CASE WHEN zs_tb_u >= -2 AND zs_tb_u <= 2 THEN 1 ELSE 0 END) as normal_count'), // Hijau
-                DB::raw('SUM(CASE WHEN zs_tb_u > 2 THEN 1 ELSE 0 END) as tinggi_count') // Biru
+                DB::raw('SUM(CASE WHEN zs_tb_u < -3 THEN 1 ELSE 0 END) as sangat_pendek_count'),
+                DB::raw('SUM(CASE WHEN zs_tb_u >= -3 AND zs_tb_u < -2 THEN 1 ELSE 0 END) as pendek_count'),
+                DB::raw('SUM(CASE WHEN zs_tb_u >= -2 AND zs_tb_u <= 2 THEN 1 ELSE 0 END) as normal_count'),
+                DB::raw('SUM(CASE WHEN zs_tb_u > 2 THEN 1 ELSE 0 END) as tinggi_count')
             )
             ->first();
 
@@ -47,8 +45,8 @@ class HomeController extends Controller
             'normal'        => $stats->normal_count ?? 0,
             'tinggi'        => $stats->tinggi_count ?? 0,
         ];
-       
-        // 4. Ambil Spoiler Data Stunting (Tidak berubah)
+
+        // 4. Spoiler Data Stunting
         $spoilerDataStunting = DataGizi::where('status', 'published')
             ->select(
                 'desa_kelurahan',
@@ -63,30 +61,40 @@ class HomeController extends Controller
             ->limit(3)
             ->get();
 
-        // 5. Ambil Spoiler Data Wilayah (3 Desa dengan update terbaru)
+        // 5. Spoiler Data Wilayah
         $spoilerDataWilayah = DataGizi::where('status', 'published')
             ->select(
                 'desa_kelurahan',
                 DB::raw('MAX(created_at) as update_terbaru'),
                 DB::raw('COUNT(*) as total_anak_di_desa'),
-                DB::raw('AVG(berat) as avg_berat'), // <-- TAMBAHKAN INI
-                DB::raw('AVG(tinggi) as avg_tinggi') // <-- TAMBAHKAN INI
+                DB::raw('AVG(berat) as avg_berat'),
+                DB::raw('AVG(tinggi) as avg_tinggi')
             )
             ->groupBy('desa_kelurahan')
-            ->orderBy('update_terbaru', 'desc') // Urutkan dari yang terbaru
-            ->limit(3)                        // Ambil 3 teratas
+            ->orderBy('update_terbaru', 'desc')
+            ->limit(3)
             ->get();
 
+        // 6. Ambil data FASKES dari database
+        $faskesList = Faskes::where('is_active', true)
+            ->select('id', 'nama_faskes', 'jenis', 'alamat', 'desa_kelurahan', 'lat', 'lng')
+            ->orderBy('nama_faskes')
+            ->get();
 
-        // 6. Kirim semua data ke view
-        return view('public_view.home.welcome', compact( // Pastikan nama view ini benar
+        // Hitung total faskes
+        $total_faskes = $faskesList->count();
+
+        // 7. Kirim semua data ke view
+        return view('public_view.home.welcome', compact(
             'total_desa',
             'rata_rata_kasus',
             'distribusi',
             'distribusi_counts',
             'total_anak',
             'spoilerDataStunting',
-            'spoilerDataWilayah' // Data ini sekarang punya avg_berat & avg_tinggi
+            'spoilerDataWilayah',
+            'faskesList', // <--- ini dari file JSON, siap dipakai di Blade / JS
+            'total_faskes'
         ));
     }
 }

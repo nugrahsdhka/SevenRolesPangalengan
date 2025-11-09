@@ -40,10 +40,10 @@
 
     {{-- Konten Peta --}}
     <section id="tab-map">
-        <div class="bg-white rounded-lg overflow-hidden">
-            <div class="p-2">
+        <div class="bg-white rounded-lg overflow-hidden flex items-center justify-center">
+            <div class="p-2 w-full md:w-[95%]">
                 {{-- Map Container --}}
-                <div id="map" class="rounded-lg w-full h-[60vh] md:h-[600px]"></div>
+                <div id="map" class="rounded-lg w-full h-[60vh] md:h-[400px]"></div>
             </div>
         </div>
 
@@ -166,7 +166,7 @@
                 }).addTo(map);
 
                 // Data faskes dari controller
-                const faskes = {!! $faskesJson !!};
+                const faskes = @json($faskes);
 
                 // 1) Tambahkan batas wilayah Kecamatan Pangalengan
                 fetch('{{ asset('maps/PetaDesaKecPangalengan.geojson') }}')
@@ -174,10 +174,10 @@
                     .then(geojson => {
                         const batasLayer = L.geoJSON(geojson, {
                             style: {
-                                color: '#111827',
-                                weight: 0.23,
+                                color: '#000',
+                                weight: 0.25,
                                 fillColor: '#16a34a', // hijau (faskes context)
-                                fillOpacity: 0.18
+                                fillOpacity: 0.35
                             }
                         }).addTo(map);
 

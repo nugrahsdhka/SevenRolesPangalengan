@@ -6,89 +6,91 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Auth\Events\Registered;
 use Spatie\Permission\Models\Role;
 use Illuminate\Validation\Rules;
+use Illuminate\Support\Str;
 
 class UserController extends Controller
 {
     /**
-     * ✅ PERBAIKAN: Tampilkan user yang aktif maupun yang nonaktif (trashed)
+     * Tampilkan semua user (aktif + nonaktif/soft delete)
      */
     public function index()
     {
-        $roles = Role::with(['users' => function ($query) {
-            $query->withTrashed(); // Ambil juga user yang sudah di-soft-delete
-        }])->get();
-        
-        return view('admin.users.index', compact('roles'));
+        $users = User::withTrashed()
+            ->with('roles')
+            ->orderBy('name')
+            ->get();
+
+        $roles = Role::pluck('name', 'id');
+
+        return view('admin.users.index', compact('users', 'roles'));
     }
 
     public function create()
     {
+        // Ambil semua role kecuali "Guest"
         $roles = Role::where('name', '!=', 'Guest')->pluck('name', 'name');
+
         return view('admin.users.create', compact('roles'));
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:'.User::class],
-            'role' => ['required', 'string', 'exists:roles,name'],
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'name'  => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:' . User::class],
+            'role'  => ['required', 'string', 'exists:roles,name'],
         ]);
 
+        // Password dummy random (tidak akan dipakai, nanti user set sendiri)
+        $randomPassword = Str::random(32);
+
         $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
+            'name'     => $request->name,
+            'email'    => $request->email,
+            'password' => Hash::make($randomPassword),
         ]);
 
         $user->assignRole($request->role);
-        event(new Registered($user));
 
-        return redirect()->route('admin.users.index')->with('success', 'User berhasil dibuat dan email verifikasi telah dikirim.');
+        return redirect()
+            ->route('admin.users.index')
+            ->with('success', 'User berhasil dibuat. User akan melengkapi registrasi saat pertama kali login.');
     }
 
-    /**
-     * ✅ PERBAIKAN: Gunakan $id dan cari user secara manual
-     */
     public function destroy($id)
     {
-        $user = User::findOrFail($id); // Temukan user yang masih aktif
+        $user = User::findOrFail($id);
+
         if ($user->id === auth()->id()) {
             return back()->with('error', 'Anda tidak dapat menonaktifkan akun Anda sendiri.');
         }
-        
-        $user->delete(); // Ini akan menjalankan Soft Delete
+
+        $user->delete();
+
         return back()->with('success', 'User berhasil dinonaktifkan.');
     }
 
-    /**
-     * ✅ METHOD BARU: Mengaktifkan (restore) user
-     */
     public function restore($id)
     {
-        // Temukan user di "sampah" (trashed)
         $user = User::withTrashed()->findOrFail($id);
-        $user->restore(); // Perintah untuk mengaktifkan kembali
+
+        $user->restore();
 
         return back()->with('success', 'User berhasil diaktifkan kembali.');
     }
 
-    /**
-     * ✅ PERBAIKAN: Gunakan $id dan cari user secara manual
-     */
     public function updatePassword(Request $request, $id)
     {
-        $user = User::findOrFail($id); // Temukan user yang masih aktif
+        $user = User::findOrFail($id);
+
         $request->validate([
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
-        
+
         $user->update([
-            'password' => Hash::make($request->password)
+            'password' => Hash::make($request->password),
         ]);
 
         return back()->with('success', 'Password untuk user ' . $user->name . ' berhasil diperbarui.');

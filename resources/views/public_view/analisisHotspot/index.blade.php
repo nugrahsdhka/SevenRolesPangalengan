@@ -39,10 +39,10 @@
     </div>
 
     <section id="tab-map">
-        <div class="bg-white rounded-lg overflow-hidden">
-            <div class="p-2">
+        <div class="bg-white rounded-lg overflow-hidden flex items-center justify-center">
+            <div class="p-2 w-full md:w-[95%]">
                 {{-- Map Container --}}
-                <div id="map" class="rounded-lg w-full h-[65vh] md:h-[600px]"></div>
+                <div id="map" class="rounded-lg w-full h-[65vh] md:h-[400px]"></div>
             </div>
         </div>
 
@@ -251,8 +251,8 @@
                             const zs       = item ? item.avg_zs_tbu : null;
 
                             return {
-                                color: '#111827',
-                                weight: 0.23,
+                                color: '#FFF',
+                                weight: 0.25,
                                 fillColor: getColor(zs),
                                 fillOpacity: 0.65
                             };
