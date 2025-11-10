@@ -16,7 +16,7 @@
     </x-slot>
 
     <div class="py-6 sm:py-8 lg:py-12 bg-gradient-to-br from-slate-50 via-gray-50 to-slate-100 min-h-screen">
-        <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8"> {{-- Max width sedikit lebih kecil --}}
+        <div class="max-w-3xl mx-auto px-1 sm:px-6 lg:px-8"> {{-- Max width sedikit lebih kecil --}}
 
             {{-- Tampilkan pesan sukses/info --}}
              @if (session('status'))

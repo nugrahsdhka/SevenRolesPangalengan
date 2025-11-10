@@ -17,7 +17,7 @@
         </div>
     </x-slot>
 
-    <div class="py-6">
+    <div class="py-6 px-1">
         <div class="max-w-3xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white shadow-sm rounded-xl border border-gray-100 p-6 space-y-6">
 

@@ -19,7 +19,7 @@
         </div>
     </x-slot>
 
-    <div class="py-6 px-2">
+    <div class="py-6 px-1">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             @if (session('success'))
                 <div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 3000)" x-transition class="mb-6 flex items-start sm:items-center gap-3 rounded-lg bg-green-50 p-4 border border-green-200">

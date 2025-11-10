@@ -134,7 +134,7 @@
     </x-slot>
 
     <div class="py-8 bg-gradient-to-br from-slate-50 via-rose-50/30 to-slate-50" x-data="{ openModal: false, modalData: null, modalTitle: '' }">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto px-1 sm:px-6 lg:px-8">
             {{-- Alert Messages --}}
             @if (session('success'))
                 <div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 3000)" x-transition class="mb-6 flex items-start sm:items-center gap-3 rounded-xl bg-green-50 p-4 ring-1 ring-green-200">
@@ -153,7 +153,7 @@
 
             {{-- Main Card --}}
             {{-- ✅ MODIFIKASI: Gunakan $activeTab dari controller --}}
-            <section x-data="{ activeTab: '{{ $activeTab }}' }" class="rounded-2xl bg-white shadow-lg ring-1 ring-gray-900/5 overflow-hidden">
+            <section x-data="{ activeTab: '{{ $activeTab }}' }" class="rounded-2xl bg-white shadow-lg ring-1 ring-gray-900/5 overflow-visible sm:overflow-hidden">
                 {{-- Navigasi Tab --}}
                 <div class="border-b border-gray-200">
                     {{-- Header Title --}}
@@ -319,7 +319,7 @@
                 </div>
 
                 {{-- Konten Tab --}}
-                <div class="p-4 sm:p-6 lg:p-8 h-[180px] md:h-full">
+                <div class="p-4 sm:p-6 lg:p-8">
                     {{-- Konten Gizi --}}
                     <div x-show="activeTab === 'gizi'">
                         {{-- TOMBOL AKSI MASSAL GIZI (DARI KODE ASLI ADMIN) --}}
@@ -454,30 +454,64 @@
                         <div class="mb-4 flex flex-col sm:flex-row gap-2 justify-end">
                             {{-- ✅ MODIFIKASI: Gunakan $bulkActionData --}}
                             @if($bulkActionData['pencegahan']['has_approved'])
-                                <form action="{{ route('admin.bulk_publish') }}" method="POST" class="inline" onsubmit="return confirm('Anda yakin ingin PUBLISH semua data Approved di tab ini?');"> @csrf <input type="hidden" name="model_type" value="pencegahan"> <input type="hidden" name="action" value="publish_all"> <input type="hidden" name="active_tab" x-bind:value="activeTab"> <button type="submit" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg bg-green-100 px-3 py-2 text-xs font-semibold text-green-700 transition hover:bg-green-200">
-                                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                      <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                    </svg>
-                                    Publish Semua Approved</button>
+                                <form action="{{ route('admin.bulk_publish') }}" method="POST" class="inline" onsubmit="return confirm('Anda yakin ingin PUBLISH semua data Approved di tab ini?');">
+                                    @csrf
+                                    <input type="hidden" name="model_type" value="pencegahan">
+                                    <input type="hidden" name="action" value="publish_all">
+                                    <input type="hidden" name="active_tab" x-bind:value="activeTab">
+                                    <button type="submit" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg bg-green-100 px-3 py-2 text-xs font-semibold text-green-700 transition hover:bg-green-200">
+                                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                        Publish Semua Approved
+                                    </button>
                                 </form>
                             @endif
                             {{-- ✅ MODIFIKASI: Gunakan $bulkActionData --}}
                             @if($bulkActionData['pencegahan']['has_published'])
-                                <form action="{{ route('admin.bulk_publish') }}" method="POST" class="inline" onsubmit="return confirm('Anda yakin ingin TARIK semua data Published di tab ini?');"> @csrf <input type="hidden" name="model_type" value="pencegahan"> <input type="hidden" name="action" value="unpublish_all"> <input type="hidden" name="active_tab" x-bind:value="activeTab"> <button type="submit" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg bg-yellow-100 px-3 py-2 text-xs font-semibold text-yellow-700 transition hover:bg-yellow-200">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
-                                    Tarik Semua Published</button>
+                                <form action="{{ route('admin.bulk_publish') }}" method="POST" class="inline" onsubmit="return confirm('Anda yakin ingin TARIK semua data Published di tab ini?');">
+                                    @csrf
+                                    <input type="hidden" name="model_type" value="pencegahan">
+                                    <input type="hidden" name="action" value="unpublish_all">
+                                    <input type="hidden" name="active_tab" x-bind:value="activeTab">
+                                    <button type="submit" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg bg-yellow-100 px-3 py-2 text-xs font-semibold text-yellow-700 transition hover:bg-yellow-200">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                                        Tarik Semua Published
+                                    </button>
                                 </form>
                             @endif
                         </div>
                         
                         @forelse ($dataToReview['pencegahan'] as $data)
                             <div class="py-4 border-b border-black/10 last:border-0 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
-                                <div class="min-w-0"> <p class="font-semibold text-gray-800 truncate">{{ $data->judul_kegiatan }}</p> <p class="text-xs text-gray-500 mt-1 truncate"> Diinput oleh: <span class="font-medium">{{ $data->user->name }}</span> | Periode: {{ $data->periode->format('F Y') }} </p> </div>
+                                <div class="min-w-0">
+                                    <p class="font-semibold text-gray-800 truncate">{{ $data->judul_kegiatan }}</p>
+                                    <p class="text-xs text-gray-500 mt-1 truncate">
+                                        Diinput oleh: <span class="font-medium">{{ $data->user->name }}</span> |
+                                        Periode: {{ $data->periode->format('F Y') }}
+                                    </p>
+                                </div>
                                 <div class="flex flex-wrap items-center gap-2 sm:justify-end">
                                     <button type="button" @click="openModal = true; modalData = {{ Js::from($data) }}; modalTitle = 'Detail Data Pencegahan'" class="text-xs text-indigo-600 hover:underline px-2">Detail</button>
-                                    @if($data->status === 'published') <span class="inline-flex items-center gap-1 rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-700"><span class="h-1.5 w-1.5 rounded-full bg-green-600"></span>Published</span> @elseif($data->status === 'approved') <span class="inline-flex items-center gap-1 rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-700"><span class="h-1.5 w-1.5 rounded-full bg-blue-600"></span>Approved</span> @endif
+                                    @if($data->status === 'published')
+                                        <span class="inline-flex items-center gap-1 rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-700">
+                                            <span class="h-1.5 w-1.5 rounded-full bg-green-600"></span>Published
+                                        </span>
+                                    @elseif($data->status === 'approved')
+                                        <span class="inline-flex items-center gap-1 rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-700">
+                                            <span class="h-1.5 w-1.5 rounded-full bg-blue-600"></span>Approved
+                                        </span>
+                                    @endif
                                     @if($data->status !== 'pending')
-                                        <form action="{{ route('admin.publish') }}" method="POST" class="inline"> @csrf <input type="hidden" name="model" value="DataPencegahan"> <input type="hidden" name="id" value="{{ $data->id }}"> <input type="hidden" name="active_tab" x-bind:value="activeTab"> <button type="submit" class="px-3 py-1 text-xs font-medium text-white rounded-lg {{ $data->status === 'published' ? 'bg-yellow-600 hover:bg-yellow-700' : 'bg-green-600 hover:bg-green-700' }}"> {{ $data->status === 'published' ? 'Tarik' : 'Publish' }} </button> </form>
+                                        <form action="{{ route('admin.publish') }}" method="POST" class="inline">
+                                            @csrf
+                                            <input type="hidden" name="model" value="DataPencegahan">
+                                            <input type="hidden" name="id" value="{{ $data->id }}">
+                                            <input type="hidden" name="active_tab" x-bind:value="activeTab">
+                                            <button type="submit" class="px-3 py-1 text-xs font-medium text-white rounded-lg {{ $data->status === 'published' ? 'bg-yellow-600 hover:bg-yellow-700' : 'bg-green-600 hover:bg-green-700' }}">
+                                                {{ $data->status === 'published' ? 'Tarik' : 'Publish' }}
+                                            </button>
+                                        </form>
                                     @endif
                                 </div>
                             </div>
@@ -495,32 +529,66 @@
                     <div x-show="activeTab === 'penanggulangan'" style="display: none;">
                         {{-- TOMBOL AKSI MASSAL PENANGGULANGAN --}}
                         <div class="mb-4 flex flex-col sm:flex-row gap-2 justify-end">
-                             {{-- ✅ MODIFIKASI: Gunakan $bulkActionData --}}
+                            {{-- ✅ MODIFIKASI: Gunakan $bulkActionData --}}
                             @if($bulkActionData['penanggulangan']['has_approved'])
-                                <form action="{{ route('admin.bulk_publish') }}" method="POST" class="inline" onsubmit="return confirm('Anda yakin ingin PUBLISH semua data Approved di tab ini?');"> @csrf <input type="hidden" name="model_type" value="penanggulangan"> <input type="hidden" name="action" value="publish_all"> <input type="hidden" name="active_tab" x-bind:value="activeTab"> <button type="submit" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg bg-green-100 px-3 py-2 text-xs font-semibold text-green-700 transition hover:bg-green-200">
-                                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                      <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                    </svg>
-                                    Publish Semua Approved</button>
+                                <form action="{{ route('admin.bulk_publish') }}" method="POST" class="inline" onsubmit="return confirm('Anda yakin ingin PUBLISH semua data Approved di tab ini?');">
+                                    @csrf
+                                    <input type="hidden" name="model_type" value="penanggulangan">
+                                    <input type="hidden" name="action" value="publish_all">
+                                    <input type="hidden" name="active_tab" x-bind:value="activeTab">
+                                    <button type="submit" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg bg-green-100 px-3 py-2 text-xs font-semibold text-green-700 transition hover:bg-green-200">
+                                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                        Publish Semua Approved
+                                    </button>
                                 </form>
                             @endif
                             {{-- ✅ MODIFIKASI: Gunakan $bulkActionData --}}
                             @if($bulkActionData['penanggulangan']['has_published'])
-                                <form action="{{ route('admin.bulk_publish') }}" method="POST" class="inline" onsubmit="return confirm('Anda yakin ingin TARIK semua data Published di tab ini?');"> @csrf <input type="hidden" name="model_type" value="penanggulangan"> <input type="hidden" name="action" value="unpublish_all"> <input type="hidden" name="active_tab" x-bind:value="activeTab"> <button type="submit" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg bg-yellow-100 px-3 py-2 text-xs font-semibold text-yellow-700 transition hover:bg-yellow-200">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
-                                    Tarik Semua Published</button>
+                                <form action="{{ route('admin.bulk_publish') }}" method="POST" class="inline" onsubmit="return confirm('Anda yakin ingin TARIK semua data Published di tab ini?');">
+                                    @csrf
+                                    <input type="hidden" name="model_type" value="penanggulangan">
+                                    <input type="hidden" name="action" value="unpublish_all">
+                                    <input type="hidden" name="active_tab" x-bind:value="activeTab">
+                                    <button type="submit" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg bg-yellow-100 px-3 py-2 text-xs font-semibold text-yellow-700 transition hover:bg-yellow-200">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                                        Tarik Semua Published
+                                    </button>
                                 </form>
                             @endif
                         </div>
                         
                         @forelse ($dataToReview['penanggulangan'] as $data)
                             <div class="py-4 border-b border-black/10 last:border-0 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
-                                <div class="min-w-0"> <p class="font-semibold text-gray-800 truncate">{{ $data->jenis_bencana }} ({{$data->jumlah_korban}} korban)</p> <p class="text-xs text-gray-500 mt-1 truncate"> Diinput oleh: <span class="font-medium">{{ $data->user->name }}</span> | Periode: {{ $data->periode->format('F Y') }} </p> </div>
+                                <div class="min-w-0">
+                                    <p class="font-semibold text-gray-800 truncate">{{ $data->jenis_bencana }} ({{$data->jumlah_korban}} korban)</p>
+                                    <p class="text-xs text-gray-500 mt-1 truncate">
+                                        Diinput oleh: <span class="font-medium">{{ $data->user->name }}</span> |
+                                        Periode: {{ $data->periode->format('F Y') }}
+                                    </p>
+                                </div>
                                 <div class="flex flex-wrap items-center gap-2 sm:justify-end">
                                     <button type="button" @click="openModal = true; modalData = {{ Js::from($data) }}; modalTitle = 'Detail Data Penanggulangan'" class="text-xs text-indigo-600 hover:underline px-2">Detail</button>
-                                    @if($data->status === 'published') <span class="inline-flex items-center gap-1 rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-700"><span class="h-1.5 w-1.5 rounded-full bg-green-600"></span>Published</span> @elseif($data->status === 'approved') <span class="inline-flex items-center gap-1 rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-700"><span class="h-1.5 w-1.5 rounded-full bg-blue-600"></span>Approved</span> @endif
+                                    @if($data->status === 'published')
+                                        <span class="inline-flex items-center gap-1 rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-700">
+                                            <span class="h-1.5 w-1.5 rounded-full bg-green-600"></span>Published
+                                        </span>
+                                    @elseif($data->status === 'approved')
+                                        <span class="inline-flex items-center gap-1 rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-700">
+                                            <span class="h-1.5 w-1.5 rounded-full bg-blue-600"></span>Approved
+                                        </span>
+                                    @endif
                                     @if($data->status !== 'pending')
-                                        <form action="{{ route('admin.publish') }}" method="POST" class="inline"> @csrf <input type="hidden" name="model" value="DataPenanggulangan"> <input type="hidden" name="id" value="{{ $data->id }}"> <input type="hidden" name="active_tab" x-bind:value="activeTab"> <button type="submit" class="px-3 py-1 text-xs font-medium text-white rounded-lg {{ $data->status === 'published' ? 'bg-yellow-600 hover:bg-yellow-700' : 'bg-green-600 hover:bg-green-700' }}"> {{ $data->status === 'published' ? 'Tarik' : 'Publish' }} </button> </form>
+                                        <form action="{{ route('admin.publish') }}" method="POST" class="inline">
+                                            @csrf
+                                            <input type="hidden" name="model" value="DataPenanggulangan">
+                                            <input type="hidden" name="id" value="{{ $data->id }}">
+                                            <input type="hidden" name="active_tab" x-bind:value="activeTab">
+                                            <button type="submit" class="px-3 py-1 text-xs font-medium text-white rounded-lg {{ $data->status === 'published' ? 'bg-yellow-600 hover:bg-yellow-700' : 'bg-green-600 hover:bg-green-700' }}">
+                                                {{ $data->status === 'published' ? 'Tarik' : 'Publish' }}
+                                            </button>
+                                        </form>
                                     @endif
                                 </div>
                             </div>
@@ -538,32 +606,70 @@
                     <div x-show="activeTab === 'desa'" style="display: none;">
                         {{-- TOMBOL AKSI MASSAL DESA --}}
                         <div class="mb-4 flex flex-col sm:flex-row gap-2 justify-end">
-                             {{-- ✅ MODIFIKASI: Gunakan $bulkActionData --}}
+                            {{-- ✅ MODIFIKASI: Gunakan $bulkActionData --}}
                             @if($bulkActionData['desa']['has_approved'])
-                                <form action="{{ route('admin.bulk_publish') }}" method="POST" class="inline" onsubmit="return confirm('Anda yakin ingin PUBLISH semua data Approved di tab ini?');"> @csrf <input type="hidden" name="model_type" value="desa"> <input type="hidden" name="action" value="publish_all"> <input type="hidden" name="active_tab" x-bind:value="activeTab"> <button type="submit" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg bg-green-100 px-3 py-2 text-xs font-semibold text-green-700 transition hover:bg-green-200">
-                                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                      <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                    </svg>
-                                    Publish Semua Approved</button>
+                                <form action="{{ route('admin.bulk_publish') }}" method="POST" class="inline" onsubmit="return confirm('Anda yakin ingin PUBLISH semua data Approved di tab ini?');">
+                                    @csrf
+                                    <input type="hidden" name="model_type" value="desa">
+                                    <input type="hidden" name="action" value="publish_all">
+                                    <input type="hidden" name="active_tab" x-bind:value="activeTab">
+                                    <button type="submit" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg bg-green-100 px-3 py-2 text-xs font-semibold text-green-700 transition hover:bg-green-200">
+                                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                        Publish Semua Approved
+                                    </button>
                                 </form>
                             @endif
                             {{-- ✅ MODIFIKASI: Gunakan $bulkActionData --}}
                             @if($bulkActionData['desa']['has_published'])
-                                <form action="{{ route('admin.bulk_publish') }}" method="POST" class="inline" onsubmit="return confirm('Anda yakin ingin TARIK semua data Published di tab ini?');"> @csrf <input type="hidden" name="model_type" value="desa"> <input type="hidden" name="action" value="unpublish_all"> <input type="hidden" name="active_tab" x-bind:value="activeTab"> <button type="submit" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg bg-yellow-100 px-3 py-2 text-xs font-semibold text-yellow-700 transition hover:bg-yellow-200">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
-                                    Tarik Semua Published</button>
+                                <form action="{{ route('admin.bulk_publish') }}" method="POST" class="inline" onsubmit="return confirm('Anda yakin ingin TARIK semua data Published di tab ini?');">
+                                    @csrf
+                                    <input type="hidden" name="model_type" value="desa">
+                                    <input type="hidden" name="action" value="unpublish_all">
+                                    <input type="hidden" name="active_tab" x-bind:value="activeTab">
+                                    <button type="submit" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg bg-yellow-100 px-3 py-2 text-xs font-semibold text-yellow-700 transition hover:bg-yellow-200">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                                        Tarik Semua Published
+                                    </button>
                                 </form>
                             @endif
                         </div>
                         
                         @forelse ($dataToReview['desa'] as $data)
                             <div class="py-4 border-b border-black/10 last:border-0 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
-                                <div class="min-w-0"> <p class="font-semibold text-gray-800 truncate">{{ $data->nama_desa }}</p> <p class="text-xs text-gray-500 mt-1 truncate"> Penduduk: {{ number_format($data->jumlah_penduduk) }} | Stunting: <span class="font-bold text-red-600">{{ $data->jumlah_kasus_stunting }}</span> </p> <p class="text-xs text-gray-500 mt-1 truncate"> Diinput oleh: <span class="font-medium">{{ $data->user->name }}</span> | Periode: {{ $data->periode->format('F Y') }} </p> </div>
+                                <div class="min-w-0">
+                                    <p class="font-semibold text-gray-800 truncate">{{ $data->nama_desa }}</p>
+                                    <p class="text-xs text-gray-500 mt-1 truncate">
+                                        Penduduk: {{ number_format($data->jumlah_penduduk) }} |
+                                        Stunting: <span class="font-bold text-red-600">{{ $data->jumlah_kasus_stunting }}</span>
+                                    </p>
+                                    <p class="text-xs text-gray-500 mt-1 truncate">
+                                        Diinput oleh: <span class="font-medium">{{ $data->user->name }}</span> |
+                                        Periode: {{ $data->periode->format('F Y') }}
+                                    </p>
+                                </div>
                                 <div class="flex flex-wrap items-center gap-2 sm:justify-end">
                                     <button type="button" @click="openModal = true; modalData = {{ Js::from($data) }}; modalTitle = 'Detail Data Desa'" class="text-xs text-indigo-600 hover:underline px-2">Detail</button>
-                                    @if($data->status === 'published') <span class="inline-flex items-center gap-1 rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-700"><span class="h-1.5 w-1.5 rounded-full bg-green-600"></span>Published</span> @elseif($data->status === 'approved') <span class="inline-flex items-center gap-1 rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-700"><span class="h-1.5 w-1.5 rounded-full bg-blue-600"></span>Approved</span> @endif
+                                    @if($data->status === 'published')
+                                        <span class="inline-flex items-center gap-1 rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-700">
+                                            <span class="h-1.5 w-1.5 rounded-full bg-green-600"></span>Published
+                                        </span>
+                                    @elseif($data->status === 'approved')
+                                        <span class="inline-flex items-center gap-1 rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-700">
+                                            <span class="h-1.5 w-1.5 rounded-full bg-blue-600"></span>Approved
+                                        </span>
+                                    @endif
                                     @if($data->status !== 'pending')
-                                        <form action="{{ route('admin.publish') }}" method="POST" class="inline"> @csrf <input type="hidden" name="model" value="DataDesa"> <input type="hidden" name="id" value="{{ $data->id }}"> <input type="hidden" name="active_tab" x-bind:value="activeTab"> <button type="submit" class="px-3 py-1 text-xs font-medium text-white rounded-lg {{ $data->status === 'published' ? 'bg-yellow-600 hover:bg-yellow-700' : 'bg-green-600 hover:bg-green-700' }}"> {{ $data->status === 'published' ? 'Tarik' : 'Publish' }} </button> </form>
+                                        <form action="{{ route('admin.publish') }}" method="POST" class="inline">
+                                            @csrf
+                                            <input type="hidden" name="model" value="DataDesa">
+                                            <input type="hidden" name="id" value="{{ $data->id }}">
+                                            <input type="hidden" name="active_tab" x-bind:value="activeTab">
+                                            <button type="submit" class="px-3 py-1 text-xs font-medium text-white rounded-lg {{ $data->status === 'published' ? 'bg-yellow-600 hover:bg-yellow-700' : 'bg-green-600 hover:bg-green-700' }}">
+                                                {{ $data->status === 'published' ? 'Tarik' : 'Publish' }}
+                                            </button>
+                                        </form>
                                     @endif
                                 </div>
                             </div>
@@ -578,6 +684,7 @@
                     </div>
                 </div>
             </section>
+
         </div>
     </div>
 

@@ -10,6 +10,7 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             RoleAndUserSeeder::class, // <-- PANGGIL SEEDER KITA
+            FaskesSeeder::class,
         ]);
     }
-}
+}   
