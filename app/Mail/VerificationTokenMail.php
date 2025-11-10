@@ -11,15 +11,15 @@ class VerificationTokenMail extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public User $user;
-    public string $token;
+    public $user;
+    public $token;
 
     /**
      * Create a new message instance.
      */
     public function __construct(User $user, string $token)
     {
-        $this->user = $user;
+        $this->user  = $user;
         $this->token = $token;
     }
 
@@ -28,7 +28,12 @@ class VerificationTokenMail extends Mailable
      */
     public function build()
     {
-        return $this->subject('Kode Verifikasi Akun Rumah Stunting Pangalengan')
-            ->view('emails.verification-token');
+        return $this
+            ->subject('✅ Token Verifikasi Email - Rumah Stunting Pangalengan')
+            ->view('emails.verify-email-notification') // <- ini yang penting
+            ->with([
+                'user'  => $this->user,
+                'token' => $this->token,
+            ]);
     }
 }

@@ -16,7 +16,7 @@
                 {{-- Header Section (mirip complete-registration) --}}
                 <div class="bg-gradient-to-br from-red-600 to-red-700 px-6 py-8 text-center flex-shrink-0">
                     <div class="relative">
-                        <h1 class="text-xl sm:text-2xl font-bold text-white mb-1">Login Admin</h1>
+                        <h1 class="text-xl sm:text-2xl font-bold text-white mb-1">Login Access</h1>
                         <p class="text-red-100 text-xs sm:text-sm max-w-sm mx-auto">
                             Rumah Stunting Pangalengan
                         </p>
@@ -78,6 +78,7 @@
                                     id="password"
                                     type="password"
                                     name="password"
+                                    required
                                     autocomplete="current-password"
                                     placeholder="••••••••"
                                     class="block w-full pl-11 pr-4 py-2.75 rounded-xl border border-gray-300 bg-white text-gray-900 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all"
@@ -86,33 +87,27 @@
                             <x-input-error :messages="$errors->get('password')" class="mt-1.5" />
                         </div>
 
-                        {{-- Info Box --}}
-                        <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-3.5 border border-blue-100">
-                            <div class="flex gap-3">
-                                <div class="flex-shrink-0 mt-0.5">
-                                    <svg class="h-4.5 w-4.5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
-                                    </svg>
-                                </div>
-                                <p class="text-xs text-gray-700 leading-snug">
-                                    <span class="font-semibold">Tips:</span> Kosongkan password jika ingin verifikasi email.
-                                </p>
-                            </div>
-                        </div>
-
-                        {{-- Remember Me & (opsional) Lupa Password --}}
+                        {{-- Remember Me + Lupa Password + Verifikasi Email --}}
                         <div class="flex items-center justify-between text-xs">
                             <label class="inline-flex items-center gap-2 text-gray-600">
                                 <input id="remember_me" type="checkbox" name="remember" class="rounded border-gray-300 text-red-600 shadow-sm focus:ring-red-500">
                                 <span>Ingat saya</span>
                             </label>
 
-                            {{-- Kalau punya route password.request, bisa diaktifkan --}}
-                            @if (Route::has('password.request'))
-                                <a class="text-red-600 hover:text-red-700 font-medium" href="{{ route('password.request') }}">
-                                    Lupa password?
-                                </a>
-                            @endif
+                            <div class="flex items-center gap-3">
+                                @if (Route::has('password.request'))
+                                    <a class="text-red-600 hover:text-red-700 font-medium" href="{{ route('password.request') }}">
+                                        Lupa password?
+                                    </a>
+                                @endif
+
+                                @if (Route::has('verification.entry.show'))
+                                    <span class="text-gray-300">|</span>
+                                    <a class="text-blue-600 hover:text-blue-700 font-medium" href="{{ route('verification.entry.show') }}">
+                                        Verifikasi email
+                                    </a>
+                                @endif
+                            </div>
                         </div>
 
                         {{-- Login Button --}}

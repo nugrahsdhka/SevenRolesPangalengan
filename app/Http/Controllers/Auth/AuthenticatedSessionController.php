@@ -23,13 +23,13 @@ class AuthenticatedSessionController extends Controller
      */
     public function store(Request $request)
     {
-        // Validasi input
+        // Validasi input: sekarang password WAJIB
         $credentials = $request->validate([
             'email'    => ['required', 'string', 'email'],
-            'password' => ['nullable', 'string'],
+            'password' => ['required', 'string'],
         ]);
 
-        // Cari user berdasarkan email
+        // Cari user
         $user = User::where('email', $credentials['email'])->first();
 
         if (!$user) {
@@ -38,22 +38,16 @@ class AuthenticatedSessionController extends Controller
             ]);
         }
 
-        // Jika email BELUM terverifikasi
+        // Kalau email BELUM terverifikasi → arahkan ke halaman verifikasi email
         if (!$user->hasVerifiedEmail()) {
-            // Kalau sudah ada token & belum kadaluarsa → arahkan ke halaman verifikasi token
-            if (
-                $user->verification_token &&
-                $user->verification_token_expires_at &&
-                now()->lessThan($user->verification_token_expires_at)
-            ) {
-                return redirect()
-                    ->route('verification.token.show', ['email' => $user->email])
-                    ->with('status', 'Silakan masukkan token verifikasi yang telah dikirim ke email Anda.');
-            }
-
-            // Kalau belum punya token → arahkan ke halaman lengkapi registrasi
             return redirect()
-                ->route('register.complete.show', ['email' => $user->email]);
+                ->route('verification.entry.show')
+                ->withErrors([
+                    'email' => 'Email Anda belum terverifikasi. Silakan lakukan verifikasi melalui menu "Verifikasi email".',
+                ])
+                ->withInput([
+                    'email' => $credentials['email'],
+                ]);
         }
 
         // Kalau sudah terverifikasi → cek password
@@ -66,7 +60,6 @@ class AuthenticatedSessionController extends Controller
         // Regenerasi session (security)
         $request->session()->regenerate();
 
-        // Redirect ke dashboard (yang sudah di-handle di web.php)
         return redirect()->intended(route('dashboard'));
     }
 

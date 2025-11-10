@@ -14,11 +14,14 @@ use App\Http\Controllers\Profile\ProfileController;
 use App\Http\Controllers\Admin\FaskesController;
 
 // Guest
+use App\Http\Controllers\Auth\ForgotPasswordController;
+use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\Guest\HomeController;
 use App\Http\Controllers\Guest\PetaController;
 use App\Http\Controllers\Guest\DataWilayahController;
 use App\Http\Controllers\Guest\DataStuntingController;
 use App\Http\Controllers\Guest\AnalisisHotspotController;
+use App\Http\Controllers\Auth\EmailVerificationEntryController;
 
 // Guest Route
 // Home
@@ -38,6 +41,32 @@ Route::get('/api/hotspot', [AnalisisHotspotController::class, 'getChartDataHotsp
 
 // Peta
 Route::get('/peta-faskes', [PetaController::class, 'index'])->name('peta-faskes');
+
+// Forgot / Reset Password
+Route::middleware('guest')->group(function () {
+    // Form minta link reset
+    Route::get('/forgot-password', [ForgotPasswordController::class, 'create'])
+        ->name('password.request');
+
+    // Kirim email link reset
+    Route::post('/forgot-password', [ForgotPasswordController::class, 'store'])
+        ->name('password.email');
+
+    // Form reset password (dari link email)
+    Route::get('/reset-password/{token}', [ResetPasswordController::class, 'create'])
+        ->name('password.reset');
+
+    // Proses reset password
+    Route::post('/reset-password', [ResetPasswordController::class, 'store'])
+        ->name('password.store');
+
+    Route::get('/verify-email-entry', [EmailVerificationEntryController::class, 'create'])
+        ->name('verification.entry.show');
+
+    Route::post('/verify-email-entry', [EmailVerificationEntryController::class, 'store'])
+        ->name('verification.entry.store');
+});
+
 
 // Dashboard Redirect Logic
 Route::get('/dashboard', function () {

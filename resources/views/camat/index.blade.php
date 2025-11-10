@@ -155,7 +155,7 @@
                 <div class="border-b border-gray-200">
                     {{-- Header Title --}}
                     <div class="flex flex-col justify-center items-center py-2 border-b">
-                        <h1 class="text-md font-bold text-red-700">Review dan Approval Data</h1>
+                        <h1 class="text-md font-bold text-red-700">Penerbitan Data</h1>
                         <p class="text-sm font-bold text-red-700">
                             <span x-show="activeTab === 'gizi'">Divisi Gizi</span>
                             <span x-show="activeTab === 'pencegahan'">Divisi Pencegahan</span>
@@ -214,7 +214,7 @@
                                 class="absolute z-10 mt-1 w-full bg-white rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 overflow-hidden"
                                 style="display: none;">
                                 
-                                {{-- Data Gizi --}}
+                                {{-- Data Gizi (aktif) --}}
                                 <button @click="activeTab = 'gizi'; open = false"
                                         :class="{ 'bg-red-50 text-red-700': activeTab === 'gizi', 'text-gray-700 hover:bg-gray-50': activeTab !== 'gizi' }"
                                         class="w-full flex items-center gap-3 px-4 py-3 text-left border-b border-gray-100 transition">
@@ -227,10 +227,10 @@
                                     </svg>
                                 </button>
 
-                                {{-- Data Pencegahan --}}
-                                <button @click="activeTab = 'pencegahan'; open = false"
-                                        :class="{ 'bg-red-50 text-red-700': activeTab === 'pencegahan', 'text-gray-700 hover:bg-gray-50': activeTab !== 'pencegahan' }"
-                                        class="w-full flex items-center gap-3 px-4 py-3 text-left border-b border-gray-100 transition">
+                                {{-- Data Pencegahan (read only) --}}
+                                <button @click="activeTab = 'pencegahan'; open = false" disabled
+                                        :class="{ 'bg-red-50 text-red-700': activeTab === 'pencegahan', 'text-gray-700': activeTab !== 'pencegahan' }"
+                                        class="w-full flex items-center gap-3 px-4 py-3 text-left border-b border-gray-100 transition cursor-not-allowed opacity-60">
                                     <svg class="h-5 w-5 flex-shrink-0" :class="{ 'text-red-600': activeTab === 'pencegahan', 'text-gray-400': activeTab !== 'pencegahan' }" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
                                     </svg>
@@ -240,10 +240,10 @@
                                     </svg>
                                 </button>
 
-                                {{-- Data Penanggulangan --}}
-                                <button @click="activeTab = 'penanggulangan'; open = false"
-                                        :class="{ 'bg-red-50 text-red-700': activeTab === 'penanggulangan', 'text-gray-700 hover:bg-gray-50': activeTab !== 'penanggulangan' }"
-                                        class="w-full flex items-center gap-3 px-4 py-3 text-left border-b border-gray-100 transition">
+                                {{-- Data Penanggulangan (read only) --}}
+                                <button @click="activeTab = 'penanggulangan'; open = false" disabled
+                                        :class="{ 'bg-red-50 text-red-700': activeTab === 'penanggulangan', 'text-gray-700': activeTab !== 'penanggulangan' }"
+                                        class="w-full flex items-center gap-3 px-4 py-3 text-left border-b border-gray-100 transition cursor-not-allowed opacity-60">
                                     <svg class="h-5 w-5 flex-shrink-0" :class="{ 'text-red-600': activeTab === 'penanggulangan', 'text-gray-400': activeTab !== 'penanggulangan' }" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/>
                                     </svg>
@@ -253,10 +253,10 @@
                                     </svg>
                                 </button>
 
-                                {{-- Data Desa --}}
-                                <button @click="activeTab = 'desa'; open = false"
-                                        :class="{ 'bg-red-50 text-red-700': activeTab === 'desa', 'text-gray-700 hover:bg-gray-50': activeTab !== 'desa' }"
-                                        class="w-full flex items-center gap-3 px-4 py-3 text-left transition">
+                                {{-- Data Desa (read only) --}}
+                                <button @click="activeTab = 'desa'; open = false" disabled
+                                        :class="{ 'bg-red-50 text-red-700': activeTab === 'desa', 'text-gray-700': activeTab !== 'desa' }"
+                                        class="w-full flex items-center gap-3 px-4 py-3 text-left transition cursor-not-allowed opacity-60">
                                     <svg class="h-5 w-5 flex-shrink-0" :class="{ 'text-red-600': activeTab === 'desa', 'text-gray-400': activeTab !== 'desa' }" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 21v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21m0 0h4.5V3.545M12.75 21h7.5V10.75M2.25 21h1.5m18 0h-18M2.25 9l4.5-1.636M18.75 3l-1.5.545m0 6.205l3 1m-3-1l-1.5.545m0 0l-2.25 1.318m5.25-1.75l-5.25 1.75"/>
                                     </svg>
@@ -269,9 +269,10 @@
                         </div>
                     </div>
 
-                    {{-- Desktop View: Tab Navigation (tetap sama) --}}
+                    {{-- Desktop View: Tab Navigation --}}
                     <nav class="hidden sm:flex -mb-px" aria-label="Tabs">
                         <div class="flex w-full">
+                            {{-- Data Gizi (aktif) --}}
                             <button @click="activeTab = 'gizi'" 
                                     :class="{ 'border-red-600 text-red-600': activeTab === 'gizi', 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300': activeTab !== 'gizi' }" 
                                     class="w-1/4 py-4 px-1 text-center border-b-2 font-medium text-sm focus:outline-none flex justify-center items-center gap-2">
@@ -281,27 +282,30 @@
                                 <span>Data Gizi</span>
                             </button>
                             
-                            <button @click="activeTab = 'pencegahan'" 
-                                    :class="{ 'border-red-600 text-red-600': activeTab === 'pencegahan', 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300': activeTab !== 'pencegahan' }" 
-                                    class="w-1/4 py-4 px-1 text-center border-b-2 font-medium text-sm focus:outline-none flex justify-center items-center gap-2">
+                            {{-- Data Pencegahan (read only) --}}
+                            <button @click="activeTab = 'pencegahan'" disabled
+                                    :class="{ 'border-red-600 text-red-600': activeTab === 'pencegahan', 'border-transparent text-gray-500': activeTab !== 'pencegahan' }" 
+                                    class="w-1/4 py-4 px-1 text-center border-b-2 font-medium text-sm focus:outline-none flex justify-center items-center gap-2 cursor-not-allowed opacity-60">
                                 <svg class="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
                                 </svg>
                                 <span>Data Pencegahan</span>
                             </button>
                             
-                            <button @click="activeTab = 'penanggulangan'" 
-                                    :class="{ 'border-red-600 text-red-600': activeTab === 'penanggulangan', 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300': activeTab !== 'penanggulangan' }" 
-                                    class="w-1/4 py-4 px-1 text-center border-b-2 font-medium text-sm focus:outline-none flex justify-center items-center gap-2">
+                            {{-- Data Penanggulangan (read only) --}}
+                            <button @click="activeTab = 'penanggulangan'" disabled
+                                    :class="{ 'border-red-600 text-red-600': activeTab === 'penanggulangan', 'border-transparent text-gray-500': activeTab !== 'penanggulangan' }" 
+                                    class="w-1/4 py-4 px-1 text-center border-b-2 font-medium text-sm focus:outline-none flex justify-center items-center gap-2 cursor-not-allowed opacity-60">
                                 <svg class="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/>
                                 </svg>
                                 <span>Data Penanggulangan</span>
                             </button>
                             
-                            <button @click="activeTab = 'desa'" 
-                                    :class="{ 'border-red-600 text-red-600': activeTab === 'desa', 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300': activeTab !== 'desa' }" 
-                                    class="w-1/4 py-4 px-1 text-center border-b-2 font-medium text-sm focus:outline-none flex justify-center items-center gap-2">
+                            {{-- Data Desa (read only) --}}
+                            <button @click="activeTab = 'desa'" disabled
+                                    :class="{ 'border-red-600 text-red-600': activeTab === 'desa', 'border-transparent text-gray-500': activeTab !== 'desa' }" 
+                                    class="w-1/4 py-4 px-1 text-center border-b-2 font-medium text-sm focus:outline-none flex justify-center items-center gap-2 cursor-not-allowed opacity-60">
                                 <svg class="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 21v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21m0 0h4.5V3.545M12.75 21h7.5V10.75M2.25 21h1.5m18 0h-18M2.25 9l4.5-1.636M18.75 3l-1.5.545m0 6.205l3 1m-3-1l-1.5.545m0 0l-2.25 1.318m5.25-1.75l-5.25 1.75"/>
                                 </svg>

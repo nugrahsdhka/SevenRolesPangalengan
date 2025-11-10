@@ -29,6 +29,10 @@
                 'login',
                 'register.complete.show',
                 'verification.token.show',
+                'password.request',
+                'password.email',
+                'password.reset',
+                'password.store'
             ];
         @endphp
 
