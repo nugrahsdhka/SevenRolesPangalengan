@@ -98,8 +98,8 @@
         </div>
     </x-slot>
 
-    <div class="py-12 bg-slate-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="py-2 bg-slate-50">
+        <div class="max-w-7xl mx-auto px-1 sm:px-6 lg:px-1">
             {{-- Notifikasi --}}
             @if (session('success'))
                 <div x-data="{ show: true }"
@@ -108,7 +108,7 @@
                      x-transition:leave="transition ease-in duration-300"
                      x-transition:leave-start="opacity-100"
                      x-transition:leave-end="opacity-0"
-                     class="mb-6 flex items-start sm:items-center gap-3 rounded-xl bg-green-50 p-4 ring-1 ring-green-200">
+                     class="mb-2 flex items-start sm:items-center gap-3 rounded-xl bg-green-50 p-4 ring-1 ring-green-200">
                     <div class="flex-shrink-0">
                         <svg class="h-5 w-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -124,14 +124,14 @@
                     </button>
                 </div>
             @endif
-             @if (session('error'))
+            @if (session('error'))
                 <div x-data="{ show: true }"
                      x-show="show"
                      x-init="setTimeout(() => show = false, 5000)"
                      x-transition:leave="transition ease-in duration-300"
                      x-transition:leave-start="opacity-100"
                      x-transition:leave-end="opacity-0"
-                     class="mb-6 flex items-start sm:items-center gap-3 rounded-xl bg-red-50 p-4 ring-1 ring-red-200">
+                     class="mb-2 flex items-start sm:items-center gap-3 rounded-xl bg-red-50 p-4 ring-1 ring-red-200">
                     <div class="flex-shrink-0">
                         <svg class="h-5 w-5 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -149,7 +149,8 @@
             @endif
 
             {{-- Menggunakan $activeTab dari controller --}}
-            <div x-data="{ activeTab: '{{ $activeTab }}', openModal: false, modalData: null, modalTitle: '' }" class="bg-white shadow-lg rounded-2xl ring-1 ring-black/5 overflow-hidden">
+            <section x-data="{ activeTab: '{{ $activeTab }}', openModal: false, modalData: null, modalTitle: '' }" 
+                    class="bg-white shadow-lg rounded-2xl ring-1 ring-black/5">
 
                 {{-- Navigasi Tab --}}
                 <div class="border-b border-gray-200">
@@ -316,7 +317,7 @@
                 </div>
 
                 {{-- Konten Tab --}}
-                <div class="p-4 sm:p-6 lg:p-8 min-h-[180px]">
+                <div class="p-4 sm:p-2 lg:p-2">
                     {{-- Konten Gizi --}}
                     <div x-show="activeTab === 'gizi'">
                         {{-- TOMBOL AKSI MASSAL GIZI --}}
@@ -600,36 +601,36 @@
 
                 {{-- Modal Detail --}}
                 <div x-show="openModal" @keydown.escape.window="openModal = false" class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true" style="display: none;">
-                        <div class="flex items-end justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
-                            <div x-show="openModal" @click="openModal = false" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
-                            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-                            <div x-show="openModal" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100" x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100" x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                                 class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all w-full max-w-lg sm:my-8 sm:align-middle sm:max-w-2xl">
-                                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                                    <div class="sm:flex sm:items-start">
-                                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
-                                            <h3 class="text-lg leading-6 font-bold text-gray-900" id="modal-title" x-text="modalTitle"></h3>
-                                            <div class="mt-4 text-sm text-gray-600 space-y-4">
-                                                <template x-if="modalData">
-                                                    <div class="space-y-3 max-h-[70vh] sm:max-h-[60vh] overflow-y-auto pr-1 sm:pr-4">
-                                                        <template x-if="modalTitle === 'Detail Data Gizi'"> <div> <p class="font-semibold text-gray-800">Judul:</p> <p x-text="modalData.judul"></p> <p class="font-semibold text-gray-800 mt-2">Deskripsi:</p> <p class="preserve-lines" x-text="modalData.deskripsi"></p> </div> </template>
-                                                        <template x-if="modalTitle === 'Detail Data Pencegahan'"> <div> <p><span class="font-semibold text-gray-800">Judul Kegiatan:</span> <span x-text="modalData.judul_kegiatan"></span></p> <p><span class="font-semibold text-gray-800">Lokasi:</span> <span x-text="modalData.lokasi"></span></p> <p><span class="font-semibold text-gray-800">Tanggal Kegiatan:</span> <span x-text="new Date(modalData.tanggal_kegiatan).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })"></span></p> <p class="font-semibold text-gray-800 mt-2">Laporan Singkat:</p> <p class="preserve-lines" x-text="modalData.laporan_singkat"></p> </div> </template>
-                                                        <template x-if="modalTitle === 'Detail Data Penanggulangan'"> <div> <p><span class="font-semibold text-gray-800">Jenis Bencana:</span> <span x-text="modalData.jenis_bencana"></span></p> <p><span class="font-semibold text-gray-800">Jumlah Korban:</span> <span x-text="modalData.jumlah_korban"></span></p> <p class="font-semibold text-gray-800 mt-2">Tindakan:</p> <p class="preserve-lines" x-text="modalData.tindakan"></p> </div> </template>
-                                                        <template x-if="modalTitle === 'Detail Data Desa'"> <div> <p><span class="font-semibold text-gray-800">Nama Desa:</span> <span x-text="modalData.nama_desa"></span></p> <p><span class="font-semibold text-gray-800">Jumlah Penduduk:</span> <span x-text="new Intl.NumberFormat('id-ID').format(modalData.jumlah_penduduk)"></span></p> <p><span class="font-semibold text-gray-800">Luas Wilayah:</span> <span x-text="new Intl.NumberFormat('id-ID').format(modalData.luas_wilayah)"></span> m²</p> <p><span class="font-semibold text-gray-800">Jumlah Kasus Stunting:</span> <span x-text="modalData.jumlah_kasus_stunting" class="font-bold text-red-600"></span></p> <p class="font-semibold text-gray-800 mt-2">Potensi Desa:</p> <p class="preserve-lines" x-text="modalData.potensi_desa"></p> </div> </template>
-                                                        <div class="border-t pt-3 mt-3"> <p><span class="font-semibold text-gray-800">Periode Laporan:</span> <span x-text="new Date(modalData.periode).toLocaleString('id-ID', { month: 'long', year: 'numeric' })"></span></p> </div>
-                                                    </div>
-                                                </template>
-                                            </div>
+                    <div class="flex items-end justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+                        <div x-show="openModal" @click="openModal = false" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+                        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+                        <div x-show="openModal" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100" x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100" x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                             class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all w-full max-w-lg sm:my-8 sm:align-middle sm:max-w-2xl">
+                            <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                                <div class="sm:flex sm:items-start">
+                                    <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+                                        <h3 class="text-lg leading-6 font-bold text-gray-900" id="modal-title" x-text="modalTitle"></h3>
+                                        <div class="mt-4 text-sm text-gray-600 space-y-4">
+                                            <template x-if="modalData">
+                                                <div class="space-y-3 max-h-[70vh] sm:max-h-[60vh] overflow-y-auto pr-1 sm:pr-4">
+                                                    <template x-if="modalTitle === 'Detail Data Gizi'"> <div> <p class="font-semibold text-gray-800">Judul:</p> <p x-text="modalData.judul"></p> <p class="font-semibold text-gray-800 mt-2">Deskripsi:</p> <p class="preserve-lines" x-text="modalData.deskripsi"></p> </div> </template>
+                                                    <template x-if="modalTitle === 'Detail Data Pencegahan'"> <div> <p><span class="font-semibold text-gray-800">Judul Kegiatan:</span> <span x-text="modalData.judul_kegiatan"></span></p> <p><span class="font-semibold text-gray-800">Lokasi:</span> <span x-text="modalData.lokasi"></span></p> <p><span class="font-semibold text-gray-800">Tanggal Kegiatan:</span> <span x-text="new Date(modalData.tanggal_kegiatan).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })"></span></p> <p class="font-semibold text-gray-800 mt-2">Laporan Singkat:</p> <p class="preserve-lines" x-text="modalData.laporan_singkat"></p> </div> </template>
+                                                    <template x-if="modalTitle === 'Detail Data Penanggulangan'"> <div> <p><span class="font-semibold text-gray-800">Jenis Bencana:</span> <span x-text="modalData.jenis_bencana"></span></p> <p><span class="font-semibold text-gray-800">Jumlah Korban:</span> <span x-text="modalData.jumlah_korban"></span></p> <p class="font-semibold text-gray-800 mt-2">Tindakan:</p> <p class="preserve-lines" x-text="modalData.tindakan"></p> </div> </template>
+                                                    <template x-if="modalTitle === 'Detail Data Desa'"> <div> <p><span class="font-semibold text-gray-800">Nama Desa:</span> <span x-text="modalData.nama_desa"></span></p> <p><span class="font-semibold text-gray-800">Jumlah Penduduk:</span> <span x-text="new Intl.NumberFormat('id-ID').format(modalData.jumlah_penduduk)"></span></p> <p><span class="font-semibold text-gray-800">Luas Wilayah:</span> <span x-text="new Intl.NumberFormat('id-ID').format(modalData.luas_wilayah)"></span> m²</p> <p><span class="font-semibold text-gray-800">Jumlah Kasus Stunting:</span> <span x-text="modalData.jumlah_kasus_stunting" class="font-bold text-red-600"></span></p> <p class="font-semibold text-gray-800 mt-2">Potensi Desa:</p> <p class="preserve-lines" x-text="modalData.potensi_desa"></p> </div> </template>
+                                                    <div class="border-t pt-3 mt-3"> <p><span class="font-semibold text-gray-800">Periode Laporan:</span> <span x-text="new Date(modalData.periode).toLocaleString('id-ID', { month: 'long', year: 'numeric' })"></span></p> </div>
+                                                </div>
+                                            </template>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                                    <button @click="openModal = false" type="button" class="mt-3 sm:mt-0 sm:ml-3 w-full sm:w-auto inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base sm:text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"> Tutup </button>
-                                </div>
+                            </div>
+                            <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                                <button @click="openModal = false" type="button" class="mt-3 sm:mt-0 sm:ml-3 w-full sm:w-auto inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base sm:text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"> Tutup </button>
                             </div>
                         </div>
+                    </div>
                 </div>
-            </div>
+            </section>
         </div>
     </div>
 

@@ -5,17 +5,21 @@
 
     @include('layouts.nav_public')
 
+
     {{-- Header --}}
-    <div class="p-2">
+    <div class="p-1">
         <div class="bg-white backdrop-blur-lg rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
-            <div class="p-6">
+            <div class="p-3">
                 <div class="flex items-center justify-between gap-4">
                     <div>
                         <h1 class="text-xl font-bold text-gray-900">
                             Peta Fasilitas Kesehatan
                         </h1>
-                        <p class="mt-1 text-sm text-gray-500">
-                            Fasilitas Kesehatan di Kecamatan Pangalengan
+                        <p class="hidden md:block mt-1 text-sm text-gray-500">
+                            Peta Fasilitas Kesehatan di Kecamatan Pangalengan
+                        </p>
+                        <p class="block md:hidden mt-1 text-sm text-gray-500">
+                            Peta Faskes di Kecamatan Pangalengan
                         </p>
                     </div>
 
@@ -41,9 +45,9 @@
     {{-- Konten Peta --}}
     <section id="tab-map">
         <div class="bg-white rounded-lg overflow-hidden flex items-center justify-center">
-            <div class="p-2 w-full md:w-[95%]">
+            <div class="p-1 w-full">
                 {{-- Map Container --}}
-                <div id="map" class="rounded-lg w-full h-[60vh] md:h-[400px]"></div>
+                <div id="map" class="rounded-lg w-full h-[73vh] md:h-[70vh]"></div>
             </div>
         </div>
 
@@ -160,10 +164,13 @@
             document.addEventListener('DOMContentLoaded', () => {
                 const map = L.map('map');
 
-                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                L.tileLayer(
+                'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+                {
                     maxZoom: 19,
-                    attribution: '&copy; OpenStreetMap contributors'
-                }).addTo(map);
+                    attribution: '&copy; <a href="https://www.esri.com/en-us/home" target="_blank" rel="noopener noreferrer">Esri</a>'
+                }
+                ).addTo(map);
 
                 // Data faskes dari controller
                 const faskes = @json($faskes);
@@ -174,10 +181,10 @@
                     .then(geojson => {
                         const batasLayer = L.geoJSON(geojson, {
                             style: {
-                                color: '#000',
+                                color: '#fff',
                                 weight: 0.25,
                                 fillColor: '#16a34a', // hijau (faskes context)
-                                fillOpacity: 0.35
+                                fillOpacity: 0.15
                             }
                         }).addTo(map);
 

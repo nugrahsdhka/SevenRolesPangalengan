@@ -61,12 +61,12 @@
         </div>
     </x-slot>
 
-    <div class="px-2 py-8 bg-gradient-to-br from-slate-50 via-rose-50/30 to-slate-50"> 
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+    <div class="px-1 py-2 bg-gradient-to-br from-slate-50 via-rose-50/30 to-slate-50"> 
+        <div class="max-w-7xl ">
             {{-- Alert Messages --}}
             @if (session('success'))
                 <div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 5000)" x-transition:leave="transition ease-in duration-300" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
-                     class="mb-6 flex items-center gap-3 rounded-xl bg-green-50 p-4 ring-1 ring-green-200">
+                     class="my-3 flex items-center gap-3 rounded-xl bg-green-50 p-4 ring-1 ring-green-200">
                     <div class="flex-shrink-0"><svg class="h-5 w-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></div>
                     <div class="flex-1"><p class="text-sm font-medium text-green-900">{{ session('success') }}</p></div>
                     <button @click="show = false" class="flex-shrink-0 text-green-600 hover:text-green-800"><svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg></button>
@@ -74,14 +74,14 @@
             @endif
             @if (session('error'))
                 <div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 5000)" x-transition:leave="transition ease-in duration-300" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
-                     class="mb-6 flex items-center gap-3 rounded-xl bg-red-50 p-4 ring-1 ring-red-200">
+                     class="my-3 flex items-center gap-3 rounded-xl bg-red-50 p-4 ring-1 ring-red-200">
                     <div class="flex-shrink-0"><svg class="h-5 w-5 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></div>
                     <div class="flex-1"><p class="text-sm font-medium text-red-900">{{ session('error') }}</p></div>
                     <button @click="show = false" class="flex-shrink-0 text-red-600 hover:text-red-800"><svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg></button>
                 </div>
             @endif
             @if ($errors->any())
-                <div class="mb-6 p-4 bg-red-50 text-red-800 rounded-xl ring-1 ring-red-200 text-sm">
+                <div class="my-3 p-4 bg-red-50 text-red-800 rounded-xl ring-1 ring-red-200 text-sm">
                     <p class="font-bold mb-2">Terjadi kesalahan validasi:</p>
                     <ul class="list-disc list-inside">
                         @foreach ($errors->all() as $error) <li>{{ $error }}</li> @endforeach
@@ -94,7 +94,7 @@
                 <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                      {{-- Judul --}}
                     <div>
-                        <h3 class="text-lg font-semibold text-gray-900">Data Gizi per Desa/Kelurahan</h3>
+                        <h3 class="text-lg font-semibold text-gray-900 text-center md:text-left">Data Gizi per Desa/Kelurahan</h3>
                     </div>
                     <div class="flex items-center gap-3">
                         {{-- Tombol Import --}}
@@ -159,152 +159,158 @@
                 {{-- TABEL AGREGRASI --}}
                 <div class="mt-6 overflow-hidden rounded-xl border border-gray-200">
                     <div class="overflow-x-auto">
-                        <table class="w-full">
-                            <thead class="bg-gray-50">
-                                <tr class="border-b border-gray-200">
-                                    {{-- Kolom Header --}}
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-700">Update Terakhir</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-700">Desa/Kelurahan</th>
-                                    <th scope="col" class="px-6 py-3 text-center text-xs font-semibold uppercase tracking-wider text-gray-700">Total Anak</th>
-                                    <th scope="col" class="px-6 py-3 text-center text-xs font-semibold uppercase tracking-wider text-gray-700">Kasus Stunting</th>
-                                    <th scope="col" class="px-6 py-3 text-center text-xs font-semibold uppercase tracking-wider text-gray-700">Rata-rata ZS (Stunting)</th>
-                                    <th scope="col" class="px-6 py-3 text-center text-xs font-semibold uppercase tracking-wider text-gray-700">Status Desa</th> 
-                                    <th scope="col" class="px-6 py-3 text-center text-xs font-semibold uppercase tracking-wider text-gray-700">Status Data</th> {{-- <-- KOLOM BARU --}}
-                                    <th scope="col" class="px-6 py-3 text-center text-xs font-semibold uppercase tracking-wider text-gray-700">Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-gray-200 bg-white">
-                                {{-- Loop data agregat --}}
-                                @forelse ($aggregatedData as $item)
-                                    <tr class="transition hover:bg-gray-50">
-                                        {{-- Tanggal Input Terbaru --}}
-                                        <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-600">
-                                            {{ \Carbon\Carbon::parse($item->tanggal_input_terbaru)->isoFormat('D MMM YYYY, HH:mm') }}
-                                        </td>
+                        {{-- ✅ Scroll vertikal hanya di area tabel --}}
+                        <div class="max-h-[64vh] md:max-h-[63vh] overflow-y-auto bg-white">
+                            <table class="w-full min-w-[900px]">
+                                <thead class="bg-gray-50 sticky top-0 z-10">
+                                    <tr class="border-b border-gray-200">
+                                        {{-- Kolom Header --}}
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-700">Update Terakhir</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-700">Desa/Kelurahan</th>
+                                        <th scope="col" class="px-6 py-3 text-center text-xs font-semibold uppercase tracking-wider text-gray-700">Total Anak</th>
+                                        <th scope="col" class="px-6 py-3 text-center text-xs font-semibold uppercase tracking-wider text-gray-700">Kasus Stunting</th>
+                                        <th scope="col" class="px-6 py-3 text-center text-xs font-semibold uppercase tracking-wider text-gray-700">Rata-rata ZS (Stunting)</th>
+                                        <th scope="col" class="px-6 py-3 text-center text-xs font-semibold uppercase tracking-wider text-gray-700">Status Desa</th> 
+                                        <th scope="col" class="px-6 py-3 text-center text-xs font-semibold uppercase tracking-wider text-gray-700">Status Data</th>
+                                        <th scope="col" class="px-6 py-3 text-center text-xs font-semibold uppercase tracking-wider text-gray-700">Aksi</th>
+                                    </tr>
+                                </thead>
 
-                                        {{-- Desa/Kelurahan --}}
-                                        <td class="whitespace-nowrap px-6 py-4">
-                                            <div class="text-sm font-semibold text-gray-900 uppercase">{{ $item->desa_kelurahan }}</div>
-                                        </td>
+                                <tbody class="divide-y divide-gray-200 bg-white">
+                                    {{-- Loop data agregat --}}
+                                    @forelse ($aggregatedData as $item)
+                                        <tr class="transition hover:bg-gray-50">
+                                            {{-- Tanggal Input Terbaru --}}
+                                            <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-600">
+                                                {{ \Carbon\Carbon::parse($item->tanggal_input_terbaru)->isoFormat('D MMM YYYY, HH:mm') }}
+                                            </td>
 
-                                         {{-- Total Anak --}}
-                                        <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-600 text-center">
-                                           {{ $item->total_anak }}
-                                        </td>
+                                            {{-- Desa/Kelurahan --}}
+                                            <td class="whitespace-nowrap px-6 py-4">
+                                                <div class="text-sm font-semibold text-gray-900 uppercase">{{ $item->desa_kelurahan }}</div>
+                                            </td>
 
-                                        {{-- Total Kasus Stunting --}}
-                                        <td class="whitespace-nowrap px-6 py-4 text-sm font-semibold text-center {{ $item->total_kasus_stunting > 0 ? 'text-red-600' : 'text-gray-600' }}">
-                                            {{ $item->total_kasus_stunting }}
-                                        </td>
+                                            {{-- Total Anak --}}
+                                            <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-600 text-center">
+                                                {{ $item->total_anak }}
+                                            </td>
 
-                                        {{-- Rata-rata ZS TB/U (SEMUA Anak) --}}
-                                        <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-600 text-center">
-                                            @php
-                                                $avgZsTbU = ($item->total_anak > 0) ? ($item->sum_zs_tbu / $item->total_anak) : null;
-                                            @endphp
-                                            {{ !is_null($avgZsTbU) ? number_format($avgZsTbU, 2) : '-' }}
-                                        </td>
+                                            {{-- Total Kasus Stunting --}}
+                                            <td class="whitespace-nowrap px-6 py-4 text-sm font-semibold text-center {{ $item->total_kasus_stunting > 0 ? 'text-red-600' : 'text-gray-600' }}">
+                                                {{ $item->total_kasus_stunting }}
+                                            </td>
 
-                                        {{-- Status Desa --}}
-                                        <td class="whitespace-nowrap px-6 py-4 text-center">
-                                            @php
-                                                // Logika status desa tetap sama
-                                                $avgZsTbU = ($item->total_anak > 0 && $item->sum_zs_tbu != 0) 
-                                                    ? ($item->sum_zs_tbu / $item->total_anak) 
-                                                    : null;
-                                            @endphp
+                                            {{-- Rata-rata ZS TB/U (SEMUA Anak) --}}
+                                            <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-600 text-center">
+                                                @php
+                                                    $avgZsTbU = ($item->total_anak > 0) ? ($item->sum_zs_tbu / $item->total_anak) : null;
+                                                @endphp
+                                                {{ !is_null($avgZsTbU) ? number_format($avgZsTbU, 2) : '-' }}
+                                            </td>
+
+                                            {{-- Status Desa --}}
+                                            <td class="whitespace-nowrap px-6 py-4 text-center">
+                                                @php
+                                                    $avgZsTbU = ($item->total_anak > 0 && $item->sum_zs_tbu != 0) 
+                                                        ? ($item->sum_zs_tbu / $item->total_anak) 
+                                                        : null;
+                                                @endphp
+                                                
+                                                @if(is_null($avgZsTbU) || $item->total_anak == 0)
+                                                    <span class="inline-flex items-center gap-1 rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-700">N/A</span>
+                                                @elseif($avgZsTbU < -3)
+                                                    <span class="inline-flex items-center gap-1 rounded-full bg-red-100 px-3 py-1 text-xs font-medium text-red-700">
+                                                        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                                                        </svg>
+                                                        Sangat Pendek ({{ number_format($avgZsTbU, 2) }})
+                                                    </span>
+                                                @elseif($avgZsTbU < -2)
+                                                    <span class="inline-flex items-center gap-1 rounded-full bg-orange-100 px-3 py-1 text-xs font-medium text-orange-700">
+                                                        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                                            <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                                                        </svg>
+                                                        Pendek ({{ number_format($avgZsTbU, 2) }})
+                                                    </span>
+                                                @elseif($avgZsTbU <= 2)
+                                                    <span class="inline-flex items-center gap-1 rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-700">
+                                                        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                                        </svg>
+                                                        Normal ({{ number_format($avgZsTbU, 2) }})
+                                                    </span>
+                                                @else
+                                                    <span class="inline-flex items-center gap-1 rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-700">
+                                                        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                                            <path fill-rule="evenodd" d="M3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"/>
+                                                            <path fill-rule="evenodd" d="M5.293 7.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L10 4.414 6.707 7.707a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+                                                        </svg>
+                                                        Tinggi ({{ number_format($avgZsTbU, 2) }})
+                                                    </span>
+                                                @endif
+                                            </td>
+
+                                            {{-- Status Data --}}
+                                            <td class="whitespace-nowrap px-6 py-4 text-center">
+                                                @if($item->status === 'published') 
+                                                    <span class="inline-flex items-center gap-1 rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-700">
+                                                        <span class="h-1.5 w-1.5 rounded-full bg-green-600"></span>Published
+                                                    </span> 
+                                                @elseif($item->status === 'approved') 
+                                                    <span class="inline-flex items-center gap-1 rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-700">
+                                                        <span class="h-1.5 w-1.5 rounded-full bg-blue-600"></span>Approved
+                                                    </span> 
+                                                @else 
+                                                    <span class="inline-flex items-center gap-1 rounded-full bg-yellow-100 px-3 py-1 text-xs font-medium text-yellow-700">
+                                                        <span class="h-1.5 w-1.5 rounded-full bg-yellow-600"></span>Pending
+                                                    </span> 
+                                                @endif
+                                            </td>
                                             
-                                            @if(is_null($avgZsTbU) || $item->total_anak == 0)
-                                                <span class="inline-flex items-center gap-1 rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-700">N/A</span>
-                                            @elseif($avgZsTbU < -3)
-                                                <span class="inline-flex items-center gap-1 rounded-full bg-red-100 px-3 py-1 text-xs font-medium text-red-700">
-                                                   <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/></svg>
-                                                   Sangat Pendek ({{ number_format($avgZsTbU, 2) }})
-                                                </span>
-                                            @elseif($avgZsTbU < -2)
-                                                <span class="inline-flex items-center gap-1 rounded-full bg-orange-100 px-3 py-1 text-xs font-medium text-orange-700">
-                                                   <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
-                                                   Pendek ({{ number_format($avgZsTbU, 2) }})
-                                                </span>
-                                            @elseif($avgZsTbU <= 2)
-                                                <span class="inline-flex items-center gap-1 rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-700">
-                                                   <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
-                                                   Normal ({{ number_format($avgZsTbU, 2) }})
-                                                </span>
-                                            @else
-                                                <span class="inline-flex items-center gap-1 rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-700">
-                                                   <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M5.293 7.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L10 4.414 6.707 7.707a1 1 0 01-1.414 0z" clip-rule="evenodd"/></svg>
-                                                   Tinggi ({{ number_format($avgZsTbU, 2) }})
-                                                </span>
-                                            @endif
-                                        </td>
+                                            {{-- Aksi --}}
+                                            <td class="whitespace-nowrap px-6 py-4">
+                                                <div class="flex items-center justify-center gap-3">
+                                                    <a href="{{ route('gizi.detail', ['desa' => $item->desa_kelurahan]) }}" 
+                                                        class="text-sm font-medium text-indigo-600 transition hover:text-indigo-800 hover:underline">
+                                                        Detail
+                                                    </a>
+                                                    
+                                                    <span class="text-gray-300">|</span>
 
-                                        {{-- ✅ KOLOM BARU: Status Data --}}
-                                        <td class="whitespace-nowrap px-6 py-4 text-center">
-                                            @if($item->status === 'published') 
-                                                <span class="inline-flex items-center gap-1 rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-700">
-                                                    <span class="h-1.5 w-1.5 rounded-full bg-green-600"></span>Published
-                                                </span> 
-                                            @elseif($item->status === 'approved') 
-                                                <span class="inline-flex items-center gap-1 rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-700">
-                                                    <span class="h-1.5 w-1.5 rounded-full bg-blue-600"></span>Approved
-                                                </span> 
-                                            @else 
-                                                {{-- Default: Pending --}}
-                                                <span class="inline-flex items-center gap-1 rounded-full bg-yellow-100 px-3 py-1 text-xs font-medium text-yellow-700">
-                                                    <span class="h-1.5 w-1.5 rounded-full bg-yellow-600"></span>Pending
-                                                </span> 
-                                            @endif
-                                        </td>
-                                        
-                                        {{-- Aksi --}}
-                                        <td class="whitespace-nowrap px-6 py-4">
-                                            <div class="flex items-center justify-center gap-3">
-                                                
-                                                {{-- Link Detail --}}
-                                                <a href="{{ route('gizi.detail', ['desa' => $item->desa_kelurahan]) }}" 
-                                                class="text-sm font-medium text-indigo-600 transition hover:text-indigo-800 hover:underline">
-                                                    Detail
+                                                    <form action="{{ route('gizi.destroyAggregated') }}" method="POST" 
+                                                        onsubmit="return confirm('Yakin ingin menghapus SEMUA ({{ $item->total_anak }} data) untuk desa {{ $item->desa_kelurahan }} dengan status \'{{ $item->status }}\'? Tindakan ini tidak dapat diurungkan.');">
+                                                        @csrf
+                                                        <input type="hidden" name="desa_kelurahan" value="{{ $item->desa_kelurahan }}">
+                                                        <input type="hidden" name="status" value="{{ $item->status }}">
+                                                        <button type="submit" class="text-sm font-medium text-red-600 transition hover:text-red-800 hover:underline">
+                                                            Hapus
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="8" class="px-6 py-12 text-center">
+                                                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+                                                </svg>
+                                                <p class="mt-4 text-sm text-gray-500">Belum ada data gizi yang diinput</p>
+                                                <a href="{{ route('gizi.create') }}" class="mt-4 inline-flex items-center gap-2 text-sm font-medium text-red-600 hover:text-red-700">
+                                                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                                                    </svg>
+                                                    Tambah Data Pertama
                                                 </a>
-                                                
-                                                <span class="text-gray-300">|</span>
-
-                                                {{-- Form Hapus Agregat --}}
-                                                <form action="{{ route('gizi.destroyAggregated') }}" method="POST" 
-                                                    onsubmit="return confirm('Yakin ingin menghapus SEMUA ({{ $item->total_anak }} data) untuk desa {{ $item->desa_kelurahan }} dengan status \'{{ $item->status }}\'? Tindakan ini tidak dapat diurungkan.');">
-                                                    
-                                                    {{-- INI WAJIB ADA --}}
-                                                    @csrf
-                                                    
-                                                    {{-- @method('DELETE') --}}
-                                                    
-                                                    <input type="hidden" name="desa_kelurahan" value="{{ $item->desa_kelurahan }}">
-                                                    <input type="hidden" name="status" value="{{ $item->status }}">
-                                                    <button type="submit" class="text-sm font-medium text-red-600 transition hover:text-red-800 hover:underline">
-                                                        Hapus
-                                                    </button>
-                                                </form>
-
-                                            </div>
-                                        </td>
-                                    </tr>
-                                @empty
-                                    <tr>
-                                        {{-- ✅ Colspan disesuaikan menjadi 8 --}}
-                                        <td colspan="8" class="px-6 py-12 text-center">
-                                            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" /></svg>
-                                            <p class="mt-4 text-sm text-gray-500">Belum ada data gizi yang diinput</p>
-                                            <a href="{{ route('gizi.create') }}" class="mt-4 inline-flex items-center gap-2 text-sm font-medium text-red-600 hover:text-red-700">
-                                                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
-                                                Tambah Data Pertama
-                                            </a>
-                                        </td>
-                                    </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
+                                            </td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
+
 
                 {{-- Pagination --}}
                 @php $paginator = $aggregatedData; @endphp 

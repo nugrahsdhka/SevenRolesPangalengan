@@ -10,10 +10,10 @@
     @endphp
 
     {{-- Filter Card --}}
-    <div class="p-2">
-        <div class="mb-6">
+    <div class="p-1">
+        <div class="mb-3">
             <div class="bg-white backdrop-blur-lg rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
-                <div class="p-6">
+                <div class="p-3">
                     {{-- Form Filter --}}
                     <form action="{{ route('data-wilayah') }}" method="GET" id="filterForm">
                         <div class="flex flex-col lg:flex-row items-stretch lg:items-end gap-4">
@@ -39,10 +39,10 @@
     {{-- ===== Konten Tabel ===== --}}
     <section id="tab-table">
         <div class="bg-white rounded-lg overflow-hidden">
-            <div class="p-6">
+            <div class="px-1 py-3">
 
                 {{-- Judul Tabel dan Tombol Info --}}
-                <div class="flex items-center justify-between mb-6">
+                <div class="flex items-center justify-between mb-3 px-3">
                     <div>
                         <h2 class="text-xl font-bold text-gray-900">Tabel Data Wilayah</h2>
                     </div>
@@ -197,12 +197,6 @@
                         </table>
                     </div>
                 </div>
-
-                {{-- Paginasi Tabel --}}
-                {{-- <div class="mt-6 p-6 border-t border-gray-100">
-                    {{ $dataWilayah->appends(request()->query())->links() }}
-                </div> --}}
-
             </div>
         </div>
 
@@ -381,5 +375,4 @@
             input.addEventListener('input', autoSubmit);
         });
     </script>
-
 </x-guest-layout>

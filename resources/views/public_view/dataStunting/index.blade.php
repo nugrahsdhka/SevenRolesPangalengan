@@ -33,10 +33,10 @@
 
     {{-- Filter Card (Hanya Tampil di Tab Tabel) --}}
     <div x-data="{ isTableActive: @json($currentView === 'table') }" x-show="isTableActive" x-transition>
-        <div class="p-2">
-            <div class="mb-6">
+        <div class="p-1">
+            <div class="mb-3">
                 <div class="bg-white backdrop-blur-lg rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
-                    <div class="p-6">
+                    <div class="p-3">
                         {{-- Form Filter --}}
                         <form action="{{ route('data-stunting') }}" method="GET" x-ref="filterForm">
                             <input type="hidden" name="view" id="viewInput" value="{{ $currentView }}">
@@ -83,10 +83,10 @@
     {{-- ===== Konten Tab: TABLE ===== --}}
     <section id="tab-table" class="{{ $currentView === 'table' ? '' : 'hidden' }}">
         <div class="bg-white rounded-lg overflow-hidden">
-            <div class="p-6">
+            <div class="p-1">
 
                 {{-- Judul Tabel dan Tombol Info --}}
-                <div class="flex items-center justify-between mb-6">
+                <div class="flex items-center justify-between mb-3 mt-2 px-3">
                     <div>
                     <h2 class="text-xl font-bold text-gray-900">Tabel Data Stunting</h2>
                     </div>
@@ -110,145 +110,139 @@
                 {{-- Tabel --}}
                 <div class="overflow-hidden rounded-xl border border-gray-200">
                     <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200">
+                        <table class="min-w-full divide-y divide-gray-200">
 
-                        {{-- THEAD --}}
-                        <thead class="bg-gradient-to-r from-gray-50 to-gray-100">
-                            <tr class="uppercase">
-                                <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-gray-700 tracking-wider">
-                                    desa
-                                </th>
+                            {{-- THEAD --}}
+                            <thead class="bg-gradient-to-r from-gray-50 to-gray-100">
+                                <tr class="uppercase">
+                                    <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-gray-700 tracking-wider">
+                                        desa
+                                    </th>
 
-                                <th scope="col" class="px-6 py-4 text-center text-xs font-bold text-gray-700 tracking-wider">
-                                    kasus stunting
-                                </th>
+                                    <th scope="col" class="px-6 py-4 text-center text-xs font-bold text-gray-700 tracking-wider">
+                                        kasus stunting
+                                    </th>
 
-                                <th scope="col" class="px-6 py-4 text-center text-xs font-bold text-gray-700 tracking-wider">
-                                    total anak
-                                </th>
+                                    <th scope="col" class="px-6 py-4 text-center text-xs font-bold text-gray-700 tracking-wider">
+                                        total anak
+                                    </th>
 
-                                <th scope="col" class="px-6 py-4 text-center text-xs font-bold text-gray-700 tracking-wider">
-                                    rata-rata zs tb/u
-                                </th>
+                                    <th scope="col" class="px-6 py-4 text-center text-xs font-bold text-gray-700 tracking-wider">
+                                        rata-rata zs tb/u
+                                    </th>
 
-                                <th scope="col" class="px-6 py-4 text-center text-xs font-bold text-gray-700 tracking-wider">
-                                    status desa
-                                </th>
+                                    <th scope="col" class="px-6 py-4 text-center text-xs font-bold text-gray-700 tracking-wider">
+                                        status desa
+                                    </th>
 
-                                <th scope="col" class="px-6 py-4 text-right text-xs font-bold text-gray-700 tracking-wider">
-                                    periode
-                                </th>
-                            </tr>
-                        </thead>
+                                    <th scope="col" class="px-6 py-4 text-right text-xs font-bold text-gray-700 tracking-wider">
+                                        periode
+                                    </th>
+                                </tr>
+                            </thead>
 
-                        {{-- TBODY --}}
-                        <tbody class="bg-white divide-y divide-gray-100">
-                        @forelse ($dataStunting as $data)
-                            @php
-                            $avgZsTbU = $data->avg_zs_tbu;
-                            @endphp
+                            {{-- TBODY --}}
+                            <tbody class="bg-white divide-y divide-gray-100">
+                            @forelse ($dataStunting as $data)
+                                @php
+                                $avgZsTbU = $data->avg_zs_tbu;
+                                @endphp
 
-                            <tr class="hover:bg-gradient-to-r hover:from-gray-50 hover:to-transparent transition-all duration-150 group">
-                            {{-- Desa --}}
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="text-sm font-semibold text-gray-900">
-                                    {{ $data->desa_kelurahan }}
-                                </span>
-                            </td>
+                                <tr class="hover:bg-gradient-to-r hover:from-gray-50 hover:to-transparent transition-all duration-150 group">
+                                {{-- Desa --}}
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="text-sm font-semibold text-gray-900">
+                                        {{ $data->desa_kelurahan }}
+                                    </span>
+                                </td>
 
-                            {{-- Kasus Stunting --}}
-                            <td class="px-6 py-4 whitespace-nowrap text-center">
-                                <span class="text-sm font-bold text-gray-900">
-                                {{ number_format($data->total_kasus_stunting) }}
-                                </span>
-                            </td>
+                                {{-- Kasus Stunting --}}
+                                <td class="px-6 py-4 whitespace-nowrap text-center">
+                                    <span class="text-sm font-bold text-gray-900">
+                                    {{ number_format($data->total_kasus_stunting) }}
+                                    </span>
+                                </td>
 
-                            {{-- Total Anak --}}
-                            <td class="px-6 py-4 whitespace-nowrap text-center">
-                                <span class="text-sm text-gray-700">
-                                {{ number_format($data->total_anak) }}
-                                </span>
-                            </td>
+                                {{-- Total Anak --}}
+                                <td class="px-6 py-4 whitespace-nowrap text-center">
+                                    <span class="text-sm text-gray-700">
+                                    {{ number_format($data->total_anak) }}
+                                    </span>
+                                </td>
 
-                            {{-- Rata-rata ZS TB/U --}}
-                            <td class="px-6 py-4 whitespace-nowrap text-center">
-                                @include('components.zscore-badge', ['value' => $avgZsTbU])
-                            </td>
+                                {{-- Rata-rata ZS TB/U --}}
+                                <td class="px-6 py-4 whitespace-nowrap text-center">
+                                    @include('components.zscore-badge', ['value' => $avgZsTbU])
+                                </td>
 
-                            {{-- Status Desa --}}
-                            <td class="whitespace-nowrap px-6 py-4 text-center">
-                                @if (is_null($avgZsTbU) || $data->total_anak == 0)
-                                <span class="inline-flex items-center px-3.5 py-1.5 rounded-full text-xs font-bold shadow-sm
-                                            bg-gradient-to-r from-gray-400 to-gray-500 text-white">
-                                    N/A
-                                </span>
-                                @elseif ($avgZsTbU < -3)
-                                <span class="inline-flex items-center px-3.5 py-1.5 rounded-full text-xs font-bold shadow-sm
-                                            bg-gradient-to-r from-red-500 to-red-600 text-white">
-                                    Sangat Pendek
-                                </span>
-                                @elseif ($avgZsTbU < -2)
-                                <span class="inline-flex items-center px-3.5 py-1.5 rounded-full text-xs font-bold shadow-sm
-                                            bg-gradient-to-r from-orange-500 to-orange-600 text-white">
-                                    Pendek
-                                </span>
-                                @elseif ($avgZsTbU <= 2)
-                                <span class="inline-flex items-center px-3.5 py-1.5 rounded-full text-xs font-bold shadow-sm
-                                            bg-gradient-to-r from-green-500 to-green-600 text-white">
-                                    Normal
-                                </span>
-                                @else
-                                <span class="inline-flex items-center px-3.5 py-1.5 rounded-full text-xs font-bold shadow-sm
-                                            bg-gradient-to-r from-blue-500 to-blue-600 text-white">
-                                    Tinggi
-                                </span>
-                                @endif
-                            </td>
+                                {{-- Status Desa --}}
+                                <td class="whitespace-nowrap px-6 py-4 text-center">
+                                    @if (is_null($avgZsTbU) || $data->total_anak == 0)
+                                    <span class="inline-flex items-center px-3.5 py-1.5 rounded-full text-xs font-bold shadow-sm
+                                                bg-gradient-to-r from-gray-400 to-gray-500 text-white">
+                                        N/A
+                                    </span>
+                                    @elseif ($avgZsTbU < -3)
+                                    <span class="inline-flex items-center px-3.5 py-1.5 rounded-full text-xs font-bold shadow-sm
+                                                bg-gradient-to-r from-red-500 to-red-600 text-white">
+                                        Sangat Pendek
+                                    </span>
+                                    @elseif ($avgZsTbU < -2)
+                                    <span class="inline-flex items-center px-3.5 py-1.5 rounded-full text-xs font-bold shadow-sm
+                                                bg-gradient-to-r from-orange-500 to-orange-600 text-white">
+                                        Pendek
+                                    </span>
+                                    @elseif ($avgZsTbU <= 2)
+                                    <span class="inline-flex items-center px-3.5 py-1.5 rounded-full text-xs font-bold shadow-sm
+                                                bg-gradient-to-r from-green-500 to-green-600 text-white">
+                                        Normal
+                                    </span>
+                                    @else
+                                    <span class="inline-flex items-center px-3.5 py-1.5 rounded-full text-xs font-bold shadow-sm
+                                                bg-gradient-to-r from-blue-500 to-blue-600 text-white">
+                                        Tinggi
+                                    </span>
+                                    @endif
+                                </td>
 
-                            {{-- Periode --}}
-                            <td class="px-6 py-4 whitespace-nowrap text-right">
-                                <div class="flex items-center gap-2 justify-end">
-                                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                                    />
-                                </svg>
-                                <span class="text-sm text-gray-700 font-medium">
-                                    {{ \Carbon\Carbon::parse($data->periode)->format("M 'y") }}
-                                </span>
-                                </div>
-                            </td>
-                            </tr>
+                                {{-- Periode --}}
+                                <td class="px-6 py-4 whitespace-nowrap text-right">
+                                    <div class="flex items-center gap-2 justify-end">
+                                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                                        />
+                                    </svg>
+                                    <span class="text-sm text-gray-700 font-medium">
+                                        {{ \Carbon\Carbon::parse($data->periode)->format("M 'y") }}
+                                    </span>
+                                    </div>
+                                </td>
+                                </tr>
 
-                        @empty
-                            <tr>
-                            <td colspan="6" class="px-6 py-12 text-center">
-                                <div class="flex flex-col items-center justify-center">
-                                <svg class="w-16 h-16 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                                <p class="text-sm font-medium text-gray-500">
-                                    Tidak ada data yang ditemukan
-                                </p>
-                                </div>
-                            </td>
-                            </tr>
-                        @endforelse
-                        </tbody>
+                            @empty
+                                <tr>
+                                <td colspan="6" class="px-6 py-12 text-center">
+                                    <div class="flex flex-col items-center justify-center">
+                                    <svg class="w-16 h-16 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    <p class="text-sm font-medium text-gray-500">
+                                        Tidak ada data yang ditemukan
+                                    </p>
+                                    </div>
+                                </td>
+                                </tr>
+                            @endforelse
+                            </tbody>
 
-                    </table>
+                        </table>
                     </div>
                 </div>
-
-                {{-- Paginasi Tabel --}}
-                {{-- <div class="mt-6 p-6 border-t border-gray-100">
-                    {{ $dataStunting->links() }}
-                </div> --}}
-
             </div>
         </div>
 
@@ -341,9 +335,9 @@
     <section id="tab-chart" class="{{ $currentView === 'chart' ? '' : 'hidden' }}">
         <div class="bg-gradient-to-br from-blue-50/30 via-white to-purple-50/20 rounded-3xl overflow-hidden border border-gray-100/50">
             <!-- Chart Container -->
-            <div class="p-4 sm:p-8">
+            <div class="p-4">
                 <!-- Header Section -->
-                <div class="flex items-center justify-between mb-6">
+                <div class="flex items-center justify-between mb-3">
                     <div>
                         <h2 class="text-xl font-bold text-gray-900">Chart Data Stunting</h2>
                     </div>
@@ -362,7 +356,7 @@
                     </button>
                 </div>
 
-                <div class="bg-white rounded-2xl border border-gray-200/50 p-4 sm:p-6 backdrop-blur-sm">
+                <div class="bg-white rounded-2xl border border-gray-200/50 p-1 backdrop-blur-sm">
                     <div class="relative h-[450px] sm:h-[550px] md:h-[650px]" id="chartContainer">
                         <canvas id="stuntingChart"></canvas>
                         <div id="chartMessage" class="absolute inset-0 flex flex-col items-center justify-center text-gray-500 hidden">

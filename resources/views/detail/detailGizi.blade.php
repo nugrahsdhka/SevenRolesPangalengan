@@ -76,12 +76,12 @@
         </div>
     </x-slot>
 
-    <div class="px-2 py-8 bg-gradient-to-br from-slate-50 via-rose-50/30 to-slate-50">
+    <div class="px-1 py-2 bg-gradient-to-br from-slate-50 via-rose-50/30 to-slate-50">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             {{-- Alert Messages --}}
             @if (session('success'))
                 <div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 5000)" 
-                     class="mb-6 flex items-center gap-3 rounded-xl bg-green-50 p-4 ring-1 ring-green-200">
+                     class="mb-2 flex items-center gap-3 rounded-xl bg-green-50 p-4 ring-1 ring-green-200">
                     <svg class="h-5 w-5 text-green-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                     <p class="text-sm font-medium text-green-900">{{ session('success') }}</p>
                     <button @click="show = false" class="ml-auto text-green-600 hover:text-green-800">
@@ -92,7 +92,7 @@
 
             @if (session('error'))
                 <div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 5000)"
-                     class="mb-6 flex items-center gap-3 rounded-xl bg-red-50 p-4 ring-1 ring-red-200">
+                     class="mb-2 flex items-center gap-3 rounded-xl bg-red-50 p-4 ring-1 ring-red-200">
                     <svg class="h-5 w-5 text-red-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                     <p class="text-sm font-medium text-red-900">{{ session('error') }}</p>
                     <button @click="show = false" class="ml-auto text-red-600 hover:text-red-800">
@@ -132,7 +132,7 @@
                         icon: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z'
                     }
                 }
-            }" class="mb-6">
+            }" class="mb-2 relative z-30">
                 
                 {{-- Mobile View: Dropdown --}}
                 <div class="lg:hidden">

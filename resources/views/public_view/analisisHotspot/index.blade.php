@@ -6,9 +6,9 @@
     @include('layouts.nav_public')
 
     {{-- Header --}}
-    <div class="p-2">
+    <div class="p-1">
         <div class="bg-white backdrop-blur-lg rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
-            <div class="p-6">
+            <div class="p-3">
                 <div class="flex items-center justify-between gap-4">
                     <div>
                         <h1 class="text-xl font-bold text-gray-900">
@@ -40,9 +40,9 @@
 
     <section id="tab-map">
         <div class="bg-white rounded-lg overflow-hidden flex items-center justify-center">
-            <div class="p-2 w-full md:w-[95%]">
+            <div class="p-1 w-full">
                 {{-- Map Container --}}
-                <div id="map" class="rounded-lg w-full h-[65vh] md:h-[400px]"></div>
+                <div id="map" class="rounded-lg w-full h-[73vh] md:h-[70vh]"></div>
             </div>
         </div>
 
@@ -219,10 +219,13 @@
             document.addEventListener('DOMContentLoaded', () => {
                 const map = L.map('map');
 
-                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                L.tileLayer(
+                'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+                {
                     maxZoom: 19,
-                    attribution: '&copy; OpenStreetMap contributors'
-                }).addTo(map);
+                    attribution: '&copy; <a href="https://www.esri.com/en-us/home" target="_blank" rel="noopener noreferrer">Esri</a>'
+                }
+                ).addTo(map);
 
                 // Ambil data dari DB + GeoJSON
                 Promise.all([
@@ -235,12 +238,12 @@
                     // Fungsi warna (sama seperti DataStunting)
                     function getColor(zs) {
                         if (zs === null || zs === undefined || isNaN(zs)) {
-                            return '#9ca3af'; // abu-abu N/A
+                            return '#9E9E9E'; // abu-abu N/A
                         }
-                        if (zs < -3)  return '#ef4444'; // merah (Sangat Pendek)
-                        if (zs < -2)  return '#f97316'; // oranye (Pendek)
-                        if (zs <= 2)  return '#22c55e'; // hijau (Normal)
-                        return '#3b82f6';              // biru (Tinggi)
+                        if (zs < -3)  return '#D32F2F'; // merah tua (Sangat Pendek)
+                        if (zs < -2)  return '#F57C00'; // oranye (Pendek)
+                        if (zs <= 2)  return '#388E3C'; // hijau tua (Normal)
+                        return '#1976D2';              // biru tua (Tinggi)
                     }
 
                     const layer = L.geoJSON(geojson, {
@@ -254,7 +257,7 @@
                                 color: '#FFF',
                                 weight: 0.25,
                                 fillColor: getColor(zs),
-                                fillOpacity: 0.65
+                                fillOpacity: 0.45
                             };
                         },
                         onEachFeature: (feature, layer) => {
