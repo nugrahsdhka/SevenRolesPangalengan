@@ -5,77 +5,79 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>{{ $title ?? config('app.name', 'Data Stunting — Pangalengan') }}</title>
+        <title>403 Forbidden</title>
+        <link rel="icon" href="{{ asset('img/logo-kab-bandung.png') }}" type="image/png">
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700&display=swap" rel="stylesheet" />
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+        <style>
+            @keyframes fadeInUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(20px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            .animate-fade {
+                opacity: 0;
+                animation: fadeInUp 0.3s ease-out forwards;
+            }
+
+            .delay-1 { animation-delay: 0.2s; }
+            .delay-2 { animation-delay: 0.4s; }
+            .delay-3 { animation-delay: 0.6s; }
+            .delay-4 { animation-delay: 0.8s; }
+            .delay-5 { animation-delay: 1.0s; }
+            .delay-6 { animation-delay: 1.2s; }
+        </style>
     </head>
-    <body class="font-sans text-gray-900 antialiased">
-        <div class="min-h-screen flex flex-col justify-center items-center relative bg-gradient-to-br from-red-600 via-red-500 to-rose-900 overflow-hidden">
+    <body class="font-sans antialiased">
+        <div class="min-h-screen flex flex-col justify-center items-center bg-white px-5 overflow-hidden">
             
-            {{-- Gradient blur backgrounds --}}
-            <div class="absolute inset-0 opacity-10">
-                <div class="absolute top-0 left-1/4 h-64 w-64 rounded-full bg-white blur-3xl"></div>
-                <div class="absolute bottom-0 right-1/4 h-96 w-96 rounded-full bg-white blur-3xl"></div>
-            </div>
-
-            {{-- Geometric dots pattern --}}
-            <div class="absolute inset-0 opacity-[0.08]">
-                <svg class="h-full w-full" xmlns="http://www.w3.org/2000/svg">
-                    <defs>
-                        <pattern id="dot-pattern" x="0" y="0" width="32" height="32" patternUnits="userSpaceOnUse">
-                            <circle cx="2" cy="2" r="1.5" fill="white"/>
-                        </pattern>
-                    </defs>
-                    <rect width="100%" height="100%" fill="url(#dot-pattern)"/>
-                </svg>
-            </div>
-
-            {{-- Geometric circles --}}
-            <div class="pointer-events-none absolute inset-0">
-                <div class="absolute -top-40 -right-40 h-80 w-80 rounded-full border border-white/20"></div>
-                <div class="absolute -top-32 -right-32 h-64 w-64 rounded-full border-2 border-white/10"></div>
-                <div class="absolute top-1/2 -left-20 h-60 w-60 rounded-full border border-white/15"></div>
-                <div class="absolute -bottom-32 -left-32 h-96 w-96 rounded-full border border-white/10"></div>
-            </div>
-
-            {{-- Geometric squares --}}
-            <div class="pointer-events-none absolute inset-0">
-                <div class="absolute top-20 right-1/4 h-16 w-16 rotate-45 border border-white/20"></div>
-                <div class="absolute bottom-32 left-1/3 h-12 w-12 rotate-12 border border-white/15"></div>
-                <div class="absolute top-1/3 left-20 h-20 w-20 -rotate-12 border border-white/10"></div>
-            </div>
-
-            {{-- Geometric lines --}}
-            <div class="pointer-events-none absolute inset-0">
-                <svg class="h-full w-full" xmlns="http://www.w3.org/2000/svg">
-                    <line x1="0" y1="20%" x2="30%" y2="0" stroke="white" stroke-opacity="0.1" stroke-width="1"/>
-                    <line x1="70%" y1="100%" x2="100%" y2="80%" stroke="white" stroke-opacity="0.1" stroke-width="1"/>
-                    <line x1="100%" y1="30%" x2="85%" y2="50%" stroke="white" stroke-opacity="0.08" stroke-width="1"/>
-                </svg>
-            </div>
-
-            {{-- Content --}}
-            <div class="relative z-10">
-                <div class="max-w-md w-full text-center p-6">
-                    <svg class="mx-auto h-20 w-20 text-slate-50" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
-                    </svg>
+            <div class="max-w-2xl w-full text-center">
                 
-                    <h1 class="mt-4 text-4xl font-extrabold text-slate-50 tracking-tight">403 | Akses Ditolak</h1>
-                    <p class="mt-2 text-lg text-slate-50">
-                        Maaf, Anda tidak memiliki izin untuk mengakses halaman ini.
-                    </p>
-                    <div class="mt-8 flex items-center justify-center space-x-4">
-                        <a href="{{ route('welcome') }}" class="inline-flex items-center px-4 py-2 bg-red-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-700">
-                            Kembali ke Home
-                        </a>
-                    </div>
+                {{-- Logo --}}
+                <img src="{{ asset('img/logo-kab-bandung.png') }}" alt="Logo Kabupaten Bandung" class="animate-fade delay-1 max-w-[130px] h-auto mx-auto mb-6">
+                
+                {{-- Pre-title --}}
+                <p class="animate-fade delay-2 text-sm font-semibold text-red-600 uppercase tracking-widest mb-2.5">
+                    Rumah Stunting Pangalengan
+                </p>
+
+                {{-- Main Title --}}
+                <h1 class="animate-fade delay-3 text-5xl md:text-6xl font-bold text-gray-900 mt-0 mb-5">
+                    Akses Ditolak
+                </h1>
+
+                {{-- Divider --}}
+                <hr class="animate-fade delay-4 w-16 h-0.5 bg-red-600 border-0 mx-auto mb-6">
+
+                {{-- Description --}}
+                <p class="animate-fade delay-5 text-lg text-gray-600 mb-8 leading-relaxed">
+                    Maaf, Anda tidak memiliki izin untuk mengakses halaman ini.
+                    <br>
+                    Silakan hubungi administrator jika Anda merasa ini adalah kesalahan.
+                </p>
+
+                {{-- Action Button --}}
+                <div class="animate-fade delay-6">
+                    <a href="{{ route('welcome') }}" class="inline-flex items-center justify-center px-8 py-3 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition-colors duration-200">
+                        <svg class="w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+                        </svg>
+                        Kembali ke Home
+                    </a>
                 </div>
+
             </div>
         </div>
     </body>

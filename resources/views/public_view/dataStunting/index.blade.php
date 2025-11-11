@@ -357,7 +357,7 @@
                 </div>
 
                 <div class="bg-white rounded-2xl border border-gray-200/50 p-1 backdrop-blur-sm">
-                    <div class="relative h-[65vh] md:h-[80vh]" id="chartContainer">
+                    <div class="relative h-[80vh] md:h-[80vh]" id="chartContainer">
                         <canvas id="stuntingChart"></canvas>
                         <div id="chartMessage" class="absolute inset-0 flex flex-col items-center justify-center text-gray-500 hidden">
                             <svg class="w-12 h-12 sm:w-16 sm:h-16 text-blue-400 mb-4 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
