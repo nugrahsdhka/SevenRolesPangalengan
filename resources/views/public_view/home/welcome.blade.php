@@ -387,209 +387,239 @@
     {{-- ====== MODERN NAVIGATION WITH GLASS EFFECT ====== --}}
     @include('layouts.nav_public')
 
-    {{-- ====== MODERN CONTENT CARDS (PERBAIKAN LAYOUT & KONTEN) ====== --}}
-    <div class="p-2">
-        <main class="pb-3">
-            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-        
-                <section class="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    
-                    {{-- Data Stunting --}}
-                    <div class="bg-white shadow-xl rounded-2xl ring-2 ring-red-100 hover:ring-red-200 transition-all duration-300 flex flex-col">
-                        
-                        <div class="p-6 flex-1"> 
-                            <h3 class="text-lg font-bold text-gray-900 border-b border-red-200 pb-2">Perhatian Stunting per Desa</h3>
-                            <p class="text-sm text-gray-600 mt-1">Menampilkan 3 desa dengan rata-rata Z-Score TB/U terendah.</p>
-                            
-                            @isset($spoilerDataStunting)
-                            @if($spoilerDataStunting->count() > 0)
-                            <ul role="list" class="divide-y divide-red-100 mt-4">
-                                @foreach($spoilerDataStunting as $data)
-                                <li class="py-3 sm:py-4">
-                                    <div class="flex items-center space-x-4">
-                                        <div class="flex-shrink-0">
-                                            {{-- Icon berdasarkan Z-Score --}}
-                                            @if($data->avg_zs_tbu < -3)
-                                                <span class="flex items-center justify-center h-10 w-10 rounded-full bg-red-500 text-white shadow-md">
-                                                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                                                </span>
-                                            @elseif($data->avg_zs_tbu < -2)
-                                                <span class="flex items-center justify-center h-10 w-10 rounded-full bg-red-400 text-white shadow-md">
-                                                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
-                                                </span>
-                                            @else
-                                                <span class="flex items-center justify-center h-10 w-10 rounded-full bg-red-300 text-white shadow-md">
-                                                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                                                </span>
-                                            @endif
-                                        </div>
-                                        <div class="flex-1 min-w-0">
-                                            <p class="text-sm font-semibold text-gray-900 truncate uppercase">{{ $data->desa_kelurahan }}</p>
-                                            <p class="text-sm text-gray-600 truncate">
-                                                {{ $data->total_kasus_stunting }} kasus stunting
-                                            </p>
-                                        </div>
-                                        <div class="inline-flex items-center text-base font-bold text-red-600">
-                                            {{ number_format($data->avg_zs_tbu, 2, ',', '.') }}
-                                            <span class="ml-1 text-xs font-normal text-gray-500">Avg. ZS</span>
-                                        </div>
-                                    </div>
-                                </li>
-                                @endforeach
-                            </ul>
-                            @else
-                            <p class="text-sm text-gray-600 mt-4">Belum ada data stunting untuk ditampilkan.</p>
-                            @endif
-                            @endisset
-                        </div>
-                        
-                        <a href="{{ route('data-stunting') }}" class="text-sm font-medium text-red-600 hover:text-red-700 transition-colors duration-200">
-                            
-                            {{-- ✅ Tambahkan class shimmer-effect di sini ✅ --}}
-                            <div class="bg-red-50 px-6 py-4 rounded-b-2xl shimmer-effect"> 
-                                Lihat Semua Data Stunting &rarr;
-                            </div>
-                        </a>
-                    </div>
+    {{-- ====== MODERN CONTENT CARDS (MENAMPILKAN DATA) ====== --}}
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        {{-- Grid Kartu --}}
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-                    {{-- Data Wilayah --}}
-                    <div class="bg-white shadow-xl rounded-2xl ring-2 ring-red-100 hover:ring-red-200 transition-all duration-300 flex flex-col">
-                        
-                        <div class="p-6 flex-1">
-                            <h3 class="text-lg font-bold text-gray-900 border-b border-red-200 pb-2">Data Wilayah per Desa</h3>
-                            <p class="text-sm text-gray-600 mt-1">Menampilkan total anak yang didata tiap desa.</p>
-
-                            @isset($spoilerDataWilayah)
-                            @if($spoilerDataWilayah->count() > 0)
-                            <ul role="list" class="divide-y divide-red-100 mt-4">
-                                @foreach($spoilerDataWilayah as $data)
-                                <li class="py-3 sm:py-4">
-                                    <div class="flex items-center space-x-4">
-                                        <div class="flex-shrink-0">
-                                            <span class="flex items-center justify-center h-10 w-10 rounded-full bg-red-500 text-white shadow-md">
-                                                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-                                            </span>
-                                        </div>
-                                        
-                                        <div class="flex-1 min-w-0">
-                                            <p class="text-sm font-semibold text-gray-900 truncate uppercase">{{ $data->desa_kelurahan }}</p>
-                                            
-                                            <p class="text-xs text-gray-500 truncate" title="Rata-rata Berat / Rata-rata Tinggi">
-                                                Avg: {{ number_format($data->avg_berat, 1, ',', '.') }} kg / {{ number_format($data->avg_tinggi, 1, ',', '.') }} cm
-                                            </p>
-                                        </div>
-                                        
-                                        <div class="inline-flex items-center text-base font-bold text-red-600">
-                                            {{ number_format($data->total_anak_di_desa) }}
-                                            <span class="ml-1 text-xs font-normal text-gray-500">Anak</span>
-                                        </div>
-                                    </div>
-                                </li>
-                                @endforeach
-                            </ul>
-                            @else
-                            <p class="text-sm text-gray-600 mt-4">Belum ada data wilayah untuk ditampilkan.</p>
-                            @endif
-                            @endisset
+            {{-- 1. Kartu Data Stunting --}}
+            <a href="{{ route('data-stunting') }}"
+            class="group relative bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1 flex flex-col">
+                
+                {{-- Header Kartu (Merah) --}}
+                <div class="p-5 bg-gradient-to-r from-red-50 to-red-100/60 border-b border-red-200/50">
+                    <div class="flex items-center gap-4">
+                        <div class="flex-shrink-0 p-3 bg-white rounded-full shadow-md border border-red-100">
+                            <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                            </svg>
                         </div>
-                        
-                        <a href="{{ route('data-wilayah') }}" class="text-sm font-medium text-red-600 hover:text-red-700 transition-colors duration-200">
-                            
-                            {{-- ✅ Tambahkan class shimmer-effect di sini ✅ --}}
-                            <div class="bg-red-50 px-6 py-4 rounded-b-2xl shimmer-effect"> 
-                                Lihat Semua Data Wilayah &rarr;
-                            </div>
-                        </a>
-                    </div>
-                    
-                    {{-- Analisis Hotspot --}}
-                    <div class="bg-white shadow-xl rounded-2xl ring-2 ring-red-100 hover:ring-red-200 transition-all duration-300 flex flex-col">
-                        
-                        <div class="p-6 flex-1">
-                            <h3 class="text-lg font-bold text-gray-900 border-b border-red-200 pb-2">
-                                Analisis Hotspot Stunting
+                        <div>
+                            <h3 class="text-xl font-bold text-gray-900">
+                                Data Stunting
                             </h3>
-                            <p class="text-sm text-gray-600 mt-1">
-                                Visualisasi peta desa dengan rata-rata Z-Score TB/U dan kategori risiko stunting per wilayah.
-                            </p>
-
-                            {{-- Mini legend biar nyambung sama halaman Analisis Hotspot --}}
-                            <div class="mt-4 grid grid-cols-2 gap-2 text-xs">
-                                <div class="flex items-center gap-2">
-                                    <span class="inline-block w-3 h-3 rounded-full bg-red-500"></span>
-                                    <span class="text-gray-700 font-medium">Sangat Pendek</span>
-                                </div>
-                                <div class="flex items-center gap-2">
-                                    <span class="inline-block w-3 h-3 rounded-full bg-orange-500"></span>
-                                    <span class="text-gray-700 font-medium">Pendek</span>
-                                </div>
-                                <div class="flex items-center gap-2">
-                                    <span class="inline-block w-3 h-3 rounded-full bg-emerald-500"></span>
-                                    <span class="text-gray-700 font-medium">Normal</span>
-                                </div>
-                                <div class="flex items-center gap-2">
-                                    <span class="inline-block w-3 h-3 rounded-full bg-blue-500"></span>
-                                    <span class="text-gray-700 font-medium">Tinggi</span>
-                                </div>
-                            </div>
-
-                            <p class="mt-3 text-[11px] text-gray-500">
-                                Data diambil dari agregasi status gizi anak dan diplot ke batas desa di Kecamatan Pangalengan.
+                            <p class="text-sm text-red-700/80 font-medium">
+                                Tabel & Chart Agregat Stunting
                             </p>
                         </div>
-
-                        {{-- ganti nama route sesuai yang kamu pakai untuk halaman analisis hotspot --}}
-                        <a href="{{ route('analisis-hotspot') }}" class="text-sm font-medium text-red-600 hover:text-red-700 transition-colors duration-200">
-                            <div class="bg-red-50 px-6 py-4 rounded-b-2xl shimmer-effect">
-                                Lihat Peta Hotspot &rarr;
-                            </div>
-                        </a>
                     </div>
+                </div>
 
-                    {{-- Peta Faskes --}}
-                    <div class="bg-white shadow-xl rounded-2xl ring-2 ring-red-100 hover:ring-red-200 transition-all duration-300 flex flex-col">
-                        
-                        <div class="p-6 flex-1">
-                            <h3 class="text-lg font-bold text-gray-900 border-b border-red-200 pb-2">
-                                Peta Fasilitas Kesehatan
+                {{-- Body Kartu (Putih) --}}
+                <div class="p-5">
+                    <p class="text-sm text-gray-600 mb-3">
+                        Total kasus stunting (ZS TB/U &lt; -2 SD) dan total anak terukur dari seluruh desa:
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        {{-- Stat 1 --}}
+                        <div class="flex-1 bg-gray-50 rounded-xl p-4 border border-gray-200">
+                            <p class="text-sm font-semibold text-gray-500 uppercase tracking-wide">Total Kasus Stunting</p>
+                            <p class="text-3xl font-bold text-red-600">
+                                {{ number_format($total_stunting) }}
+                            </p>
+                            <p class="text-sm font-medium text-gray-700">
+                                anak
+                            </p>
+                        </div>
+                        {{-- Stat 2 --}}
+                        <div class="flex-1 bg-gray-50 rounded-xl p-4 border border-gray-200">
+                            <p class="text-sm font-semibold text-gray-500 uppercase tracking-wide">Total Anak Terukur</p>
+                            <p class="text-3xl font-bold text-gray-800">
+                                {{ number_format($total_anak) }}
+                            </p>
+                            <p class="text-sm font-medium text-gray-700">
+                                anak
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Footer Kartu (Putih) --}}
+                <div class="px-5 pb-5 mt-auto"> <div class="flex items-center justify-between text-sm font-medium text-red-600">
+                        <span>Lihat Data Stunting</span>
+                        <svg class="w-5 h-5 transition-transform duration-300 group-hover:translate-x-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                    </div>
+                </div>
+            </a>
+
+            {{-- 2. Kartu Data Wilayah --}}
+            <a href="{{ route('data-wilayah') }}"
+            class="group relative bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1 flex flex-col">
+                
+                {{-- Header Kartu (Merah) --}}
+                <div class="p-5 bg-gradient-to-r from-red-50 to-red-100/60 border-b border-red-200/50">
+                    <div class="flex items-center gap-4">
+                        <div class="flex-shrink-0 p-3 bg-white rounded-full shadow-md border border-red-100">
+                            <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold text-gray-900">
+                                Data Wilayah
                             </h3>
-                            <p class="text-sm text-gray-600 mt-1">
-                                Menampilkan lokasi puskesmas, klinik, dan fasilitas kesehatan lain di wilayah Kecamatan Pangalengan.
+                            <p class="text-sm text-red-700/80 font-medium">
+                                Rata-rata Z-Score (Semua Indikator)
                             </p>
-
-                            <div class="mt-4 space-y-2 text-sm">
-                                <div class="flex items-center gap-2">
-                                    <span class="inline-flex items-center justify-center h-8 w-8 rounded-full bg-red-500 text-white shadow-md">
-                                        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" />
-                                        </svg>
-                                    </span>
-                                    <div>
-                                        <p class="text-xs text-gray-500">Pin merah:</p>
-                                        <p class="text-xs font-semibold text-gray-800">Lokasi fasilitas kesehatan</p>
-                                    </div>
-                                </div>
-
-                                <p class="text-[11px] text-gray-500">
-                                    Peta menggunakan basemap OpenStreetMap dan layer batas desa yang sama dengan analisis hotspot.
-                                </p>
-                            </div>
                         </div>
-
-                        {{-- ganti nama route sesuai yang kamu pakai untuk halaman peta faskes --}}
-                        <a href="{{ route('peta-faskes') }}" class="text-sm font-medium text-red-600 hover:text-red-700 transition-colors duration-200">
-                            <div class="bg-red-50 px-6 py-4 rounded-b-2xl shimmer-effect">
-                                Lihat Peta Fasilitas Kesehatan &rarr;
-                            </div>
-                        </a>
                     </div>
-                </section>
-        
-            </div>
-        </main>
-    </div>
+                </div>
 
+                {{-- Body Kartu (Putih) --}}
+                <div class="p-5 space-y-3">
+                    <p class="text-sm text-gray-600">
+                        Rata-rata Z-Score gabungan dari seluruh anak yang terdata di Kecamatan Pangalengan:
+                    </p>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-center">
+                        {{-- ZS BB/U --}}
+                        <div class="bg-gray-50 rounded-xl p-3 border border-gray-200">
+                            <p class="text-xs font-semibold text-gray-500 uppercase">BB/U</p>
+                            <p class="text-xl font-bold text-gray-800">
+                                {{ number_format($avgZScores->avg_bbu ?? 0, 2) }}
+                            </p>
+                        </div>
+                        {{-- ZS TB/U --}}
+                        <div class="bg-red-50 rounded-xl p-3 border border-red-200">
+                            <p class="text-xs font-semibold text-red-700 uppercase">TB/U</p>
+                            <p class="text-xl font-bold text-red-600">
+                                {{ number_format($avgZScores->avg_tbu ?? 0, 2) }}
+                            </p>
+                        </div>
+                        {{-- ZS BB/TB --}}
+                        <div class="bg-gray-50 rounded-xl p-3 border border-gray-200">
+                            <p class="text-xs font-semibold text-gray-500 uppercase">BB/TB</p>
+                            <p class="text-xl font-bold text-gray-800">
+                                {{ number_format($avgZScores->avg_bbtb ?? 0, 2) }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Footer Kartu (Putih) --}}
+                <div class="px-5 pb-5 mt-auto">
+                    <div class="flex items-center justify-between text-sm font-medium text-red-600">
+                        <span>Lihat Data Wilayah</span>
+                        <svg class="w-5 h-5 transition-transform duration-300 group-hover:translate-x-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                    </div>
+                </div>
+            </a>
+
+            {{-- 3. Kartu Analisis Hotspot --}}
+            <a href="{{ route('analisis-hotspot') }}"
+            class="group relative bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1 flex flex-col">
+                
+                {{-- Header Kartu (Merah) --}}
+                <div class="p-5 bg-gradient-to-r from-red-50 to-red-100/60 border-b border-red-200/50">
+                    <div class="flex items-center gap-4">
+                        <div class="flex-shrink-0 p-3 bg-white rounded-full shadow-md border border-red-100">
+                            <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold text-gray-900">
+                                Analisis Hotspot
+                            </h3>
+                            <p class="text-sm text-red-700/80 font-medium">
+                                Peta Persebaran Z-Score TB/U
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Body Kartu (Putih) --}}
+                <div class="p-5 space-y-3">
+                    <p class="text-sm text-gray-600">
+                        Desa dengan rata-rata Z-Score TB/U terendah (paling rawan) saat ini adalah:
+                    </p>
+                    @if ($desaTerawan)
+                        <div class="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                            <p class="text-sm font-semibold text-gray-500 uppercase tracking-wide">Desa Terawan</p>
+                            <p class="text-2xl font-bold text-red-600 truncate">
+                                {{ $desaTerawan->desa_kelurahan }}
+                            </p>
+                            <p class="text-sm font-medium text-gray-700">
+                                Rata-rata ZS: <strong class="text-red-600">{{ number_format($desaTerawan->avg_zs_tbu, 2) }} SD</strong>
+                            </p>
+                        </div>
+                    @else
+                        <div class="bg-gray-50 rounded-xl p-4 border border-gray-200 text-center">
+                            <p class="text-sm text-gray-500">Data desa rawan belum tersedia.</p>
+                        </div>
+                    @endif
+                </div>
+
+                {{-- Footer Kartu (Putih) --}}
+                <div class="px-5 pb-5 mt-auto">
+                    <div class="flex items-center justify-between text-sm font-medium text-red-600">
+                        <span>Lihat Analisis Hotspot</span>
+                        <svg class="w-5 h-5 transition-transform duration-300 group-hover:translate-x-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                    </div>
+                </div>
+            </a>
+
+            {{-- 4. Kartu Peta Faskes --}}
+            <a href="{{ route('peta-faskes') }}"
+            class="group relative bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1 flex flex-col">
+                
+                {{-- Header Kartu (Merah) --}}
+                <div class="p-5 bg-gradient-to-r from-red-50 to-red-100/60 border-b border-red-200/50">
+                    <div class="flex items-center gap-4">
+                        <div class="flex-shrink-0 p-3 bg-white rounded-full shadow-md border border-red-100">
+                            <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                <circle cx="12" cy="10" r="3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></circle>
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold text-gray-900">
+                                Peta Faskes
+                            </h3>
+                            <p class="text-sm text-red-700/80 font-medium">
+                                Lokasi Fasilitas Kesehatan
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Body Kartu (Putih) --}}
+                <div class="p-5 space-y-3">
+                    <p class="text-sm text-gray-600">
+                        Kami telah memetakan lokasi fasilitas kesehatan (Puskesmas, Klinik, Rumah Sakit, dll) di seluruh Kecamatan Pangalengan.
+                    </p>
+                    <div class="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                        <p class="text-sm font-semibold text-gray-500 uppercase tracking-wide">Faskes Terdaftar</p>
+                        <p class="text-3xl font-bold text-red-600">
+                            {{ number_format($total_faskes) }}
+                        </p>
+                        <p class="text-sm font-medium text-gray-700">
+                            Lokasi
+                        </p>
+                    </div>
+                </div>
+
+                {{-- Footer Kartu (Putih) --}}
+                <div class="px-5 pb-5 mt-auto">
+                    <div class="flex items-center justify-between text-sm font-medium text-red-600">
+                        <span>Lihat Peta Faskes</span>
+                        <svg class="w-5 h-5 transition-transform duration-300 group-hover:translate-x-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                    </div>
+                </div>
+            </a>
+
+        </div>
+    </main>
 
     {{-- Custom Scrollbar Styles --}}
     <style>
