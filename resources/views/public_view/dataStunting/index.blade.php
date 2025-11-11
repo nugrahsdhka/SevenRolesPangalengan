@@ -8,7 +8,7 @@
 
     {{-- Tab Navigation --}}
     @php $queryParams = request()->query(); @endphp
-    <div class="border-b border-gray-200 bg-gray-50 mb-6">
+    <div class="border-b border-gray-200 bg-gray-50 mb-3">
         <div class="flex">
             {{-- Tombol Tab Tabel --}}
             <a href="#"
@@ -335,9 +335,9 @@
     <section id="tab-chart" class="{{ $currentView === 'chart' ? '' : 'hidden' }}">
         <div class="bg-gradient-to-br from-blue-50/30 via-white to-purple-50/20 rounded-3xl overflow-hidden border border-gray-100/50">
             <!-- Chart Container -->
-            <div class="p-4">
+            <div class="p-1">
                 <!-- Header Section -->
-                <div class="flex items-center justify-between mb-3">
+                <div class="flex items-center justify-between mb-3 px-2">
                     <div>
                         <h2 class="text-xl font-bold text-gray-900">Chart Data Stunting</h2>
                     </div>
@@ -357,7 +357,7 @@
                 </div>
 
                 <div class="bg-white rounded-2xl border border-gray-200/50 p-1 backdrop-blur-sm">
-                    <div class="relative h-[450px] sm:h-[550px] md:h-[650px]" id="chartContainer">
+                    <div class="relative h-[65vh] md:h-[80vh]" id="chartContainer">
                         <canvas id="stuntingChart"></canvas>
                         <div id="chartMessage" class="absolute inset-0 flex flex-col items-center justify-center text-gray-500 hidden">
                             <svg class="w-12 h-12 sm:w-16 sm:h-16 text-blue-400 mb-4 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
