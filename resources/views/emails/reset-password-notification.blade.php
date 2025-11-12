@@ -1,17 +1,22 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <title>Reset Password - Rumah Stunting Pangalengan</title>
 </head>
-<body style="margin:0;padding:0;background:#f3f4f6;font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;">
+
+<body
+    style="margin:0;padding:0;background:#f3f4f6;font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;">
     <table width="100%" cellpadding="0" cellspacing="0" style="padding:24px 0;">
         <tr>
             <td align="center">
-                <table width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 10px 40px rgba(0,0,0,0.06);">
+                <table width="100%" cellpadding="0" cellspacing="0"
+                    style="max-width:600px;background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 10px 40px rgba(0,0,0,0.06);">
                     {{-- Header merah --}}
                     <tr>
-                        <td style="background:linear-gradient(135deg,#b91c1c,#dc2626,#ef4444);padding:20px 24px;color:#fff;">
+                        <td
+                            style="background:linear-gradient(135deg,#b91c1c,#dc2626,#ef4444);padding:20px 24px;color:#fff;">
                             <h1 style="margin:0;font-size:20px;font-weight:700;">
                                 Rumah Stunting Pangalengan
                             </h1>
@@ -37,7 +42,7 @@
                             {{-- Tombol CTA --}}
                             <p style="margin:0 0 24px;text-align:center;">
                                 <a href="{{ $url }}"
-                                   style="display:inline-block;padding:10px 22px;border-radius:999px;background:#dc2626;color:#fff;text-decoration:none;font-size:14px;font-weight:600;">
+                                    style="display:inline-block;padding:10px 22px;border-radius:999px;background:#dc2626;color:#fff;text-decoration:none;font-size:14px;font-weight:600;">
                                     Atur Ulang Password
                                 </a>
                             </p>
@@ -46,7 +51,8 @@
                                 Tautan ini hanya berlaku selama <strong>60 menit</strong> sejak email ini dikirim.
                             </p>
                             <p style="margin:0 0 8px;font-size:12px;color:#6b7280;">
-                                Jika Anda tidak merasa meminta reset password, Anda dapat mengabaikan email ini dan password Anda akan tetap aman.
+                                Jika Anda tidak merasa meminta reset password, Anda dapat mengabaikan email ini dan
+                                password Anda akan tetap aman.
                             </p>
 
                             {{-- URL plain (fallback) --}}
@@ -72,4 +78,5 @@
         </tr>
     </table>
 </body>
+
 </html>

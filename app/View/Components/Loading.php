@@ -26,10 +26,10 @@ class Loading extends Component
         string $text = 'Memuat...',
         string $img = null,
         string $alt = 'Loading',
-        bool $ring = true,
-        int $size = 96,
-        int $logo = 64,
-        int $ringThickness = 4,
+        bool $ring = false,
+        int $size = 110,
+        int $logo = 100,
+        int $ringThickness = 10,
         string $ringColor = '#111827',   // gray-900
         string $ringTrail = '#E5E7EB',   // gray-200
         string $speed = '0.9s',

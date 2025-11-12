@@ -4,10 +4,12 @@
 
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <title>Verifikasi Akun</title>
 </head>
+
 <body>
     <p>Halo {{ $user?->name ?? 'Pengguna' }},</p>
 
@@ -23,4 +25,5 @@
 
     <p>Salam,<br>Rumah Stunting Pangalengan</p>
 </body>
+
 </html>

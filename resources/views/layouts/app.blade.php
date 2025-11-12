@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -18,20 +19,12 @@
     <!-- Per-page head injections (e.g., Leaflet CSS, meta tambahan) -->
     @stack('head')
 </head>
+
 <body class="font-sans antialiased">
     <x-confirm-modal />
 
-    <x-loading
-    img="{{ asset('img/logo-kab-bandung.png') }}"
-    ring="true"
-    mode="dual"
-    size="70"
-    logo="40"
-    ringThickness="3"
-    ringColor="#8B0000"
-    ringTrail="#E5E7EB"
-    speed="1.0s"
-    />
+    <x-loading img="{{ asset('img/logo-kab-bandung.png') }}" ring="true" mode="dual" size="120" logo="70"
+        ringThickness="7" ringColor="#8B0000" ringTrail="#E5E7EB" speed="0.65s" />
 
     <div class="min-h-screen bg-slate-50">
         {{-- @include('layouts.navigation') --}}
@@ -55,4 +48,5 @@
 
     @stack('scripts')
 </body>
+
 </html>

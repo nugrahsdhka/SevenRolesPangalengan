@@ -24,17 +24,12 @@
                     </div>
 
                     {{-- Tombol Modal --}}
-                    <button
-                        id="openInfoModalBtn"
+                    <button id="openInfoModalBtn"
                         class="p-2.5 text-white bg-gradient-to-r from-red-600 to-pink-600 rounded-xl
-                                hover:shadow-lg transform hover:scale-105 transition-all duration-200"
-                    >
+                                hover:shadow-lg transform hover:scale-105 transition-all duration-200">
                         <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                            <path
-                                fill-rule="evenodd"
-                                clip-rule="evenodd"
-                                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-                            />
+                            <path fill-rule="evenodd" clip-rule="evenodd"
+                                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" />
                         </svg>
                     </button>
                 </div>
@@ -53,19 +48,17 @@
 
         {{-- Modal Keterangan Peta --}}
         <div id="infoModalOverlay"
-             class="fixed inset-0 bg-gray-600 bg-opacity-75 overflow-y-auto h-full w-full z-50 flex items-center justify-center p-4 hidden">
-            <div
-                class="relative mx-auto border w-full max-w-md sm:max-w-lg md:max-w-xl shadow-lg rounded-xl bg-white transform transition-all duration-300 scale-95 opacity-0"
-                id="infoModalContent"
-            >
+            class="fixed inset-0 bg-gray-600 bg-opacity-75 overflow-y-auto h-full w-full z-50 flex items-center justify-center p-4 hidden">
+            <div class="relative mx-auto border w-full max-w-md sm:max-w-lg md:max-w-xl shadow-lg rounded-xl bg-white transform transition-all duration-300 scale-95 opacity-0"
+                id="infoModalContent">
                 {{-- Modal Header --}}
                 <div class="flex justify-between items-center px-6 py-4 border-b border-gray-200">
                     <p class="text-lg font-bold text-gray-800">Keterangan Peta Fasilitas Kesehatan</p>
                     <button id="closeInfoModalBtnHeader"
-                            class="text-gray-400 hover:text-gray-600 transition-colors duration-200">
+                        class="text-gray-400 hover:text-gray-600 transition-colors duration-200">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                  d="M6 18L18 6M6 6l12 12"></path>
+                                d="M6 18L18 6M6 6l12 12"></path>
                         </svg>
                     </button>
                 </div>
@@ -90,19 +83,21 @@
                         </li>
                         <li>
                             <strong>Akurasi Lokasi:</strong> Titik koordinat berasal dari data yang diinput pada sistem.
-                            Jika terdapat perbedaan dengan lokasi sebenarnya di lapangan, silakan lakukan pembaruan data.
+                            Jika terdapat perbedaan dengan lokasi sebenarnya di lapangan, silakan lakukan pembaruan
+                            data.
                         </li>
                     </ul>
 
                     <p class="mt-3 text-xs text-gray-500">
-                        <em>*Peta menggunakan basemap OpenStreetMap dan batas administrasi desa Kecamatan Pangalengan.</em>
+                        <em>*Peta menggunakan basemap OpenStreetMap dan batas administrasi desa Kecamatan
+                            Pangalengan.</em>
                     </p>
                 </div>
 
                 {{-- Modal Footer --}}
                 <div class="px-6 py-4 bg-gray-50 border-t border-gray-200 text-right rounded-b-xl">
                     <button id="closeInfoModalBtnFooter"
-                            class="px-5 py-2 bg-gray-600 text-white text-sm font-semibold rounded-lg shadow hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors duration-200">
+                        class="px-5 py-2 bg-gray-600 text-white text-sm font-semibold rounded-lg shadow hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors duration-200">
                         Tutup
                     </button>
                 </div>
@@ -112,10 +107,8 @@
 
     @push('styles')
         {{-- Leaflet CSS --}}
-        <link rel="stylesheet"
-              href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-              integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
-              crossorigin=""/>
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+            integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
 
         <style>
             /* Fix supaya map tidak menutupi navbar & modal */
@@ -155,9 +148,7 @@
 
     @push('scripts')
         <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-                integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-                crossorigin="">
-        </script>
+            integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
         {{-- Leaflet --}}
         <script>
@@ -165,11 +156,10 @@
                 const map = L.map('map');
 
                 L.tileLayer(
-                'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-                {
-                    maxZoom: 19,
-                    attribution: '&copy; <a href="https://www.esri.com/en-us/home" target="_blank" rel="noopener noreferrer">Esri</a>'
-                }
+                    'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+                        maxZoom: 19,
+                        attribution: '&copy; <a href="https://www.esri.com/en-us/home" target="_blank" rel="noopener noreferrer">Esri</a>'
+                    }
                 ).addTo(map);
 
                 // Data faskes dari controller
@@ -189,7 +179,9 @@
                         }).addTo(map);
 
                         const bounds = batasLayer.getBounds();
-                        map.fitBounds(bounds, { padding: [20, 20] });
+                        map.fitBounds(bounds, {
+                            padding: [20, 20]
+                        });
 
                         const minZoom = 12;
                         if (map.getZoom() < minZoom) {
@@ -204,8 +196,8 @@
                 // 2) Definisikan icon custom berbasis SVG (pin merah)
                 const faskesIcon = L.divIcon({
                     className: 'faskes-marker-icon',
-                    iconSize: [30, 40],      // lebar, tinggi
-                    iconAnchor: [15, 38],    // titik yang nempel ke koordinat (tengah bawah)
+                    iconSize: [30, 40], // lebar, tinggi
+                    iconAnchor: [15, 38], // titik yang nempel ke koordinat (tengah bawah)
                     popupAnchor: [0, -32],
                     html: `
                         <svg xmlns="http://www.w3.org/2000/svg"
@@ -223,7 +215,13 @@
 
                 // 3) Tambahkan marker faskes dengan icon SVG di atas
                 faskes.forEach(item => {
-                    const { lat, lng, nama_faskes, jenis, alamat } = item;
+                    const {
+                        lat,
+                        lng,
+                        nama_faskes,
+                        jenis,
+                        alamat
+                    } = item;
                     if (!lat || !lng) return;
 
                     const marker = L.marker([lat, lng], {

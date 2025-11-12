@@ -1,20 +1,24 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <title>Token Verifikasi Email - Rumah Stunting Pangalengan</title>
 </head>
-<body style="margin:0;padding:0;background:#f3f4f6;font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;">
+
+<body
+    style="margin:0;padding:0;background:#f3f4f6;font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;">
     <table width="100%" cellpadding="0" cellspacing="0" style="padding:24px 0;">
         <tr>
             <td align="center">
                 <table width="100%" cellpadding="0" cellspacing="0"
-                       style="max-width:600px;background:#ffffff;border-radius:16px;overflow:hidden;
+                    style="max-width:600px;background:#ffffff;border-radius:16px;overflow:hidden;
                               box-shadow:0 10px 40px rgba(0,0,0,0.06);">
 
                     {{-- Header merah --}}
                     <tr>
-                        <td style="background:linear-gradient(135deg,#b91c1c,#dc2626,#ef4444);
+                        <td
+                            style="background:linear-gradient(135deg,#b91c1c,#dc2626,#ef4444);
                                    padding:20px 24px;color:#fff;">
                             <h1 style="margin:0;font-size:20px;font-weight:700;">
                                 Rumah Stunting Pangalengan
@@ -40,7 +44,8 @@
 
                             {{-- BOX TOKEN --}}
                             <div style="margin:16px 0 20px;text-align:center;">
-                                <div style="display:inline-block;padding:12px 24px;border-radius:999px;
+                                <div
+                                    style="display:inline-block;padding:12px 24px;border-radius:999px;
                                             background:#fef2f2;border:1px dashed #fecaca;">
                                     <span style="letter-spacing:4px;font-size:22px;font-weight:700;color:#b91c1c;">
                                         {{ $token }}
@@ -72,4 +77,5 @@
         </tr>
     </table>
 </body>
+
 </html>
