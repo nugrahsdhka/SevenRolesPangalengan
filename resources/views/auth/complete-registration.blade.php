@@ -50,17 +50,89 @@
                         <x-input-error :messages="$errors->get('name')" class="mt-1" />
                     </div>
 
-                    {{-- Password --}}
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-1">Password <span class="text-red-600">*</span></label>
-                        <input id="password" name="password" type="password" required placeholder="Minimal 8 karakter" class="w-full rounded-xl border border-gray-300 bg-white text-gray-900 text-sm py-2.5 px-3 focus:ring-1 focus:ring-red-500 focus:border-red-500" />
+                    {{-- Password (with show/hide) --}}
+                    <div x-data="{ show: false }">
+                        <label for="password" class="block text-sm font-semibold text-gray-700 mb-1">
+                            Password <span class="text-red-600">*</span>
+                        </label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <svg class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                          d="M12 11c1.657 0 3-1.567 3-3.5S13.657 4 12 4 9 5.567 9 7.5 10.343 11 12 11zm0 0v1m-6 4h12a2 2 0 002-2v-1a7 7 0 10-14 0v1a2 2 0 002 2z" />
+                                </svg>
+                            </div>
+
+                            <input
+                                id="password"
+                                name="password"
+                                :type="show ? 'text' : 'password'"
+                                required
+                                placeholder="Minimal 8 karakter"
+                                class="w-full rounded-xl border border-gray-300 bg-white text-gray-900 text-sm py-2.5 pl-11 pr-11 focus:ring-1 focus:ring-red-500 focus:border-red-500"
+                            />
+
+                            <button
+                                type="button"
+                                @click="show = !show"
+                                class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 focus:outline-none"
+                                title="Tampilkan/Sembunyikan password"
+                            >
+                                {{-- eye --}}
+                                <svg x-show="!show" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                          d="M15 12a3 3 0 11-6 0 3 3 0 016 0zm6 0s-3-7-9-7-9 7-9 7 3 7 9 7 9-7 9-7z"/>
+                                </svg>
+                                {{-- eye-off --}}
+                                <svg x-show="show" x-cloak class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                          d="M13.875 18.825A10.05 10.05 0 0112 19c-6 0-9-7-9-7a17.4 17.4 0 013.274-4.323M6.223 6.223C8.043 4.839 9.996 4 12 4c6 0 9 7 9 7a17.4 17.4 0 01-3.38 4.466M3 3l18 18M9.88 9.88A3 3 0 0014.12 14.12"/>
+                                </svg>
+                            </button>
+                        </div>
                         <x-input-error :messages="$errors->get('password')" class="mt-1" />
                     </div>
 
-                    {{-- Konfirmasi Password --}}
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-1">Konfirmasi Password <span class="text-red-600">*</span></label>
-                        <input id="password_confirmation" name="password_confirmation" type="password" required placeholder="Ulangi password" class="w-full rounded-xl border border-gray-300 bg-white text-gray-900 text-sm py-2.5 px-3 focus:ring-1 focus:ring-red-500 focus:border-red-500" />
+                    {{-- Konfirmasi Password (with show/hide) --}}
+                    <div x-data="{ show: false }">
+                        <label for="password_confirmation" class="block text-sm font-semibold text-gray-700 mb-1">
+                            Konfirmasi Password <span class="text-red-600">*</span>
+                        </label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <svg class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                          d="M12 11c1.657 0 3-1.567 3-3.5S13.657 4 12 4 9 5.567 9 7.5 10.343 11 12 11zm0 0v1m-6 4h12a2 2 0 002-2v-1a7 7 0 10-14 0v1a2 2 0 002 2z" />
+                                </svg>
+                            </div>
+
+                            <input
+                                id="password_confirmation"
+                                name="password_confirmation"
+                                :type="show ? 'text' : 'password'"
+                                required
+                                placeholder="Ulangi password"
+                                class="w-full rounded-xl border border-gray-300 bg-white text-gray-900 text-sm py-2.5 pl-11 pr-11 focus:ring-1 focus:ring-red-500 focus:border-red-500"
+                            />
+
+                            <button
+                                type="button"
+                                @click="show = !show"
+                                class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 focus:outline-none"
+                                title="Tampilkan/Sembunyikan konfirmasi password"
+                            >
+                                {{-- eye --}}
+                                <svg x-show="!show" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                          d="M15 12a3 3 0 11-6 0 3 3 0 016 0zm6 0s-3-7-9-7-9 7-9 7 3 7 9 7 9-7 9-7z"/>
+                                </svg>
+                                {{-- eye-off --}}
+                                <svg x-show="show" x-cloak class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                          d="M13.875 18.825A10.05 10.05 0 0112 19c-6 0-9-7-9-7a17.4 17.4 0 013.274-4.323M6.223 6.223C8.043 4.839 9.996 4 12 4c6 0 9 7 9 7a17.4 17.4 0 01-3.38 4.466M3 3l18 18M9.88 9.88A3 3 0 0014.12 14.12"/>
+                                </svg>
+                            </button>
+                        </div>
                         <x-input-error :messages="$errors->get('password_confirmation')" class="mt-1" />
                     </div>
 

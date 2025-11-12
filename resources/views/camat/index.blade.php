@@ -322,33 +322,56 @@
                     <div x-show="activeTab === 'gizi'">
                         {{-- TOMBOL AKSI MASSAL GIZI --}}
                         <div class="mb-4 flex flex-col sm:flex-row gap-2 justify-end">
+                            {{-- Approve Semua Pending --}}
                             @if($bulkActionData['gizi']['has_pending'])
-                                <form action="{{ route('camat.bulk_status') }}" method="POST" class="inline" onsubmit="return confirm('Anda yakin ingin Approve semua data Pending di tab ini?');"> 
-                                    @csrf 
-                                    <input type="hidden" name="model_type" value="gizi"> 
-                                    <input type="hidden" name="action" value="approve_all"> 
-                                    <input type="hidden" name="active_tab" x-bind:value="activeTab"> 
-                                    <button type="submit" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg bg-green-100 px-3 py-2 text-xs font-semibold text-green-700 transition hover:bg-green-200">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                        </svg> 
-                                        Approve Semua Pending
-                                    </button> 
-                                </form>
+                            <form action="{{ route('camat.bulk_status') }}" method="POST" class="inline" x-data>
+                            @csrf
+                            <input type="hidden" name="model_type" value="gizi">
+                            <input type="hidden" name="action" value="approve_all">
+                            <input type="hidden" name="active_tab" x-bind:value="activeTab">
+
+                            <button type="button"
+                                    @click.prevent="
+                                        $dispatch('open-confirm', {
+                                        form: $el.closest('form'),
+                                        title: 'Approve Semua Pending (Gizi)',
+                                        message: 'Approve semua data berstatus Pending di tab Gizi?',
+                                        okText: 'Approve'
+                                        })
+                                    "
+                                    class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg bg-green-100 px-3 py-2 text-xs font-semibold text-green-700 transition hover:bg-green-200">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                Approve Semua Pending
+                            </button>
+                            </form>
                             @endif
+
+                            {{-- Tarik Semua Approved --}}
                             @if($bulkActionData['gizi']['has_approved'])
-                                <form action="{{ route('camat.bulk_status') }}" method="POST" class="inline" onsubmit="return confirm('Anda yakin ingin Tarik (Unapprove) semua data Approved di tab ini? Data Published tidak akan terpengaruh.');"> 
-                                    @csrf 
-                                    <input type="hidden" name="model_type" value="gizi"> 
-                                    <input type="hidden" name="action" value="unapprove_all"> 
-                                    <input type="hidden" name="active_tab" x-bind:value="activeTab"> 
-                                    <button type="submit" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg bg-yellow-100 px-3 py-2 text-xs font-semibold text-yellow-700 transition hover:bg-yellow-200">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                                        </svg> 
-                                        Tarik Semua Approved
-                                    </button> 
-                                </form>
+                            <form action="{{ route('camat.bulk_status') }}" method="POST" class="inline" x-data>
+                            @csrf
+                            <input type="hidden" name="model_type" value="gizi">
+                            <input type="hidden" name="action" value="unapprove_all">
+                            <input type="hidden" name="active_tab" x-bind:value="activeTab">
+
+                            <button type="button"
+                                    @click.prevent="
+                                        $dispatch('open-confirm', {
+                                        form: $el.closest('form'),
+                                        title: 'Tarik Semua Approved (Gizi)',
+                                        message: 'Tarik (Unapprove) semua data berstatus Approved di tab Gizi? (Data Published tidak terpengaruh.)',
+                                        okText: 'Tarik'
+                                        })
+                                    "
+                                    class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg bg-yellow-100 px-3 py-2 text-xs font-semibold text-yellow-700 transition hover:bg-yellow-200">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                </svg>
+                                Tarik Semua Approved
+                            </button>
+                            </form>
                             @endif
                         </div>
                         
@@ -440,15 +463,25 @@
                                                 Approve
                                             </button> 
                                         </form>
-                                        <form action="{{ route('camat.destroy') }}" method="POST" onsubmit="return confirm('Anda yakin ingin menghapus semua data desa ini?');" class="inline"> 
-                                            @csrf 
-                                            @method('DELETE') 
-                                            <input type="hidden" name="model" value="DataGizi"> 
-                                            <input type="hidden" name="desa_kelurahan" value="{{ $data->desa_kelurahan }}"> 
-                                            <input type="hidden" name="active_tab" x-bind:value="activeTab"> 
-                                            <button type="submit" class="px-3 py-1 text-xs font-medium text-white rounded-lg bg-red-600 hover:bg-red-700 whitespace-nowrap">
+                                        <form action="{{ route('camat.destroy') }}" method="POST" class="inline" x-data>
+                                            @csrf
+                                            @method('DELETE')
+                                            <input type="hidden" name="model" value="DataGizi">
+                                            <input type="hidden" name="desa_kelurahan" value="{{ $data->desa_kelurahan }}">
+                                            <input type="hidden" name="active_tab" x-bind:value="activeTab">
+
+                                            <button type="button"
+                                                    @click.prevent="
+                                                        $dispatch('open-confirm', {
+                                                        form: $el.closest('form'),
+                                                        title: 'Hapus Data Gizi Desa',
+                                                        message: 'Anda yakin ingin menghapus SEMUA data gizi untuk desa {{ strtoupper($data->desa_kelurahan) }}? Tindakan ini tidak dapat dibatalkan.',
+                                                        okText: 'Hapus'
+                                                        })
+                                                    "
+                                                    class="px-3 py-1 text-xs font-medium text-white rounded-lg bg-red-600 hover:bg-red-700 whitespace-nowrap">
                                                 Hapus
-                                            </button> 
+                                            </button>
                                         </form>
                                     @elseif ($data->status === 'approved' || $data->status === 'published')
                                         <form action="{{ route('camat.status') }}" method="POST" class="inline"> 
@@ -461,15 +494,25 @@
                                                 Tarik
                                             </button> 
                                         </form>
-                                        <form action="{{ route('camat.destroy') }}" method="POST" onsubmit="return confirm('Anda yakin ingin menghapus semua data desa ini?');" class="inline"> 
-                                            @csrf 
-                                            @method('DELETE') 
-                                            <input type="hidden" name="model" value="DataGizi"> 
-                                            <input type="hidden" name="desa_kelurahan" value="{{ $data->desa_kelurahan }}"> 
-                                            <input type="hidden" name="active_tab" x-bind:value="activeTab"> 
-                                            <button type="submit" class="px-3 py-1 text-xs font-medium text-white rounded-lg bg-red-600 hover:bg-red-700 whitespace-nowrap">
+                                        <form action="{{ route('camat.destroy') }}" method="POST" class="inline" x-data>
+                                            @csrf
+                                            @method('DELETE')
+                                            <input type="hidden" name="model" value="DataGizi">
+                                            <input type="hidden" name="desa_kelurahan" value="{{ $data->desa_kelurahan }}">
+                                            <input type="hidden" name="active_tab" x-bind:value="activeTab">
+
+                                            <button type="button"
+                                                    @click.prevent="
+                                                        $dispatch('open-confirm', {
+                                                        form: $el.closest('form'),
+                                                        title: 'Hapus Data Gizi Desa',
+                                                        message: 'Anda yakin ingin menghapus SEMUA data gizi untuk desa {{ strtoupper($data->desa_kelurahan) }}? Tindakan ini tidak dapat dibatalkan.',
+                                                        okText: 'Hapus'
+                                                        })
+                                                    "
+                                                    class="px-3 py-1 text-xs font-medium text-white rounded-lg bg-red-600 hover:bg-red-700 whitespace-nowrap">
                                                 Hapus
-                                            </button> 
+                                            </button>
                                         </form>
                                     @endif
                                 </div>
@@ -488,11 +531,56 @@
                     <div x-show="activeTab === 'pencegahan'" style="display: none;">
                          {{-- TOMBOL AKSI MASSAL PENCEGAHAN --}}
                         <div class="mb-4 flex flex-col sm:flex-row gap-2 justify-end">
-                            @if($bulkActionData['pencegahan']['has_pending'])
-                                <form action="{{ route('camat.bulk_status') }}" method="POST" class="inline" onsubmit="return confirm('Anda yakin ingin Approve semua data Pending di tab ini?');"> @csrf <input type="hidden" name="model_type" value="pencegahan"> <input type="hidden" name="action" value="approve_all"> <input type="hidden" name="active_tab" x-bind:value="activeTab"> <button type="submit" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg bg-green-100 px-3 py-2 text-xs font-semibold text-green-700 transition hover:bg-green-200"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> Approve Semua Pending</button> </form>
+                            {{-- Approve Semua Pending --}}
+                            @if($bulkActionData['gizi']['has_pending'])
+                            <form action="{{ route('camat.bulk_status') }}" method="POST" class="inline" x-data>
+                            @csrf
+                            <input type="hidden" name="model_type" value="gizi">
+                            <input type="hidden" name="action" value="approve_all">
+                            <input type="hidden" name="active_tab" x-bind:value="activeTab">
+
+                            <button type="button"
+                                    @click.prevent="
+                                        $dispatch('open-confirm', {
+                                        form: $el.closest('form'),
+                                        title: 'Approve Semua Pending (Gizi)',
+                                        message: 'Approve semua data berstatus Pending di tab Gizi?',
+                                        okText: 'Approve'
+                                        })
+                                    "
+                                    class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg bg-green-100 px-3 py-2 text-xs font-semibold text-green-700 transition hover:bg-green-200">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                Approve Semua Pending
+                            </button>
+                            </form>
                             @endif
-                            @if($bulkActionData['pencegahan']['has_approved'])
-                                <form action="{{ route('camat.bulk_status') }}" method="POST" class="inline" onsubmit="return confirm('Anda yakin ingin Tarik (Unapprove) semua data Approved di tab ini? Data Published tidak akan terpengaruh.');"> @csrf <input type="hidden" name="model_type" value="pencegahan"> <input type="hidden" name="action" value="unapprove_all"> <input type="hidden" name="active_tab" x-bind:value="activeTab"> <button type="submit" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg bg-yellow-100 px-3 py-2 text-xs font-semibold text-yellow-700 transition hover:bg-yellow-200"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg> Tarik Semua Approved</button> </form>
+
+                            {{-- Tarik Semua Approved --}}
+                            @if($bulkActionData['gizi']['has_approved'])
+                            <form action="{{ route('camat.bulk_status') }}" method="POST" class="inline" x-data>
+                            @csrf
+                            <input type="hidden" name="model_type" value="gizi">
+                            <input type="hidden" name="action" value="unapprove_all">
+                            <input type="hidden" name="active_tab" x-bind:value="activeTab">
+
+                            <button type="button"
+                                    @click.prevent="
+                                        $dispatch('open-confirm', {
+                                        form: $el.closest('form'),
+                                        title: 'Tarik Semua Approved (Gizi)',
+                                        message: 'Tarik (Unapprove) semua data berstatus Approved di tab Gizi? (Data Published tidak terpengaruh.)',
+                                        okText: 'Tarik'
+                                        })
+                                    "
+                                    class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg bg-yellow-100 px-3 py-2 text-xs font-semibold text-yellow-700 transition hover:bg-yellow-200">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                </svg>
+                                Tarik Semua Approved
+                            </button>
+                            </form>
                             @endif
                         </div>
                         
@@ -505,10 +593,48 @@
                                     {{-- Tombol Aksi Pencegahan --}}
                                     @if ($data->status === 'pending')
                                         <form action="{{ route('camat.status') }}" method="POST" class="inline"> @csrf <input type="hidden" name="model" value="DataPencegahan"> <input type="hidden" name="id" value="{{ $data->id }}"> <input type="hidden" name="new_status" value="approved"> <input type="hidden" name="active_tab" x-bind:value="activeTab"> <button type="submit" class="px-3 py-1 text-xs font-medium text-white rounded-lg bg-green-600 hover:bg-green-700">Approve</button> </form>
-                                        <form action="{{ route('camat.destroy') }}" method="POST" onsubmit="return confirm('Anda yakin ingin menghapus data ini?');" class="inline"> @csrf @method('DELETE') <input type="hidden" name="model" value="DataPencegahan"> <input type="hidden" name="id" value="{{ $data->id }}"> <input type="hidden" name="active_tab" x-bind:value="activeTab"> <button type="submit" class="px-3 py-1 text-xs font-medium text-white rounded-lg bg-red-600 hover:bg-red-700">Hapus</button> </form>
+                                        <form action="{{ route('camat.destroy') }}" method="POST" class="inline" x-data>
+                                            @csrf
+                                            @method('DELETE')
+                                            <input type="hidden" name="model" value="DataGizi">
+                                            <input type="hidden" name="desa_kelurahan" value="{{ $data->desa_kelurahan }}">
+                                            <input type="hidden" name="active_tab" x-bind:value="activeTab">
+
+                                            <button type="button"
+                                                    @click.prevent="
+                                                        $dispatch('open-confirm', {
+                                                        form: $el.closest('form'),
+                                                        title: 'Hapus Data Gizi Desa',
+                                                        message: 'Anda yakin ingin menghapus SEMUA data gizi untuk desa {{ strtoupper($data->desa_kelurahan) }}? Tindakan ini tidak dapat dibatalkan.',
+                                                        okText: 'Hapus'
+                                                        })
+                                                    "
+                                                    class="px-3 py-1 text-xs font-medium text-white rounded-lg bg-red-600 hover:bg-red-700 whitespace-nowrap">
+                                                Hapus
+                                            </button>
+                                        </form>
                                     @elseif ($data->status === 'approved' || $data->status === 'published')
                                         <form action="{{ route('camat.status') }}" method="POST" class="inline"> @csrf <input type="hidden" name="model" value="DataPencegahan"> <input type="hidden" name="id" value="{{ $data->id }}"> <input type="hidden" name="new_status" value="{{ $data->status === 'published' ? 'approved' : 'pending' }}"> <input type="hidden" name="active_tab" x-bind:value="activeTab"> <button type="submit" class="px-3 py-1 text-xs font-medium text-white rounded-lg bg-yellow-600 hover:bg-yellow-700">Tarik</button> </form>
-                                        <form action="{{ route('camat.destroy') }}" method="POST" onsubmit="return confirm('Anda yakin ingin menghapus data ini?');" class="inline"> @csrf @method('DELETE') <input type="hidden" name="model" value="DataPencegahan"> <input type="hidden" name="id" value="{{ $data->id }}"> <input type="hidden" name="active_tab" x-bind:value="activeTab"> <button type="submit" class="px-3 py-1 text-xs font-medium text-white rounded-lg bg-red-600 hover:bg-red-700">Hapus</button> </form>
+                                        <form action="{{ route('camat.destroy') }}" method="POST" class="inline" x-data>
+                                            @csrf
+                                            @method('DELETE')
+                                            <input type="hidden" name="model" value="DataGizi">
+                                            <input type="hidden" name="desa_kelurahan" value="{{ $data->desa_kelurahan }}">
+                                            <input type="hidden" name="active_tab" x-bind:value="activeTab">
+
+                                            <button type="button"
+                                                    @click.prevent="
+                                                        $dispatch('open-confirm', {
+                                                        form: $el.closest('form'),
+                                                        title: 'Hapus Data Gizi Desa',
+                                                        message: 'Anda yakin ingin menghapus SEMUA data gizi untuk desa {{ strtoupper($data->desa_kelurahan) }}? Tindakan ini tidak dapat dibatalkan.',
+                                                        okText: 'Hapus'
+                                                        })
+                                                    "
+                                                    class="px-3 py-1 text-xs font-medium text-white rounded-lg bg-red-600 hover:bg-red-700 whitespace-nowrap">
+                                                Hapus
+                                            </button>
+                                        </form>                                        
                                     @endif
                                 </div>
                             </div>
@@ -526,11 +652,56 @@
                     <div x-show="activeTab === 'penanggulangan'" style="display: none;">
                         {{-- TOMBOL AKSI MASSAL PENANGGULANGAN --}}
                         <div class="mb-4 flex flex-col sm:flex-row gap-2 justify-end">
-                            @if($bulkActionData['penanggulangan']['has_pending'])
-                                <form action="{{ route('camat.bulk_status') }}" method="POST" class="inline" onsubmit="return confirm('Anda yakin ingin Approve semua data Pending di tab ini?');"> @csrf <input type="hidden" name="model_type" value="penanggulangan"> <input type="hidden" name="action" value="approve_all"> <input type="hidden" name="active_tab" x-bind:value="activeTab"> <button type="submit" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg bg-green-100 px-3 py-2 text-xs font-semibold text-green-700 transition hover:bg-green-200"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> Approve Semua Pending</button> </ form>
+                            {{-- Approve Semua Pending --}}
+                            @if($bulkActionData['gizi']['has_pending'])
+                            <form action="{{ route('camat.bulk_status') }}" method="POST" class="inline" x-data>
+                            @csrf
+                            <input type="hidden" name="model_type" value="gizi">
+                            <input type="hidden" name="action" value="approve_all">
+                            <input type="hidden" name="active_tab" x-bind:value="activeTab">
+
+                            <button type="button"
+                                    @click.prevent="
+                                        $dispatch('open-confirm', {
+                                        form: $el.closest('form'),
+                                        title: 'Approve Semua Pending (Gizi)',
+                                        message: 'Approve semua data berstatus Pending di tab Gizi?',
+                                        okText: 'Approve'
+                                        })
+                                    "
+                                    class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg bg-green-100 px-3 py-2 text-xs font-semibold text-green-700 transition hover:bg-green-200">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                Approve Semua Pending
+                            </button>
+                            </form>
                             @endif
-                            @if($bulkActionData['penanggulangan']['has_approved'])
-                                <form action="{{ route('camat.bulk_status') }}" method="POST" class="inline" onsubmit="return confirm('Anda yakin ingin Tarik (Unapprove) semua data Approved di tab ini? Data Published tidak akan terpengaruh.');"> @csrf <input type="hidden" name="model_type" value="penanggulangan"> <input type="hidden" name="action" value="unapprove_all"> <input type="hidden" name="active_tab" x-bind:value="activeTab"> <button type="submit" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg bg-yellow-100 px-3 py-2 text-xs font-semibold text-yellow-700 transition hover:bg-yellow-200"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg> Tarik Semua Approved</button> </ form>
+
+                            {{-- Tarik Semua Approved --}}
+                            @if($bulkActionData['gizi']['has_approved'])
+                            <form action="{{ route('camat.bulk_status') }}" method="POST" class="inline" x-data>
+                            @csrf
+                            <input type="hidden" name="model_type" value="gizi">
+                            <input type="hidden" name="action" value="unapprove_all">
+                            <input type="hidden" name="active_tab" x-bind:value="activeTab">
+
+                            <button type="button"
+                                    @click.prevent="
+                                        $dispatch('open-confirm', {
+                                        form: $el.closest('form'),
+                                        title: 'Tarik Semua Approved (Gizi)',
+                                        message: 'Tarik (Unapprove) semua data berstatus Approved di tab Gizi? (Data Published tidak terpengaruh.)',
+                                        okText: 'Tarik'
+                                        })
+                                    "
+                                    class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg bg-yellow-100 px-3 py-2 text-xs font-semibold text-yellow-700 transition hover:bg-yellow-200">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                </svg>
+                                Tarik Semua Approved
+                            </button>
+                            </form>
                             @endif
                         </div>
                         
@@ -543,10 +714,48 @@
                                     {{-- Tombol Aksi Penanggulangan --}}
                                     @if ($data->status === 'pending')
                                         <form action="{{ route('camat.status') }}" method="POST" class="inline"> @csrf <input type="hidden" name="model" value="DataPenanggulangan"> <input type="hidden" name="id" value="{{ $data->id }}"> <input type="hidden" name="new_status" value="approved"> <input type="hidden" name="active_tab" x-bind:value="activeTab"> <button type="submit" class="px-3 py-1 text-xs font-medium text-white rounded-lg bg-green-600 hover:bg-green-700">Approve</button> </form>
-                                        <form action="{{ route('camat.destroy') }}" method="POST" onsubmit="return confirm('Anda yakin ingin menghapus data ini?');" class="inline"> @csrf @method('DELETE') <input type="hidden" name="model" value="DataPenanggulangan"> <input type="hidden" name="id" value="{{ $data->id }}"> <input type="hidden" name="active_tab" x-bind:value="activeTab"> <button type="submit" class="px-3 py-1 text-xs font-medium text-white rounded-lg bg-red-600 hover:bg-red-700">Hapus</button> </form>
+                                        <form action="{{ route('camat.destroy') }}" method="POST" class="inline" x-data>
+                                            @csrf
+                                            @method('DELETE')
+                                            <input type="hidden" name="model" value="DataGizi">
+                                            <input type="hidden" name="desa_kelurahan" value="{{ $data->desa_kelurahan }}">
+                                            <input type="hidden" name="active_tab" x-bind:value="activeTab">
+
+                                            <button type="button"
+                                                    @click.prevent="
+                                                        $dispatch('open-confirm', {
+                                                        form: $el.closest('form'),
+                                                        title: 'Hapus Data Gizi Desa',
+                                                        message: 'Anda yakin ingin menghapus SEMUA data gizi untuk desa {{ strtoupper($data->desa_kelurahan) }}? Tindakan ini tidak dapat dibatalkan.',
+                                                        okText: 'Hapus'
+                                                        })
+                                                    "
+                                                    class="px-3 py-1 text-xs font-medium text-white rounded-lg bg-red-600 hover:bg-red-700 whitespace-nowrap">
+                                                Hapus
+                                            </button>
+                                        </form>
                                     @elseif ($data->status === 'approved' || $data->status === 'published')
                                         <form action="{{ route('camat.status') }}" method="POST" class="inline"> @csrf <input type="hidden" name="model" value="DataPenanggulangan"> <input type="hidden" name="id" value="{{ $data->id }}"> <input type="hidden" name="new_status" value="{{ $data->status === 'published' ? 'approved' : 'pending' }}"> <input type="hidden" name="active_tab" x-bind:value="activeTab"> <button type="submit" class="px-3 py-1 text-xs font-medium text-white rounded-lg bg-yellow-600 hover:bg-yellow-700">Tarik</button> </form>
-                                        <form action="{{ route('camat.destroy') }}" method="POST" onsubmit="return confirm('Anda yakin ingin menghapus data ini?');" class="inline"> @csrf @method('DELETE') <input type="hidden" name="model" value="DataPenanggulangan"> <input type="hidden" name="id" value="{{ $data->id }}"> <input type="hidden" name="active_tab" x-bind:value="activeTab"> <button type="submit" class="px-3 py-1 text-xs font-medium text-white rounded-lg bg-red-600 hover:bg-red-700">Hapus</button> </form>
+                                        <form action="{{ route('camat.destroy') }}" method="POST" class="inline" x-data>
+                                            @csrf
+                                            @method('DELETE')
+                                            <input type="hidden" name="model" value="DataGizi">
+                                            <input type="hidden" name="desa_kelurahan" value="{{ $data->desa_kelurahan }}">
+                                            <input type="hidden" name="active_tab" x-bind:value="activeTab">
+
+                                            <button type="button"
+                                                    @click.prevent="
+                                                        $dispatch('open-confirm', {
+                                                        form: $el.closest('form'),
+                                                        title: 'Hapus Data Gizi Desa',
+                                                        message: 'Anda yakin ingin menghapus SEMUA data gizi untuk desa {{ strtoupper($data->desa_kelurahan) }}? Tindakan ini tidak dapat dibatalkan.',
+                                                        okText: 'Hapus'
+                                                        })
+                                                    "
+                                                    class="px-3 py-1 text-xs font-medium text-white rounded-lg bg-red-600 hover:bg-red-700 whitespace-nowrap">
+                                                Hapus
+                                            </button>
+                                        </form>                                        
                                     @endif
                                 </div>
                             </div>
@@ -564,11 +773,56 @@
                     <div x-show="activeTab === 'desa'" style="display: none;">
                         {{-- TOMBOL AKSI MASSAL DESA --}}
                         <div class="mb-4 flex flex-col sm:flex-row gap-2 justify-end">
-                            @if($bulkActionData['desa']['has_pending'])
-                                <form action="{{ route('camat.bulk_status') }}" method="POST" class="inline" onsubmit="return confirm('Anda yakin ingin Approve semua data Pending di tab ini?');"> @csrf <input type="hidden" name="model_type" value="desa"> <input type="hidden" name="action" value="approve_all"> <input type="hidden" name="active_tab" x-bind:value="activeTab"> <button type="submit" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg bg-green-100 px-3 py-2 text-xs font-semibold text-green-700 transition hover:bg-green-200"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> Approve Semua Pending</button> </ form>
+                            {{-- Approve Semua Pending --}}
+                            @if($bulkActionData['gizi']['has_pending'])
+                            <form action="{{ route('camat.bulk_status') }}" method="POST" class="inline" x-data>
+                            @csrf
+                            <input type="hidden" name="model_type" value="gizi">
+                            <input type="hidden" name="action" value="approve_all">
+                            <input type="hidden" name="active_tab" x-bind:value="activeTab">
+
+                            <button type="button"
+                                    @click.prevent="
+                                        $dispatch('open-confirm', {
+                                        form: $el.closest('form'),
+                                        title: 'Approve Semua Pending (Gizi)',
+                                        message: 'Approve semua data berstatus Pending di tab Gizi?',
+                                        okText: 'Approve'
+                                        })
+                                    "
+                                    class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg bg-green-100 px-3 py-2 text-xs font-semibold text-green-700 transition hover:bg-green-200">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                Approve Semua Pending
+                            </button>
+                            </form>
                             @endif
-                            @if($bulkActionData['desa']['has_approved'])
-                                <form action="{{ route('camat.bulk_status') }}" method="POST" class="inline" onsubmit="return confirm('Anda yakin ingin Tarik (Unapprove) semua data Approved di tab ini? Data Published tidak akan terpengaruh.');"> @csrf <input type="hidden" name="model_type" value="desa"> <input type="hidden" name="action" value="unapprove_all"> <input type="hidden" name="active_tab" x-bind:value="activeTab"> <button type="submit" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg bg-yellow-100 px-3 py-2 text-xs font-semibold text-yellow-700 transition hover:bg-yellow-200"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg> Tarik Semua Approved</button> </ form>
+
+                            {{-- Tarik Semua Approved --}}
+                            @if($bulkActionData['gizi']['has_approved'])
+                            <form action="{{ route('camat.bulk_status') }}" method="POST" class="inline" x-data>
+                            @csrf
+                            <input type="hidden" name="model_type" value="gizi">
+                            <input type="hidden" name="action" value="unapprove_all">
+                            <input type="hidden" name="active_tab" x-bind:value="activeTab">
+
+                            <button type="button"
+                                    @click.prevent="
+                                        $dispatch('open-confirm', {
+                                        form: $el.closest('form'),
+                                        title: 'Tarik Semua Approved (Gizi)',
+                                        message: 'Tarik (Unapprove) semua data berstatus Approved di tab Gizi? (Data Published tidak terpengaruh.)',
+                                        okText: 'Tarik'
+                                        })
+                                    "
+                                    class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg bg-yellow-100 px-3 py-2 text-xs font-semibold text-yellow-700 transition hover:bg-yellow-200">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                </svg>
+                                Tarik Semua Approved
+                            </button>
+                            </form>
                             @endif
                         </div>
 
@@ -582,10 +836,48 @@
                                     {{-- Tombol Aksi Desa --}}
                                     @if ($data->status === 'pending')
                                         <form action="{{ route('camat.status') }}" method="POST" class="inline"> @csrf <input type="hidden" name="model" value="DataDesa"> <input type="hidden" name="id" value="{{ $data->id }}"> <input type="hidden" name="new_status" value="approved"> <input type="hidden" name="active_tab" x-bind:value="activeTab"> <button type="submit" class="px-3 py-1 text-xs font-medium text-white rounded-lg bg-green-600 hover:bg-green-700">Approve</button> </form>
-                                        <form action="{{ route('camat.destroy') }}" method="POST" onsubmit="return confirm('Anda yakin ingin menghapus data ini?');" class="inline"> @csrf @method('DELETE') <input type="hidden" name="model" value="DataDesa"> <input type="hidden" name="id" value="{{ $data->id }}"> <input type="hidden" name="active_tab" x-bind:value="activeTab"> <button type="submit" class="px-3 py-1 text-xs font-medium text-white rounded-lg bg-red-600 hover:bg-red-700">Hapus</button> </form>
+                                        <form action="{{ route('camat.destroy') }}" method="POST" class="inline" x-data>
+                                            @csrf
+                                            @method('DELETE')
+                                            <input type="hidden" name="model" value="DataGizi">
+                                            <input type="hidden" name="desa_kelurahan" value="{{ $data->desa_kelurahan }}">
+                                            <input type="hidden" name="active_tab" x-bind:value="activeTab">
+
+                                            <button type="button"
+                                                    @click.prevent="
+                                                        $dispatch('open-confirm', {
+                                                        form: $el.closest('form'),
+                                                        title: 'Hapus Data Gizi Desa',
+                                                        message: 'Anda yakin ingin menghapus SEMUA data gizi untuk desa {{ strtoupper($data->desa_kelurahan) }}? Tindakan ini tidak dapat dibatalkan.',
+                                                        okText: 'Hapus'
+                                                        })
+                                                    "
+                                                    class="px-3 py-1 text-xs font-medium text-white rounded-lg bg-red-600 hover:bg-red-700 whitespace-nowrap">
+                                                Hapus
+                                            </button>
+                                        </form>                                        
                                     @elseif ($data->status === 'approved' || $data->status === 'published')
                                         <form action="{{ route('camat.status') }}" method="POST" class="inline"> @csrf <input type="hidden" name="model" value="DataDesa"> <input type="hidden" name="id" value="{{ $data->id }}"> <input type="hidden" name="new_status" value="{{ $data->status === 'published' ? 'approved' : 'pending' }}"> <input type="hidden" name="active_tab" x-bind:value="activeTab"> <button type="submit" class="px-3 py-1 text-xs font-medium text-white rounded-lg bg-yellow-600 hover:bg-yellow-700">Tarik</button> </form>
-                                        <form action="{{ route('camat.destroy') }}" method="POST" onsubmit="return confirm('Anda yakin ingin menghapus data ini?');" class="inline"> @csrf @method('DELETE') <input type="hidden" name="model" value="DataDesa"> <input type="hidden" name="id" value="{{ $data->id }}"> <input type="hidden" name="active_tab" x-bind:value="activeTab"> <button type="submit" class="px-3 py-1 text-xs font-medium text-white rounded-lg bg-red-600 hover:bg-red-700">Hapus</button> </form>
+                                        <form action="{{ route('camat.destroy') }}" method="POST" class="inline" x-data>
+                                            @csrf
+                                            @method('DELETE')
+                                            <input type="hidden" name="model" value="DataGizi">
+                                            <input type="hidden" name="desa_kelurahan" value="{{ $data->desa_kelurahan }}">
+                                            <input type="hidden" name="active_tab" x-bind:value="activeTab">
+
+                                            <button type="button"
+                                                    @click.prevent="
+                                                        $dispatch('open-confirm', {
+                                                        form: $el.closest('form'),
+                                                        title: 'Hapus Data Gizi Desa',
+                                                        message: 'Anda yakin ingin menghapus SEMUA data gizi untuk desa {{ strtoupper($data->desa_kelurahan) }}? Tindakan ini tidak dapat dibatalkan.',
+                                                        okText: 'Hapus'
+                                                        })
+                                                    "
+                                                    class="px-3 py-1 text-xs font-medium text-white rounded-lg bg-red-600 hover:bg-red-700 whitespace-nowrap">
+                                                Hapus
+                                            </button>
+                                        </form>                                        
                                     @endif
                                 </div>
                             </div>

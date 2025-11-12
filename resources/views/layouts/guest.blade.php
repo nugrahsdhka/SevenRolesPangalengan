@@ -18,6 +18,18 @@
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     </head>
     <body class="font-sans text-gray-900 antialiased">
+        <x-loading
+            img="{{ asset('img/logo-kab-bandung.png') }}"
+            ring="true"
+            mode="dual"
+            size="70"
+            logo="40"
+            ringThickness="3"
+            ringColor="#8B0000"
+            ringTrail="#E5E7EB"
+            speed="1.0s"
+        />
+        
         {{-- Content --}}
         <div class="relative z-10">
             {{ $slot }}

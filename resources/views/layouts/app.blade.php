@@ -19,10 +19,23 @@
     @stack('head')
 </head>
 <body class="font-sans antialiased">
+    <x-confirm-modal />
+
+    <x-loading
+    img="{{ asset('img/logo-kab-bandung.png') }}"
+    ring="true"
+    mode="dual"
+    size="70"
+    logo="40"
+    ringThickness="3"
+    ringColor="#8B0000"
+    ringTrail="#E5E7EB"
+    speed="1.0s"
+    />
+
     <div class="min-h-screen bg-slate-50">
         {{-- @include('layouts.navigation') --}}
 
-        <!-- Page Heading (opsional) -->
         @isset($header)
             <header class="bg-white shadow">
                 <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
@@ -31,14 +44,15 @@
             </header>
         @endisset
 
-        <!-- Page Content -->
         <main>
             {{ $slot }}
         </main>
+
     </div>
 
+    {{-- Go To Top button --}}
     <x-goToTop />
-    <!-- Per-page scripts (e.g., Chart.js, Leaflet JS, inisialisasi chart/map) -->
+
     @stack('scripts')
 </body>
 </html>

@@ -36,6 +36,17 @@
     </style>
 </head>
 <body class="font-sans antialiased bg-gradient-to-br from-slate-50 via-gray-50 to-slate-100">
+    <x-loading
+        img="{{ asset('img/logo-kab-bandung.png') }}"
+        ring="true"
+        mode="dual"
+        size="70"
+        logo="40"
+        ringThickness="3"
+        ringColor="#8B0000"
+        ringTrail="#E5E7EB"
+        speed="1.0s"
+    />
 
     {{-- ====== MODERN HEADER WITH GLASSMORPHISM ====== --}}
     <header class="text-red-100 relative overflow-hidden bg-gradient-to-br from-red-800 via-red-800 to-rose-700">

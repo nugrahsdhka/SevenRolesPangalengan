@@ -12,9 +12,6 @@ use Illuminate\Support\Str;
 
 class UserController extends Controller
 {
-    /**
-     * Tampilkan semua user (aktif + nonaktif/soft delete)
-     */
     public function index()
     {
         $users = User::withTrashed()
@@ -29,9 +26,7 @@ class UserController extends Controller
 
     public function create()
     {
-        // Ambil semua role kecuali "Guest"
         $roles = Role::where('name', '!=', 'Guest')->pluck('name', 'name');
-
         return view('admin.users.create', compact('roles'));
     }
 
@@ -43,7 +38,6 @@ class UserController extends Controller
             'role'  => ['required', 'string', 'exists:roles,name'],
         ]);
 
-        // Password dummy random (tidak akan dipakai, nanti user set sendiri)
         $randomPassword = Str::random(32);
 
         $user = User::create([
@@ -61,13 +55,25 @@ class UserController extends Controller
 
     public function destroy($id)
     {
-        $user = User::findOrFail($id);
+        $target = User::findOrFail($id);
+        $actorId = auth()->id();
 
-        if ($user->id === auth()->id()) {
+        // ❌ Tidak boleh menonaktifkan diri sendiri
+        if ($target->id === $actorId) {
             return back()->with('error', 'Anda tidak dapat menonaktifkan akun Anda sendiri.');
         }
 
-        $user->delete();
+        // ❌ Tidak boleh menonaktifkan user yang belum verifikasi email
+        if (is_null($target->email_verified_at)) {
+            return back()->with('error', 'Tidak dapat menonaktifkan user yang belum terverifikasi.');
+        }
+
+        // Jika sudah nonaktif (soft deleted), abaikan
+        if ($target->trashed()) {
+            return back()->with('error', 'User sudah berstatus nonaktif.');
+        }
+
+        $target->delete();
 
         return back()->with('success', 'User berhasil dinonaktifkan.');
     }
@@ -76,6 +82,7 @@ class UserController extends Controller
     {
         $user = User::withTrashed()->findOrFail($id);
 
+        // (Opsional) Bisa tambahkan kebijakan khusus saat restore jika diperlukan
         $user->restore();
 
         return back()->with('success', 'User berhasil diaktifkan kembali.');

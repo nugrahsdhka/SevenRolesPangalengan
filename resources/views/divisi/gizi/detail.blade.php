@@ -431,17 +431,19 @@
                                             <td class="px-4 py-4">
                                                 <div class="flex items-center justify-center gap-2">
                                                     <a href="{{ route('gizi.edit', $data->id) }}"
-                                                        class="text-sm font-medium text-blue-600 hover:text-blue-800 transition">
-                                                        Edit
+                                                    class="text-sm font-medium text-blue-600 hover:text-blue-800 transition">
+                                                    Edit
                                                     </a>
                                                     <span class="text-gray-300">|</span>
-                                                    <form action="{{ route('gizi.destroy', $data->id) }}" method="POST"
-                                                        onsubmit="return confirm('Yakin ingin menghapus data ini?');">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                        <button type="submit" class="text-sm font-medium text-red-600 hover:text-red-800 transition">
-                                                            Hapus
-                                                        </button>
+
+                                                    <form action="{{ route('gizi.destroy', $data->id) }}" method="POST" x-data>
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="button"
+                                                            @click.prevent="$dispatch('open-confirm', { form: $el.closest('form') })"
+                                                            class="text-sm font-medium text-red-600 hover:text-red-800 transition">
+                                                        Hapus
+                                                    </button>
                                                     </form>
                                                 </div>
                                             </td>

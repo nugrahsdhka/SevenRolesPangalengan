@@ -269,24 +269,28 @@
                                             
                                             {{-- Aksi --}}
                                             <td class="whitespace-nowrap px-6 py-4">
-                                                <div class="flex items-center justify-center gap-3">
-                                                    <a href="{{ route('gizi.detail', ['desa' => $item->desa_kelurahan]) }}" 
-                                                        class="text-sm font-medium text-indigo-600 transition hover:text-indigo-800 hover:underline">
-                                                        Detail
-                                                    </a>
-                                                    
-                                                    <span class="text-gray-300">|</span>
+                                            <div class="flex items-center justify-center gap-3">
 
-                                                    <form action="{{ route('gizi.destroyAggregated') }}" method="POST" 
-                                                        onsubmit="return confirm('Yakin ingin menghapus SEMUA ({{ $item->total_anak }} data) untuk desa {{ $item->desa_kelurahan }} dengan status \'{{ $item->status }}\'? Tindakan ini tidak dapat diurungkan.');">
-                                                        @csrf
-                                                        <input type="hidden" name="desa_kelurahan" value="{{ $item->desa_kelurahan }}">
-                                                        <input type="hidden" name="status" value="{{ $item->status }}">
-                                                        <button type="submit" class="text-sm font-medium text-red-600 transition hover:text-red-800 hover:underline">
-                                                            Hapus
-                                                        </button>
-                                                    </form>
-                                                </div>
+                                                <a href="{{ route('gizi.detail', ['desa' => $item->desa_kelurahan]) }}"
+                                                class="text-sm font-medium text-indigo-600 transition hover:text-indigo-800 hover:underline">
+                                                Detail
+                                                </a>
+
+                                                <span class="text-gray-300">|</span>
+
+                                                <form action="{{ route('gizi.destroyAggregated') }}" method="POST" x-data>
+                                                @csrf
+                                                <input type="hidden" name="desa_kelurahan" value="{{ $item->desa_kelurahan }}">
+                                                <input type="hidden" name="status" value="{{ $item->status }}">
+
+                                                <button type="button"
+                                                        @click.prevent="$dispatch('open-confirm', { form: $el.closest('form') })"
+                                                        class="text-sm font-medium text-red-600 transition hover:text-red-800 hover:underline">
+                                                    Hapus
+                                                </button>
+                                                </form>
+
+                                            </div>
                                             </td>
                                         </tr>
                                     @empty

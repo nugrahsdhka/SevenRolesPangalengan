@@ -73,19 +73,7 @@
                         <a href="{{ route('admin.users.index') }}" 
                            class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor" aria-label="User"> <path d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5Zm0 2c-5.33 0-9 2.67-9 6a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1c0-3.33-3.67-6-9-6Z"/> </svg>
-                            <span class="font-medium">User</span>
-                        </a>
-
-                        {{-- Divider --}}
-                        <div class="border-t border-gray-100 my-1"></div>
-
-                        {{-- Create User --}}
-                        <a href="{{ route('admin.users.create') }}" 
-                           class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
-                            <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                              <path d="M8 9a3 3 0 100-6 3 3 0 000 6zM8 11a6 6 0 016 6H2a6 6 0 016-6zM16 7a1 1 0 10-2 0v1h-1a1 1 0 100 2h1v1a1 1 0 102 0v-1h1a1 1 0 100-2h-1V7z" />
-                            </svg>
-                            <span class="font-medium">Create User</span>
+                            <span class="font-medium">Kelola User</span>
                         </a>
 
                         {{-- Divider --}}
@@ -325,30 +313,65 @@
                         {{-- TOMBOL AKSI MASSAL GIZI (DARI KODE ASLI ADMIN) --}}
                         <div class="mb-4 flex flex-col sm:flex-row gap-2 justify-end">
                             @if($bulkActionData['gizi']['has_approved'])
-                                <form action="{{ route('admin.bulk_publish') }}" method="POST" class="inline" onsubmit="return confirm('Anda yakin ingin PUBLISH semua data Approved di tab ini?');"> 
-                                    @csrf 
-                                    <input type="hidden" name="model_type" value="gizi"> 
-                                    <input type="hidden" name="action" value="publish_all"> 
-                                    <input type="hidden" name="active_tab" x-bind:value="activeTab"> 
-                                    <button type="submit" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg bg-green-100 px-3 py-2 text-xs font-semibold text-green-700 transition hover:bg-green-200">
-                                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                        </svg>
-                                        Publish Semua Approved
-                                    </button>
-                                </form>
+                            <form x-ref="bulkPublishGizi"
+                                    action="{{ route('admin.bulk_publish') }}"
+                                    method="POST"
+                                    class="inline">
+                                @csrf
+                                <input type="hidden" name="model_type" value="gizi">
+                                <input type="hidden" name="action" value="publish_all">
+                                <input type="hidden" name="active_tab" x-bind:value="activeTab">
+
+                                <button type="button"
+                                        class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg bg-green-100 px-3 py-2 text-xs font-semibold text-green-700 transition hover:bg-green-200"
+                                        @click="
+                                            window.dispatchEvent(new CustomEvent('open-confirm', {
+                                            detail: {
+                                                form: $refs.bulkPublishGizi,
+                                                title: 'Publish Semua Approved',
+                                                message: 'Semua data berstatus Approved pada tab ini akan dipublikasikan.\nLanjutkan?',
+                                                okText: 'Ya, Publish',
+                                                cancelText: 'Batal'
+                                            }
+                                            }))
+                                        ">
+                                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
+                                    Publish Semua Approved
+                                </button>
+                            </form>
                             @endif
+
                             @if($bulkActionData['gizi']['has_published'])
-                                <form action="{{ route('admin.bulk_publish') }}" method="POST" class="inline" onsubmit="return confirm('Anda yakin ingin TARIK semua data Published di tab ini?');"> 
-                                    @csrf 
-                                    <input type="hidden" name="model_type" value="gizi"> 
-                                    <input type="hidden" name="action" value="unpublish_all"> 
-                                    <input type="hidden" name="active_tab" x-bind:value="activeTab"> 
-                                    <button type="submit" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg bg-yellow-100 px-3 py-2 text-xs font-semibold text-yellow-700 transition hover:bg-yellow-200">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
-                                        Tarik Semua Published
-                                    </button>
-                                </form>
+                            <form x-ref="bulkUnpublishGizi"
+                                    action="{{ route('admin.bulk_publish') }}"
+                                    method="POST"
+                                    class="inline">
+                                @csrf
+                                <input type="hidden" name="model_type" value="gizi">
+                                <input type="hidden" name="action" value="unpublish_all">
+                                <input type="hidden" name="active_tab" x-bind:value="activeTab">
+
+                                <button type="button"
+                                        class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg bg-yellow-100 px-3 py-2 text-xs font-semibold text-yellow-700 transition hover:bg-yellow-200"
+                                        @click="
+                                            window.dispatchEvent(new CustomEvent('open-confirm', {
+                                            detail: {
+                                                form: $refs.bulkUnpublishGizi,
+                                                title: 'Tarik Semua Published',
+                                                message: 'Semua data berstatus Published pada tab ini akan ditarik (unpublish).\nLanjutkan?',
+                                                okText: 'Ya, Tarik',
+                                                cancelText: 'Batal'
+                                            }
+                                            }))
+                                        ">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                                    </svg>
+                                    Tarik Semua Published
+                                </button>
+                            </form>
                             @endif
                         </div>
                         
@@ -454,31 +477,65 @@
                         <div class="mb-4 flex flex-col sm:flex-row gap-2 justify-end">
                             {{-- ✅ MODIFIKASI: Gunakan $bulkActionData --}}
                             @if($bulkActionData['pencegahan']['has_approved'])
-                                <form action="{{ route('admin.bulk_publish') }}" method="POST" class="inline" onsubmit="return confirm('Anda yakin ingin PUBLISH semua data Approved di tab ini?');">
-                                    @csrf
-                                    <input type="hidden" name="model_type" value="pencegahan">
-                                    <input type="hidden" name="action" value="publish_all">
-                                    <input type="hidden" name="active_tab" x-bind:value="activeTab">
-                                    <button type="submit" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg bg-green-100 px-3 py-2 text-xs font-semibold text-green-700 transition hover:bg-green-200">
-                                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                        </svg>
-                                        Publish Semua Approved
-                                    </button>
-                                </form>
+                            <form x-ref="bulkPublishPencegahan"
+                                    action="{{ route('admin.bulk_publish') }}"
+                                    method="POST"
+                                    class="inline">
+                                @csrf
+                                <input type="hidden" name="model_type" value="gizi">
+                                <input type="hidden" name="action" value="publish_all">
+                                <input type="hidden" name="active_tab" x-bind:value="activeTab">
+
+                                <button type="button"
+                                        class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg bg-green-100 px-3 py-2 text-xs font-semibold text-green-700 transition hover:bg-green-200"
+                                        @click="
+                                            window.dispatchEvent(new CustomEvent('open-confirm', {
+                                            detail: {
+                                                form: $refs.bulkPublishGizi,
+                                                title: 'Publish Semua Approved',
+                                                message: 'Semua data berstatus Approved pada tab ini akan dipublikasikan.\nLanjutkan?',
+                                                okText: 'Ya, Publish',
+                                                cancelText: 'Batal'
+                                            }
+                                            }))
+                                        ">
+                                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
+                                    Publish Semua Approved
+                                </button>
+                            </form>
                             @endif
-                            {{-- ✅ MODIFIKASI: Gunakan $bulkActionData --}}
+
                             @if($bulkActionData['pencegahan']['has_published'])
-                                <form action="{{ route('admin.bulk_publish') }}" method="POST" class="inline" onsubmit="return confirm('Anda yakin ingin TARIK semua data Published di tab ini?');">
-                                    @csrf
-                                    <input type="hidden" name="model_type" value="pencegahan">
-                                    <input type="hidden" name="action" value="unpublish_all">
-                                    <input type="hidden" name="active_tab" x-bind:value="activeTab">
-                                    <button type="submit" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg bg-yellow-100 px-3 py-2 text-xs font-semibold text-yellow-700 transition hover:bg-yellow-200">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
-                                        Tarik Semua Published
-                                    </button>
-                                </form>
+                            <form x-ref="bulkUnpublishPencegahan"
+                                    action="{{ route('admin.bulk_publish') }}"
+                                    method="POST"
+                                    class="inline">
+                                @csrf
+                                <input type="hidden" name="model_type" value="gizi">
+                                <input type="hidden" name="action" value="unpublish_all">
+                                <input type="hidden" name="active_tab" x-bind:value="activeTab">
+
+                                <button type="button"
+                                        class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg bg-yellow-100 px-3 py-2 text-xs font-semibold text-yellow-700 transition hover:bg-yellow-200"
+                                        @click="
+                                            window.dispatchEvent(new CustomEvent('open-confirm', {
+                                            detail: {
+                                                form: $refs.bulkUnpublishGizi,
+                                                title: 'Tarik Semua Published',
+                                                message: 'Semua data berstatus Published pada tab ini akan ditarik (unpublish).\nLanjutkan?',
+                                                okText: 'Ya, Tarik',
+                                                cancelText: 'Batal'
+                                            }
+                                            }))
+                                        ">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                                    </svg>
+                                    Tarik Semua Published
+                                </button>
+                            </form>
                             @endif
                         </div>
                         
@@ -531,31 +588,65 @@
                         <div class="mb-4 flex flex-col sm:flex-row gap-2 justify-end">
                             {{-- ✅ MODIFIKASI: Gunakan $bulkActionData --}}
                             @if($bulkActionData['penanggulangan']['has_approved'])
-                                <form action="{{ route('admin.bulk_publish') }}" method="POST" class="inline" onsubmit="return confirm('Anda yakin ingin PUBLISH semua data Approved di tab ini?');">
-                                    @csrf
-                                    <input type="hidden" name="model_type" value="penanggulangan">
-                                    <input type="hidden" name="action" value="publish_all">
-                                    <input type="hidden" name="active_tab" x-bind:value="activeTab">
-                                    <button type="submit" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg bg-green-100 px-3 py-2 text-xs font-semibold text-green-700 transition hover:bg-green-200">
-                                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                        </svg>
-                                        Publish Semua Approved
-                                    </button>
-                                </form>
+                            <form x-ref="bulkPublishPenanggulangan"
+                                    action="{{ route('admin.bulk_publish') }}"
+                                    method="POST"
+                                    class="inline">
+                                @csrf
+                                <input type="hidden" name="model_type" value="gizi">
+                                <input type="hidden" name="action" value="publish_all">
+                                <input type="hidden" name="active_tab" x-bind:value="activeTab">
+
+                                <button type="button"
+                                        class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg bg-green-100 px-3 py-2 text-xs font-semibold text-green-700 transition hover:bg-green-200"
+                                        @click="
+                                            window.dispatchEvent(new CustomEvent('open-confirm', {
+                                            detail: {
+                                                form: $refs.bulkPublishGizi,
+                                                title: 'Publish Semua Approved',
+                                                message: 'Semua data berstatus Approved pada tab ini akan dipublikasikan.\nLanjutkan?',
+                                                okText: 'Ya, Publish',
+                                                cancelText: 'Batal'
+                                            }
+                                            }))
+                                        ">
+                                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
+                                    Publish Semua Approved
+                                </button>
+                            </form>
                             @endif
-                            {{-- ✅ MODIFIKASI: Gunakan $bulkActionData --}}
+
                             @if($bulkActionData['penanggulangan']['has_published'])
-                                <form action="{{ route('admin.bulk_publish') }}" method="POST" class="inline" onsubmit="return confirm('Anda yakin ingin TARIK semua data Published di tab ini?');">
-                                    @csrf
-                                    <input type="hidden" name="model_type" value="penanggulangan">
-                                    <input type="hidden" name="action" value="unpublish_all">
-                                    <input type="hidden" name="active_tab" x-bind:value="activeTab">
-                                    <button type="submit" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg bg-yellow-100 px-3 py-2 text-xs font-semibold text-yellow-700 transition hover:bg-yellow-200">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
-                                        Tarik Semua Published
-                                    </button>
-                                </form>
+                            <form x-ref="bulkUnpublishPenanggulangan"
+                                    action="{{ route('admin.bulk_publish') }}"
+                                    method="POST"
+                                    class="inline">
+                                @csrf
+                                <input type="hidden" name="model_type" value="gizi">
+                                <input type="hidden" name="action" value="unpublish_all">
+                                <input type="hidden" name="active_tab" x-bind:value="activeTab">
+
+                                <button type="button"
+                                        class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg bg-yellow-100 px-3 py-2 text-xs font-semibold text-yellow-700 transition hover:bg-yellow-200"
+                                        @click="
+                                            window.dispatchEvent(new CustomEvent('open-confirm', {
+                                            detail: {
+                                                form: $refs.bulkUnpublishGizi,
+                                                title: 'Tarik Semua Published',
+                                                message: 'Semua data berstatus Published pada tab ini akan ditarik (unpublish).\nLanjutkan?',
+                                                okText: 'Ya, Tarik',
+                                                cancelText: 'Batal'
+                                            }
+                                            }))
+                                        ">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                                    </svg>
+                                    Tarik Semua Published
+                                </button>
+                            </form>
                             @endif
                         </div>
                         
@@ -606,33 +697,66 @@
                     <div x-show="activeTab === 'desa'" style="display: none;">
                         {{-- TOMBOL AKSI MASSAL DESA --}}
                         <div class="mb-4 flex flex-col sm:flex-row gap-2 justify-end">
-                            {{-- ✅ MODIFIKASI: Gunakan $bulkActionData --}}
                             @if($bulkActionData['desa']['has_approved'])
-                                <form action="{{ route('admin.bulk_publish') }}" method="POST" class="inline" onsubmit="return confirm('Anda yakin ingin PUBLISH semua data Approved di tab ini?');">
-                                    @csrf
-                                    <input type="hidden" name="model_type" value="desa">
-                                    <input type="hidden" name="action" value="publish_all">
-                                    <input type="hidden" name="active_tab" x-bind:value="activeTab">
-                                    <button type="submit" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg bg-green-100 px-3 py-2 text-xs font-semibold text-green-700 transition hover:bg-green-200">
-                                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                        </svg>
-                                        Publish Semua Approved
-                                    </button>
-                                </form>
+                            <form x-ref="bulkPublishDesa"
+                                    action="{{ route('admin.bulk_publish') }}"
+                                    method="POST"
+                                    class="inline">
+                                @csrf
+                                <input type="hidden" name="model_type" value="gizi">
+                                <input type="hidden" name="action" value="publish_all">
+                                <input type="hidden" name="active_tab" x-bind:value="activeTab">
+
+                                <button type="button"
+                                        class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg bg-green-100 px-3 py-2 text-xs font-semibold text-green-700 transition hover:bg-green-200"
+                                        @click="
+                                            window.dispatchEvent(new CustomEvent('open-confirm', {
+                                            detail: {
+                                                form: $refs.bulkPublishGizi,
+                                                title: 'Publish Semua Approved',
+                                                message: 'Semua data berstatus Approved pada tab ini akan dipublikasikan.\nLanjutkan?',
+                                                okText: 'Ya, Publish',
+                                                cancelText: 'Batal'
+                                            }
+                                            }))
+                                        ">
+                                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
+                                    Publish Semua Approved
+                                </button>
+                            </form>
                             @endif
-                            {{-- ✅ MODIFIKASI: Gunakan $bulkActionData --}}
+
                             @if($bulkActionData['desa']['has_published'])
-                                <form action="{{ route('admin.bulk_publish') }}" method="POST" class="inline" onsubmit="return confirm('Anda yakin ingin TARIK semua data Published di tab ini?');">
-                                    @csrf
-                                    <input type="hidden" name="model_type" value="desa">
-                                    <input type="hidden" name="action" value="unpublish_all">
-                                    <input type="hidden" name="active_tab" x-bind:value="activeTab">
-                                    <button type="submit" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg bg-yellow-100 px-3 py-2 text-xs font-semibold text-yellow-700 transition hover:bg-yellow-200">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
-                                        Tarik Semua Published
-                                    </button>
-                                </form>
+                            <form x-ref="bulkUnpublishDesa"
+                                    action="{{ route('admin.bulk_publish') }}"
+                                    method="POST"
+                                    class="inline">
+                                @csrf
+                                <input type="hidden" name="model_type" value="gizi">
+                                <input type="hidden" name="action" value="unpublish_all">
+                                <input type="hidden" name="active_tab" x-bind:value="activeTab">
+
+                                <button type="button"
+                                        class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg bg-yellow-100 px-3 py-2 text-xs font-semibold text-yellow-700 transition hover:bg-yellow-200"
+                                        @click="
+                                            window.dispatchEvent(new CustomEvent('open-confirm', {
+                                            detail: {
+                                                form: $refs.bulkUnpublishGizi,
+                                                title: 'Tarik Semua Published',
+                                                message: 'Semua data berstatus Published pada tab ini akan ditarik (unpublish).\nLanjutkan?',
+                                                okText: 'Ya, Tarik',
+                                                cancelText: 'Batal'
+                                            }
+                                            }))
+                                        ">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                                    </svg>
+                                    Tarik Semua Published
+                                </button>
+                            </form>
                             @endif
                         </div>
                         
