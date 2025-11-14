@@ -51,27 +51,37 @@ class DivisiGiziController extends Controller
         $currentUser = Auth::user();
         $userRoleName = $currentUser->roles->first()->name;
 
+        // Section dari sidebar: 'tambah', 'data', 'detail'
+        $view = $request->get('view', 'data');
+
+        // Inisialisasi variabel tambahan untuk view detail
+        $desaList = collect();
+        $selectedDesa = null;
+        $dataDetail = collect();
+        $detailStat = null;
+
         // --- Period (asumsi kamu sudah punya $currentPeriod & $availablePeriods) ---
         $periodYm = $request->get('period'); // 'YYYY-MM'
-        
+
         // Resolve current period: from request, or latest available, or current month
         $availablePeriods = $this->getAvailablePeriodsForRole($userRoleName);
         $currentPeriod = $this->resolveCurrentPeriod($request, $userRoleName);
-        
+
         if (!$currentPeriod) {
-            $currentPeriod = $periodYm ? ($periodYm.'-01') : now()->startOfMonth()->toDateString();
+            $currentPeriod = $periodYm ? ($periodYm . '-01') : now()->startOfMonth()->toDateString();
             if (!in_array($currentPeriod, $availablePeriods)) {
                 $availablePeriods = array_merge([$currentPeriod], $availablePeriods);
                 rsort($availablePeriods);
             }
         }
 
-        // --- Status tab ---
+        // --- Status tab (hanya relevan untuk view "data") ---
         $status = $request->get('status', 'pending');
-        if (!in_array($status, ['pending','approved','published'])) {
+        if (!in_array($status, ['pending', 'approved', 'published'])) {
             $status = 'pending';
         }
 
+        // Query base: filter role & periode
         $base = DataGizi::whereHas('user.roles', function ($q) use ($userRoleName) {
                             $q->where('name', $userRoleName);
                         })
@@ -85,7 +95,7 @@ class DivisiGiziController extends Controller
             ->toArray();
 
         // ===================================================================
-        // KODE YANG DIPERBARUI: Query Agregasi
+        // Query Agregasi (untuk halaman "Data yang Sudah Diinput")
         // ===================================================================
         $aggregatedData = $base->clone()
             ->where('status', $status)
@@ -95,9 +105,9 @@ class DivisiGiziController extends Controller
                 DB::raw('COUNT(*) as total_anak'),
                 DB::raw('MAX(created_at) as tanggal_input_terbaru'),
 
-                // Stunting (TB/U) - Anda masih butuh ini untuk kolom "Kasus Stunting" jika ada
+                // Stunting (TB/U)
                 DB::raw('SUM(CASE WHEN zs_tb_u < -2 THEN 1 ELSE 0 END) as total_kasus_stunting'),
-                
+
                 // Data baru untuk rata-rata (SUM)
                 DB::raw('SUM(berat) as sum_berat'),
                 DB::raw('SUM(tinggi) as sum_tinggi'),
@@ -107,20 +117,70 @@ class DivisiGiziController extends Controller
             )
             ->groupBy('desa_kelurahan', 'status')
             ->orderBy('tanggal_input_terbaru', 'desc')
-            ->paginate(15);
-        // ===================================================================
-        // AKHIR KODE YANG DIPERBARUI
-        // ===================================================================
+            ->paginate(50)
+            ->onEachSide(1);
 
-        // Kumpulkan daftar periode yang tersedia (DI-UPDATE untuk selalu menyertakan $availablePeriods dari helper)
-        // $availablePeriods sudah di-fetch di atas
+        // ===================================================================
+        // Data tambahan untuk view "detail": list desa + detail per desa
+        // ===================================================================
+        if ($view === 'detail') {
+            // Daftar desa di periode & role ini
+            $desaList = $base->clone()
+                ->select('desa_kelurahan')
+                ->distinct()
+                ->orderBy('desa_kelurahan')
+                ->pluck('desa_kelurahan');
+
+            // Desa yang dipilih (dari query ?desa=...), fallback ke pertama
+            $selectedDesa = $request->get('desa');
+            if (!$selectedDesa && $desaList->count() > 0) {
+                $selectedDesa = $desaList->first();
+            }
+
+            if ($selectedDesa) {
+                $detailBase = $base->clone()
+                    ->where('desa_kelurahan', strtoupper($selectedDesa));
+
+                // Data individu (paginate)
+                $dataDetail = $detailBase->clone()
+                    ->orderBy('created_at', 'desc')
+                    ->paginate(50)
+                    ->onEachSide(1)
+                    ->appends([
+                        'view'   => 'detail',
+                        'desa'   => $selectedDesa,
+                        'period' => $currentPeriod ? date('Y-m', strtotime($currentPeriod)) : null,
+                    ]);
+                    
+
+                // Statistik ringkas
+                $detailStat = $detailBase->clone()
+                    ->selectRaw('
+                        COUNT(*) as total_anak,
+                        SUM(CASE WHEN zs_tb_u < -2 THEN 1 ELSE 0 END) as total_stunting,
+                        SUM(CASE WHEN zs_bb_u < -2 THEN 1 ELSE 0 END) as total_gizi_kurang,
+                        SUM(CASE WHEN zs_bb_tb < -2 THEN 1 ELSE 0 END) as total_kurus,
+                        AVG(zs_tb_u) as avg_zs_tbu,
+                        AVG(zs_bb_u) as avg_zs_bbu,
+                        AVG(zs_bb_tb) as avg_zs_bbtb,
+                        AVG(berat) as avg_berat,
+                        AVG(tinggi) as avg_tinggi
+                    ')
+                    ->first();
+            }
+        }
 
         return view('divisi.gizi.index', compact(
             'aggregatedData',
             'currentPeriod',
             'availablePeriods',
-            'status',          // <— buat tab aktif
-            'statusCounts'     // <— buat badge
+            'status',
+            'statusCounts',
+            'view',
+            'desaList',
+            'selectedDesa',
+            'dataDetail',
+            'detailStat'
         ));
     }
 
