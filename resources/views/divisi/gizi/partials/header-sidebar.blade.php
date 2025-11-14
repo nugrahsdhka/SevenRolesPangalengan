@@ -16,7 +16,7 @@
             </button>
             {{-- Judul Divisi --}}
             <h2 class="font-semibold text-lg sm:text-xl text-gray-800 leading-tight whitespace-nowrap">
-                {{ __('Divisi Gizi') }}
+                {{ __('Dashboard Divisi Gizi') }}
             </h2>
         </div>
         {{-- Kanan: Dropdown Menu User --}}
@@ -116,9 +116,6 @@
                                 <p class="text-xs text-gray-500 mt-0.5">Divisi Gizi</p>
                             </div>
                         </div>
-                        <p class="text-sm text-gray-600">
-                            Kelola data gizi per desa/kelurahan
-                        </p>
                     </div>
                     {{-- Close button --}}
                     <button
