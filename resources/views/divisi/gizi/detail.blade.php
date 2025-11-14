@@ -1,762 +1,524 @@
-<x-app-layout>
-    <x-slot name="title">
-        Detail Data Gizi - {{ strtoupper($desaKelurahan) }}
-    </x-slot>
-
-    <x-slot name="header">
-        <div class="flex justify-between items-center gap-4">
-            {{-- Kiri: Judul --}}
-            <div class="flex items-center gap-3 min-w-0 flex-1">
-                <a href="{{ route('gizi.index') }}" class="flex-shrink-0 p-2 rounded-lg hover:bg-gray-100 transition">
-                    <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+@php
+    // Periode aktif dalam format Y-m (aman walau $currentPeriod null)
+    $activePeriodYm = $periodYm ?? \Carbon\Carbon::parse($currentPeriod ?? now())->format('Y-m');
+    // Label periode untuk tampilan (contoh: "November 2025")
+    $currentPeriodLabel = $currentPeriod
+        ? \Carbon\Carbon::parse($currentPeriod)->isoFormat('MMMM Y')
+        : now()->isoFormat('MMMM Y');
+@endphp
+<div class="flex flex-col-reverse lg:flex-row gap-2 px-2 py-2 backdrop-blur-sm" x-data="{ sidebarOpen: false }">
+    {{-- List Desa --}}
+    <div class="order-2 lg:order-1 lg:relative z-50">
+        {{-- Sidebar desktop daftar desa --}}
+        <div class="hidden lg:block">
+            <div class="lg:sticky lg:top-4">
+                {{-- Tombol toggle sidebar (chevron) --}}
+                <button type="button" @click="sidebarOpen = !sidebarOpen"
+                    class="absolute top-16 right-0 translate-x-full z-50
+                                bg-white border border-l-0 border-gray-200 
+                                rounded-r-lg px-1 py-3 text-gray-500 hover:text-emerald-600
+                                active:bg-gray-100 transition-colors"
+                    title="Toggle sidebar">
+                    {{-- Ikon Chevron Left (tutup) --}}
+                    <svg x-show="sidebarOpen" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
                     </svg>
-                </a>
-                <div class="min-w-0">
-                    <h2 class="font-semibold text-lg sm:text-xl text-gray-800 leading-tight truncate">
-                        {{ strtoupper($desaKelurahan) }}
-                    </h2>
-                    <p class="text-sm text-gray-500">Detail Data Gizi per Anak</p>
-                </div>
-            </div>
-
-            {{-- Kanan: Dropdown Menu User --}}
-            <div class="relative" x-data="{ open: false }">
-                <button @click="open = !open" @click.away="open = false"
-                    class="flex items-center justify-center h-10 w-10 rounded-full bg-red-600 text-white font-semibold text-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all hover:scale-105 flex-shrink-0"
-                    type="button" title="{{ auth()->user()->name }}">
-                    @php
-                        $words = explode(' ', trim(auth()->user()->name));
-                        $initials = '';
-                        foreach ($words as $word) {
-                            if (!empty($word)) {
-                                $initials .= strtoupper(substr($word, 0, 1));
-                            }
-                        }
-                        if (strlen($initials) > 2) {
-                            $initials = substr($initials, 0, 1) . substr($initials, -1);
-                        }
-                    @endphp
-                    {{ $initials }}
+                    {{-- Ikon Chevron Right (buka) --}}
+                    <svg x-show="!sidebarOpen" style="display: none;" class="w-4 h-4" fill="none"
+                        stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                    </svg>
                 </button>
+                {{-- Card sidebar desa --}}
+                <div class="bg-white/40 backdrop-blur-md border border-gray-200/50 rounded-xl overflow-hidden transition-all duration-300 ease-in-out"
+                    :class="sidebarOpen ? 'lg:w-[250px]' : 'lg:w-0'">
 
-                <div x-show="open" x-transition
-                    class="absolute right-0 mt-2 w-56 rounded-lg bg-white shadow-lg ring-1 ring-black ring-opacity-5 z-50 overflow-hidden"
-                    style="display: none;">
-                    <div class="py-1">
-                        <div class="px-4 py-3 border-b border-gray-100">
-                            <p class="text-sm font-medium text-gray-900 truncate">{{ auth()->user()->name }}</p>
-                            <p class="text-xs text-gray-500 truncate">{{ auth()->user()->email }}</p>
-                        </div>
-                        <a href="{{ route('profile.index') }}"
-                            class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" viewBox="0 0 20 20"
-                                fill="currentColor">
-                                <path fill-rule="evenodd"
-                                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 16a5.986 5.986 0 004.546-2.084A5 5 0 0012 11z"
-                                    clip-rule="evenodd" />
-                            </svg>
-                            <span class="font-medium">Profil Saya</span>
-                        </a>
-                        <div class="border-t border-gray-100 my-1"></div>
-                        <form method="POST" action="{{ route('logout') }}">
-                            @csrf
-                            <button type="submit"
-                                class="flex w-full items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors">
-                                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                                </svg>
-                                <span class="font-medium">Log Out</span>
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </x-slot>
-
-    <div class="px-1 py-2 bg-gradient-to-br from-slate-50 via-rose-50/30 to-slate-50">
-        <div class="max-w-7xl mx-auto sm:px-6">
-            {{-- Alert Messages --}}
-            @if (session('success'))
-                <div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 5000)"
-                    class="mb-2 flex items-center gap-3 rounded-xl bg-green-50 p-4 ring-1 ring-green-200">
-                    <svg class="h-5 w-5 text-green-600 flex-shrink-0" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    <p class="text-sm font-medium text-green-900">{{ session('success') }}</p>
-                    <button @click="show = false" class="ml-auto text-green-600 hover:text-green-800">
-                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                    </button>
-                </div>
-            @endif
-
-            @if (session('error'))
-                <div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 5000)"
-                    class="mb-2 flex items-center gap-3 rounded-xl bg-red-50 p-4 ring-1 ring-red-200">
-                    <svg class="h-5 w-5 text-red-600 flex-shrink-0" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    <p class="text-sm font-medium text-red-900">{{ session('error') }}</p>
-                    <button @click="show = false" class="ml-auto text-red-600 hover:text-red-800">
-                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                    </button>
-                </div>
-            @endif
-
-            {{-- Card Statistik Desa --}}
-            <div x-data="{
-                openStats: false,
-                selectedStat: 'total',
-                stats: {
-                    total: {
-                        label: 'Total Anak',
-                        value: '{{ $statistik->total_anak ?? 0 }}',
-                        color: 'blue',
-                        icon: 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z'
-                    },
-                    stunting: {
-                        label: 'Kasus Stunting',
-                        value: '{{ $statistik->total_stunting ?? 0 }}',
-                        subtitle: '{{ $statistik->total_anak > 0 ? number_format(($statistik->total_stunting / $statistik->total_anak) * 100, 1) : 0 }}%',
-                        color: 'red',
-                        icon: 'M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z'
-                    },
-                    tinggi: {
-                        label: 'Rata-rata Tinggi',
-                        value: '{{ $statistik->avg_tinggi ? number_format($statistik->avg_tinggi, 1) : 0 }} cm',
-                        color: 'green',
-                        icon: 'M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z'
-                    },
-                    zs: {
-                        label: 'Rata-rata ZS TB/U',
-                        value: '{{ $statistik->avg_zs_tbu ? number_format($statistik->avg_zs_tbu, 2) : '0.00' }}',
-                        color: '{{ $statistik->avg_zs_tbu < -2 ? 'red' : 'green' }}',
-                        icon: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z'
-                    }
-                }
-            }" class="mb-3 mt-1 relative z-20">
-
-                {{-- Mobile View: Dropdown --}}
-                <div class="lg:hidden relative">
-                    <div class="relative">
-                        {{-- Selected Stat Display --}}
-                        <button @click="openStats = !openStats"
-                            class="w-full bg-white rounded-xl p-5 shadow-sm ring-1 ring-gray-900/5 flex items-center justify-between">
-                            <div class="flex items-center gap-4 flex-1">
-                                {{-- Icon --}}
-                                <div class="p-3 rounded-lg"
-                                    :class="{
-                                        'bg-blue-100': selectedStat === 'total',
-                                        'bg-red-100': selectedStat === 'stunting',
-                                        'bg-green-100': selectedStat === 'tinggi',
-                                        'bg-red-100': selectedStat === 'zs' &&
-                                            {{ $statistik->avg_zs_tbu < -2 ? 'true' : 'false' }},
-                                        'bg-green-100': selectedStat === 'zs' &&
-                                            {{ $statistik->avg_zs_tbu >= -2 ? 'true' : 'false' }}
-                                    }">
-                                    <svg class="w-6 h-6"
-                                        :class="{
-                                            'text-blue-600': selectedStat === 'total',
-                                            'text-red-600': selectedStat === 'stunting',
-                                            'text-green-600': selectedStat === 'tinggi',
-                                            'text-red-600': selectedStat === 'zs' &&
-                                                {{ $statistik->avg_zs_tbu < -2 ? 'true' : 'false' }},
-                                            'text-green-600': selectedStat === 'zs' &&
-                                                {{ $statistik->avg_zs_tbu >= -2 ? 'true' : 'false' }}
-                                        }"
-                                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            :d="stats[selectedStat].icon" />
-                                    </svg>
-                                </div>
-
-                                {{-- Content --}}
-                                <div class="text-left flex-1">
-                                    <p class="text-sm font-medium text-gray-500" x-text="stats[selectedStat].label">
-                                    </p>
-                                    <p class="text-2xl font-bold mt-1"
-                                        :class="{
-                                            'text-gray-900': selectedStat === 'total' ||
-                                                selectedStat === 'tinggi',
-                                            'text-red-600': selectedStat === 'stunting' || (
-                                                selectedStat === 'zs' &&
-                                                {{ $statistik->avg_zs_tbu < -2 ? 'true' : 'false' }}),
-                                            'text-green-600': selectedStat === 'zs' &&
-                                                {{ $statistik->avg_zs_tbu >= -2 ? 'true' : 'false' }}
-                                        }"
-                                        x-text="stats[selectedStat].value"></p>
-                                    <p class="text-xs text-gray-500 mt-1" x-show="stats[selectedStat].subtitle"
-                                        x-text="stats[selectedStat].subtitle"></p>
-                                </div>
-                            </div>
-
-                            {{-- Dropdown Arrow --}}
-                            <svg class="w-5 h-5 text-gray-400 transition-transform"
-                                :class="{ 'rotate-180': openStats }" fill="none" stroke="currentColor"
+                    {{-- Header sidebar --}}
+                    <div
+                        class="p-4 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-white rounded-t-xl whitespace-nowrap">
+                        <h4 class="text-sm font-bold text-gray-900 flex items-center gap-2">
+                            <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor"
                                 viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M19 9l-7 7-7-7" />
+                                    d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                             </svg>
-                        </button>
-
-                        {{-- Dropdown Menu --}}
-                        <div x-show="openStats" @click.away="openStats = false"
-                            x-transition:enter="transition ease-out duration-200"
-                            x-transition:enter-start="opacity-0 scale-95"
-                            x-transition:enter-end="opacity-100 scale-100"
-                            x-transition:leave="transition ease-in duration-150"
-                            x-transition:leave-start="opacity-100 scale-100"
-                            x-transition:leave-end="opacity-0 scale-95"
-                            class="absolute left-0 right-0 z-30 mt-2 w-full bg-white rounded-xl shadow-lg ring-1 ring-black ring-opacity-5 overflow-hidden"
-                            {{-- ✅ z-30 supaya di atas thead --}} style="display: none;">
-
-                            {{-- Total Anak --}}
-                            <button @click="selectedStat = 'total'; openStats = false"
-                                class="w-full px-5 py-4 hover:bg-gray-50 transition flex items-center gap-3 border-b border-gray-100">
-                                <div class="p-2 bg-blue-100 rounded-lg">
-                                    <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                                    </svg>
-                                </div>
-                                <div class="text-left">
-                                    <p class="text-sm font-medium text-gray-700">Total Anak</p>
-                                    <p class="text-lg font-bold text-gray-900">{{ $statistik->total_anak ?? 0 }}</p>
-                                </div>
-                            </button>
-
-                            {{-- Kasus Stunting --}}
-                            <button @click="selectedStat = 'stunting'; openStats = false"
-                                class="w-full px-5 py-4 hover:bg-gray-50 transition flex items-center gap-3 border-b border-gray-100">
-                                <div class="p-2 bg-red-100 rounded-lg">
-                                    <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                                    </svg>
-                                </div>
-                                <div class="text-left">
-                                    <p class="text-sm font-medium text-gray-700">Kasus Stunting</p>
-                                    <p class="text-lg font-bold text-red-600">
-                                        {{ $statistik->total_stunting ?? 0 }}
-                                        <span class="text-xs text-gray-500">
-                                            ({{ $statistik->total_anak > 0 ? number_format(($statistik->total_stunting / $statistik->total_anak) * 100, 1) : 0 }}%)
-                                        </span>
-                                    </p>
-                                </div>
-                            </button>
-
-                            {{-- Rata-rata Tinggi --}}
-                            <button @click="selectedStat = 'tinggi'; openStats = false"
-                                class="w-full px-5 py-4 hover:bg-gray-50 transition flex items-center gap-3 border-b border-gray-100">
-                                <div class="p-2 bg-green-100 rounded-lg">
-                                    <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
-                                    </svg>
-                                </div>
-                                <div class="text-left">
-                                    <p class="text-sm font-medium text-gray-700">Rata-rata Tinggi</p>
-                                    <p class="text-lg font-bold text-gray-900">
-                                        {{ $statistik->avg_tinggi ? number_format($statistik->avg_tinggi, 1) : 0 }} cm
-                                    </p>
-                                </div>
-                            </button>
-
-                            {{-- Rata-rata ZS TB/U --}}
-                            <button @click="selectedStat = 'zs'; openStats = false"
-                                class="w-full px-5 py-4 hover:bg-gray-50 transition flex items-center gap-3">
-                                <div
-                                    class="p-2 {{ $statistik->avg_zs_tbu < -2 ? 'bg-red-100' : 'bg-green-100' }} rounded-lg">
-                                    <svg class="w-5 h-5 {{ $statistik->avg_zs_tbu < -2 ? 'text-red-600' : 'text-green-600' }}"
-                                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                                    </svg>
-                                </div>
-                                <div class="text-left">
-                                    <p class="text-sm font-medium text-gray-700">Rata-rata ZS TB/U</p>
-                                    <p
-                                        class="text-lg font-bold {{ $statistik->avg_zs_tbu < -2 ? 'text-red-600' : 'text-green-600' }}">
-                                        {{ $statistik->avg_zs_tbu ? number_format($statistik->avg_zs_tbu, 2) : '0.00' }}
-                                    </p>
-                                </div>
-                            </button>
-                        </div>
+                            Daftar Desa/Kelurahan
+                        </h4>
+                        @if (!$desaList->isEmpty())
+                            <p class="text-xs text-gray-500 mt-1">
+                                {{ count($desaList) }} desa tersedia
+                            </p>
+                        @endif
                     </div>
-                </div>
-
-                {{-- Desktop View: Grid (Tetap sama seperti sebelumnya) --}}
-                <div class="hidden lg:grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                    {{-- Total Anak --}}
-                    <div class="bg-white rounded-xl p-5 shadow-sm ring-1 ring-gray-900/5">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-sm font-medium text-gray-500">Total Anak</p>
-                                <p class="text-2xl font-bold text-gray-900 mt-1">{{ $statistik->total_anak ?? 0 }}</p>
-                            </div>
-                            <div class="p-3 bg-blue-100 rounded-lg">
-                                <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor"
+                    {{-- Isi sidebar: list desa / empty state --}}
+                    <div class="p-3 max-h-[50vh] sm:max-h-[60vh] lg:max-h-[calc(100vh-220px)] overflow-y-auto
+                                transition-opacity duration-100"
+                        :class="!sidebarOpen ? 'opacity-0' : 'opacity-100'">
+                        @if ($desaList->isEmpty())
+                            {{-- Empty state sidebar --}}
+                            <div class="flex flex-col items-center justify-center py-8 text-center">
+                                <svg class="w-16 h-16 text-gray-300" fill="none" stroke="currentColor"
                                     viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                                        d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
                                 </svg>
-                            </div>
-                        </div>
-                    </div>
-
-                    {{-- Total Stunting --}}
-                    <div class="bg-white rounded-xl p-5 shadow-sm ring-1 ring-gray-900/5">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-sm font-medium text-gray-500">Kasus Stunting</p>
-                                <p class="text-2xl font-bold text-red-600 mt-1">{{ $statistik->total_stunting ?? 0 }}
-                                </p>
-                                <p class="text-xs text-gray-500 mt-1">
-                                    {{ $statistik->total_anak > 0 ? number_format(($statistik->total_stunting / $statistik->total_anak) * 100, 1) : 0 }}%
+                                <p class="mt-3 text-sm text-gray-500">
+                                    Tidak ada desa dengan data<br>pada periode ini
                                 </p>
                             </div>
-                            <div class="p-3 bg-red-100 rounded-lg">
-                                <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                                </svg>
-                            </div>
-                        </div>
-                    </div>
-
-                    {{-- Rata-rata TB --}}
-                    <div class="bg-white rounded-xl p-5 shadow-sm ring-1 ring-gray-900/5">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-sm font-medium text-gray-500">Rata-rata Tinggi</p>
-                                <p class="text-2xl font-bold text-gray-900 mt-1">
-                                    {{ $statistik->avg_tinggi ? number_format($statistik->avg_tinggi, 1) : 0 }} cm</p>
-                            </div>
-                            <div class="p-3 bg-green-100 rounded-lg">
-                                <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
-                                </svg>
-                            </div>
-                        </div>
-                    </div>
-
-                    {{-- Rata-rata ZS TB/U --}}
-                    <div class="bg-white rounded-xl p-5 shadow-sm ring-1 ring-gray-900/5">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-sm font-medium text-gray-500">Rata-rata ZS TB/U</p>
-                                <p
-                                    class="text-2xl font-bold {{ $statistik->avg_zs_tbu < -2 ? 'text-red-600' : 'text-green-600' }} mt-1">
-                                    {{ $statistik->avg_zs_tbu ? number_format($statistik->avg_zs_tbu, 2) : '0.00' }}
-                                </p>
-                            </div>
-                            <div
-                                class="p-3 {{ $statistik->avg_zs_tbu < -2 ? 'bg-red-100' : 'bg-green-100' }} rounded-lg">
-                                <svg class="w-6 h-6 {{ $statistik->avg_zs_tbu < -2 ? 'text-red-600' : 'text-green-600' }}"
-                                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                                </svg>
-                            </div>
-                        </div>
+                        @else
+                            {{-- List desa --}}
+                            <ul class="space-y-1.5">
+                                @foreach ($desaList as $desa)
+                                    @php
+                                        $isActiveDesa =
+                                            $selectedDesa && strtoupper($selectedDesa) === strtoupper($desa);
+                                    @endphp
+                                    <li>
+                                        <a href="{{ route('gizi.index', [
+                                            'view' => 'detail',
+                                            'period' => $activePeriodYm,
+                                            'desa' => $desa,
+                                        ]) }}"
+                                            class="group flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200
+                                                {{ $isActiveDesa
+                                                    ? 'bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-md shadow-emerald-500/30'
+                                                    : 'text-gray-700 bg-gray-50 hover:bg-emerald-50 hover:text-emerald-700 border border-gray-200 hover:border-emerald-300 hover:shadow-sm' }}">
+                                            <span class="truncate uppercase">{{ $desa }}</span>
+                                            @if ($isActiveDesa)
+                                                <span
+                                                    class="ml-2 flex-shrink-0 flex items-center justify-center w-6 h-6 rounded-full bg-white/20">
+                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor"
+                                                        viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2.5" d="M5 13l4 4L19 7" />
+                                                    </svg>
+                                                </span>
+                                            @else
+                                                <svg class="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity text-emerald-600"
+                                                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2" d="M9 5l7 7-7 7" />
+                                                </svg>
+                                            @endif
+                                        </a>
+                                    </li>
+                                @endforeach
+                            </ul>
+                        @endif
                     </div>
                 </div>
             </div>
-
-
-            {{-- Tabel Data Individual --}}
-            <section class="rounded-2xl bg-white p-6 shadow-lg ring-1 ring-gray-900/5 sm:p-8">
-                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+        </div>
+        {{-- Header kecil mobile di atas konten --}}
+        <div
+            class="block md:hidden rounded-xl shadow-md border border-gray-200/40 p-3 bg-white/30 backdrop-blur-md mb-3">
+            <div class="flex flex-col gap-4">
+                <div class="flex flex-col md:flex-row justify-between md:items-center">
                     <div>
-                        <h3 class="text-lg font-semibold text-gray-900">Data Individual Anak</h3>
-                        <p class="text-sm text-gray-500">Daftar lengkap data gizi per anak di
-                            {{ strtoupper($desaKelurahan) }}</p>
+                        <h3 class="text-center md:text-left text-sm md:text-lg font-extrabold text-gray-800">
+                            Detail Data Gizi per Desa/Kelurahan
+                        </h3>
                     </div>
                 </div>
+            </div>
+        </div>
+        {{-- Selector desa + periode untuk mobile --}}
+        <div class="block lg:hidden bg-white/40 backdrop-blur-md border border-gray-200/40 rounded-xl shadow-md p-3">
 
-                <div class="overflow-hidden rounded-xl border border-gray-200">
-                    <!-- Scroll horizontal hanya di mobile -->
-                    <div class="overflow-x-auto lg:overflow-x-visible">
-                        <!-- Body-only vertical scroll -->
-                        <div class="max-h-[500px] overflow-y-auto bg-white">
-                            <table class="w-full min-w-[1100px] lg:min-w-0 lg:table-fixed">
-                                <!-- Kolom: di desktop No=64px, Tanggal=200px; sisanya auto -->
-                                <colgroup>
-                                    <col class="w-[64px]" />
-                                    <col class="w-[200px]" />
-                                    <!-- 9 kolom sisa: biarkan auto agar bagi rata lebar tersisa -->
-                                    <col />
-                                    <col />
-                                    <col />
-                                    <col />
-                                    <col />
-                                    <col />
-                                    <col />
-                                    <col />
-                                    <col />
-                                </colgroup>
+            {{-- Dropdown desa mobile --}}
+            <label for="mobile-desa-selector" class="text-sm font-bold text-gray-900 flex items-center gap-2 mb-3">
+                <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                </svg>
+                Pilih Desa/Kelurahan
+            </label>
 
-                                <thead class="bg-gray-50 border-b border-gray-200">
-                                    <tr>
-                                        <th scope="col"
-                                            class="sticky top-0 z-10 bg-gray-50 px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-700">
-                                            No</th>
-                                        <th scope="col"
-                                            class="sticky top-0 z-10 bg-gray-50 px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-700">
-                                            Tanggal Input</th>
-                                        <th scope="col"
-                                            class="sticky top-0 z-10 bg-gray-50 px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-gray-700">
-                                            Berat (kg)</th>
-                                        <th scope="col"
-                                            class="sticky top-0 z-10 bg-gray-50 px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-gray-700">
-                                            Tinggi (cm)</th>
-                                        <th scope="col"
-                                            class="sticky top-0 z-10 bg-gray-50 px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-gray-700">
-                                            BB/U</th>
-                                        <th scope="col"
-                                            class="sticky top-0 z-10 bg-gray-50 px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-gray-700">
-                                            ZS BB/U</th>
-                                        <th scope="col"
-                                            class="sticky top-0 z-10 bg-gray-50 px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-gray-700">
-                                            TB/U</th>
-                                        <th scope="col"
-                                            class="sticky top-0 z-10 bg-gray-50 px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-gray-700">
-                                            ZS TB/U</th>
-                                        <th scope="col"
-                                            class="sticky top-0 z-10 bg-gray-50 px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-gray-700">
-                                            BB/TB</th>
-                                        <th scope="col"
-                                            class="sticky top-0 z-10 bg-gray-50 px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-gray-700">
-                                            ZS BB/TB</th>
-                                        <th scope="col"
-                                            class="sticky top-0 z-10 bg-gray-50 px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-gray-700">
-                                            Aksi</th>
-                                    </tr>
-                                </thead>
-
-                                <tbody class="divide-y divide-gray-200">
-                                    @forelse ($dataGizi as $index => $data)
-                                        <tr class="transition hover:bg-gray-50">
-                                            {{-- No --}}
-                                            <td class="whitespace-nowrap px-4 py-4 text-sm text-gray-600">
-                                                {{ $dataGizi->firstItem() + $index }}
-                                            </td>
-
-                                            {{-- Tanggal Input --}}
-                                            <td class="whitespace-nowrap px-4 py-4 text-sm text-gray-600">
-                                                {{ \Carbon\Carbon::parse($data->created_at)->isoFormat('D MMM YYYY, HH:mm') }}
-                                            </td>
-
-                                            {{-- Berat --}}
-                                            <td class="px-4 py-4 text-sm text-gray-900 text-center font-medium">
-                                                {{ is_numeric($data->berat) ? number_format($data->berat, 2) : '-' }}
-                                            </td>
-
-                                            {{-- Tinggi --}}
-                                            <td class="px-4 py-4 text-sm text-gray-900 text-center font-medium">
-                                                {{ is_numeric($data->tinggi) ? number_format($data->tinggi, 2) : '-' }}
-                                            </td>
-
-                                            {{-- BB/U --}}
-                                            <td
-                                                class="px-4 py-4 text-sm text-gray-600 text-center lg:whitespace-normal">
-                                                {{ $data->status_bb_u ?? '-' }}
-                                            </td>
-
-                                            {{-- ZS BB/U --}}
-                                            <td class="px-4 py-4 text-sm text-center">
-                                                @php $z = $data->zs_bb_u; @endphp
-                                                <span
-                                                    class="font-medium {{ is_numeric($z) && $z < -2 ? 'text-red-600' : 'text-gray-900' }}">
-                                                    {{ is_numeric($z) ? number_format($z, 2) : '-' }}
-                                                </span>
-                                            </td>
-
-                                            {{-- TB/U --}}
-                                            <td
-                                                class="px-4 py-4 text-sm text-gray-600 text-center lg:whitespace-normal">
-                                                {{ $data->status_tb_u ?? '-' }}
-                                            </td>
-
-                                            {{-- ZS TB/U --}}
-                                            <td class="px-4 py-4 text-sm text-center">
-                                                @php $z = $data->zs_tb_u; @endphp
-                                                <span
-                                                    class="font-medium {{ is_numeric($z) && $z < -2 ? 'text-red-600' : 'text-gray-900' }}">
-                                                    {{ is_numeric($z) ? number_format($z, 2) : '-' }}
-                                                </span>
-                                            </td>
-
-                                            {{-- BB/TB --}}
-                                            <td
-                                                class="px-4 py-4 text-sm text-gray-600 text-center lg:whitespace-normal">
-                                                {{ $data->status_bb_tb ?? '-' }}
-                                            </td>
-
-                                            {{-- ZS BB/TB --}}
-                                            <td class="px-4 py-4 text-sm text-center">
-                                                @php $z = $data->zs_bb_tb; @endphp
-                                                <span
-                                                    class="font-medium {{ is_numeric($z) && $z < -2 ? 'text-red-600' : 'text-gray-900' }}">
-                                                    {{ is_numeric($z) ? number_format($z, 2) : '-' }}
-                                                </span>
-                                            </td>
-
-                                            {{-- Aksi --}}
-                                            <td class="px-4 py-4">
-                                                <div class="flex items-center justify-center gap-2">
-                                                    <a href="{{ route('gizi.edit', $data->id) }}"
-                                                        class="text-sm font-medium text-blue-600 hover:text-blue-800 transition">
-                                                        Edit
-                                                    </a>
-                                                    <span class="text-gray-300">|</span>
-
-                                                    <form action="{{ route('gizi.destroy', $data->id) }}"
-                                                        method="POST" x-data>
-                                                        @csrf
-                                                        @method('DELETE')
-                                                        <button type="button"
-                                                            @click.prevent="$dispatch('open-confirm', { form: $el.closest('form') })"
-                                                            class="text-sm font-medium text-red-600 hover:text-red-800 transition">
-                                                            Hapus
-                                                        </button>
-                                                    </form>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    @empty
-                                        <tr>
-                                            <td colspan="11" class="px-6 py-12 text-center">
-                                                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none"
-                                                    viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                        stroke-width="2"
-                                                        d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
-                                                </svg>
-                                                <p class="mt-4 text-sm text-gray-500">Belum ada data untuk desa ini</p>
-                                            </td>
-                                        </tr>
-                                    @endforelse
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                {{-- Pagination --}}
-                @php $paginator = $dataGizi; @endphp
-                @if ($paginator->hasPages())
-                    <div class="mt-6 sm:mt-8 px-4 sm:px-0">
-                        {{-- Mobile Version: Compact Pagination --}}
-                        <div class="flex sm:hidden flex-col gap-3">
-                            <div class="flex items-center justify-center">
-                                <nav
-                                    class="inline-flex items-center gap-1 rounded-lg bg-white p-1.5 shadow-sm border border-gray-100">
-                                    {{-- Previous Button --}}
-                                    @if ($paginator->onFirstPage())
-                                        <span
-                                            class="inline-flex items-center justify-center w-9 h-9 rounded-md text-gray-300 cursor-not-allowed"><svg
-                                                class="w-4 h-4" fill="none" stroke="currentColor"
-                                                viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M15 19l-7-7 7-7" />
-                                            </svg></span>
-                                    @else
-                                        <a href="{{ $paginator->previousPageUrl() }}"
-                                            class="inline-flex items-center justify-center w-9 h-9 rounded-md text-gray-600 hover:bg-red-50 hover:text-red-600 transition-all duration-200"><svg
-                                                class="w-4 h-4" fill="none" stroke="currentColor"
-                                                viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M15 19l-7-7 7-7" />
-                                            </svg></a>
-                                    @endif
-
-                                    {{-- First Page --}}
-                                    @if ($paginator->currentPage() == 1)
-                                        <span
-                                            class="inline-flex items-center justify-center w-9 h-9 rounded-md bg-red-500 text-white font-medium text-sm shadow-sm">1</span>
-                                    @else
-                                        <a href="{{ $paginator->url(1) }}"
-                                            class="inline-flex items-center justify-center w-9 h-9 rounded-md text-gray-600 hover:bg-red-50 hover:text-red-600 font-medium text-sm transition-all duration-200">1</a>
-                                    @endif
-
-                                    {{-- Left Ellipsis --}}
-                                    @if ($paginator->currentPage() > 2)
-                                        <span
-                                            class="inline-flex items-center justify-center w-9 h-9 rounded-md text-gray-400">...</span>
-                                    @endif
-
-                                    {{-- Current Page (if not first or last) --}}
-                                    @if ($paginator->currentPage() != 1 && $paginator->currentPage() != $paginator->lastPage())
-                                        <span
-                                            class="inline-flex items-center justify-center w-9 h-9 rounded-md bg-red-500 text-white font-medium text-sm shadow-sm">{{ $paginator->currentPage() }}</span>
-                                    @endif
-
-                                    {{-- Right Ellipsis --}}
-                                    @if ($paginator->currentPage() < $paginator->lastPage() - 1)
-                                        <span
-                                            class="inline-flex items-center justify-center w-9 h-9 rounded-md text-gray-400">...</span>
-                                    @endif
-
-                                    {{-- Last Page --}}
-                                    @if ($paginator->lastPage() > 1)
-                                        @if ($paginator->currentPage() == $paginator->lastPage())
-                                            <span
-                                                class="inline-flex items-center justify-center w-9 h-9 rounded-md bg-red-500 text-white font-medium text-sm shadow-sm">{{ $paginator->lastPage() }}</span>
-                                        @else
-                                            <a href="{{ $paginator->url($paginator->lastPage()) }}"
-                                                class="inline-flex items-center justify-center w-9 h-9 rounded-md text-gray-600 hover:bg-red-50 hover:text-red-600 font-medium text-sm transition-all duration-200">{{ $paginator->lastPage() }}</a>
-                                        @endif
-                                    @endif
-
-                                    {{-- Next Button --}}
-                                    @if ($paginator->hasMorePages())
-                                        <a href="{{ $paginator->nextPageUrl() }}"
-                                            class="inline-flex items-center justify-center w-9 h-9 rounded-md text-gray-600 hover:bg-red-50 hover:text-red-600 transition-all duration-200"><svg
-                                                class="w-4 h-4" fill="none" stroke="currentColor"
-                                                viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M9 5l7 7-7 7" />
-                                            </svg></a>
-                                    @else
-                                        <span
-                                            class="inline-flex items-center justify-center w-9 h-9 rounded-md text-gray-300 cursor-not-allowed"><svg
-                                                class="w-4 h-4" fill="none" stroke="currentColor"
-                                                viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M9 5l7 7-7 7" />
-                                            </svg></span>
-                                    @endif
-                                </nav>
-                            </div>
-
-                            {{-- Mobile Go To Form --}}
-                            <div class="flex items-center justify-center gap-2 mt-3">
-                                <span class="text-sm text-gray-500">Go to:</span>
-                                <form method="GET" action="{{ $paginator->url(1) }}"
-                                    class="flex items-center gap-2"
-                                    onsubmit="event.preventDefault(); const page = this.querySelector('input[name=page]').value; if(page > 0 && page <= {{ $paginator->lastPage() }}) window.location.href = this.action.replace('page=1', 'page=' + page);">
-                                    <input type="number" name="page" min="1"
-                                        max="{{ $paginator->lastPage() }}"
-                                        placeholder="{{ $paginator->currentPage() }}"
-                                        class="w-16 px-3 py-2 text-sm text-center border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent">
-                                    <button type="submit"
-                                        class="px-4 py-2 text-sm font-medium text-white bg-red-500 rounded-md hover:bg-red-600 transition-all duration-200 shadow-sm">Go</button>
-                                </form>
-                            </div>
-                        </div>
-
-                        {{-- Desktop/Tablet Version: Custom Pagination --}}
-                        <div class="hidden sm:flex flex-col items-center gap-3">
-                            <nav
-                                class="inline-flex items-center gap-1 rounded-lg bg-white p-1.5 shadow-sm border border-gray-100">
-                                {{-- Previous Button --}}
-                                @if ($paginator->onFirstPage())
-                                    <span
-                                        class="inline-flex items-center justify-center w-9 h-9 md:w-10 md:h-10 rounded-md text-gray-300 cursor-not-allowed"><svg
-                                            class="w-5 h-5" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M15 19l-7-7 7-7" />
-                                        </svg></span>
-                                @else
-                                    <a href="{{ $paginator->previousPageUrl() }}"
-                                        class="inline-flex items-center justify-center w-9 h-9 md:w-10 md:h-10 rounded-md text-gray-600 hover:bg-red-50 hover:text-red-600 transition-all duration-200"><svg
-                                            class="w-5 h-5" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M15 19l-7-7 7-7" />
-                                        </svg></a>
-                                @endif
-
-                                {{-- Pagination Elements --}}
-                                @foreach ($paginator->links()->elements as $element)
-                                    {{-- "Three Dots" Separator --}}
-                                    @if (is_string($element))
-                                        <span
-                                            class="inline-flex items-center justify-center w-9 h-9 md:w-10 md:h-10 rounded-md text-gray-400">...</span>
-                                    @endif
-                                    {{-- Array Of Links --}}
-                                    @if (is_array($element))
-                                        @foreach ($element as $page => $url)
-                                            @if ($page == $paginator->currentPage())
-                                                <span
-                                                    class="inline-flex items-center justify-center w-9 h-9 md:w-10 md:h-10 rounded-md bg-red-500 text-white font-medium text-sm shadow-sm">{{ $page }}</span>
-                                            @else
-                                                <a href="{{ $url }}"
-                                                    class="inline-flex items-center justify-center w-9 h-9 md:w-10 md:h-10 rounded-md text-gray-600 hover:bg-red-50 hover:text-red-600 font-medium text-sm transition-all duration-200">{{ $page }}</a>
-                                            @endif
-                                        @endforeach
-                                    @endif
-                                @endforeach
-
-                                {{-- Next Button --}}
-                                @if ($paginator->hasMorePages())
-                                    <a href="{{ $paginator->nextPageUrl() }}"
-                                        class="inline-flex items-center justify-center w-9 h-9 md:w-10 md:h-10 rounded-md text-gray-600 hover:bg-red-50 hover:text-red-600 transition-all duration-200"><svg
-                                            class="w-5 h-5" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M9 5l7 7-7 7" />
-                                        </svg></a>
-                                @else
-                                    <span
-                                        class="inline-flex items-center justify-center w-9 h-9 md:w-10 md:h-10 rounded-md text-gray-300 cursor-not-allowed"><svg
-                                            class="w-5 h-5" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M9 5l7 7-7 7" />
-                                        </svg></span>
-                                @endif
-                            </nav>
-
-                            {{-- Desktop Go To Form --}}
-                            <div class="flex items-center gap-2 mt-2">
-                                <span class="text-sm text-gray-500">Go to page:</span>
-                                <form method="GET" action="{{ $paginator->url(1) }}"
-                                    class="flex items-center gap-2"
-                                    onsubmit="event.preventDefault(); const page = this.querySelector('input[name=page]').value; if(page > 0 && page <= {{ $paginator->lastPage() }}) window.location.href = this.action.replace('page=1', 'page=' + page);">
-                                    <input type="number" name="page" min="1"
-                                        max="{{ $paginator->lastPage() }}"
-                                        placeholder="{{ $paginator->currentPage() }}"
-                                        class="w-20 px-3 py-1.5 text-sm text-center border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent">
-                                    <button type="submit"
-                                        class="px-4 py-1.5 text-sm font-medium text-white bg-red-500 rounded-md hover:bg-red-600 transition-all duration-200 shadow-sm">Go</button>
-                                </form>
-                            </div>
-                        </div>
-
-                        {{-- Info Text --}}
-                        <div class="mt-3 sm:mt-4 text-center">
-                            <p class="text-xs sm:text-sm text-gray-500">
-                                Menampilkan <span
-                                    class="font-medium text-gray-700">{{ $paginator->firstItem() }}</span>
-                                sampai <span class="font-medium text-gray-700">{{ $paginator->lastItem() }}</span>
-                                dari <span class="font-medium text-gray-700">{{ $paginator->total() }}</span> data
-                                anak
-                            </p>
-                        </div>
-                    </div>
+            <select id="mobile-desa-selector"
+                class="w-full text-sm rounded-lg border-gray-300 focus:ring-emerald-500 focus:border-emerald-500 shadow-sm"
+                onchange="if (this.value) window.location.href = this.value;">
+                @if ($desaList->isEmpty())
+                    <option value="" disabled selected>Tidak ada desa tersedia</option>
+                @else
+                    <option value="" {{ !$selectedDesa ? 'selected' : '' }} disabled>-- Pilih Desa --</option>
+                    @foreach ($desaList as $desa)
+                        @php
+                            $isActiveDesa = $selectedDesa && strtoupper($selectedDesa) === strtoupper($desa);
+                        @endphp
+                        <option
+                            value="{{ route('gizi.index', [
+                                'view' => 'detail',
+                                'period' => $activePeriodYm,
+                                'desa' => $desa,
+                            ]) }}"
+                            {{ $isActiveDesa ? 'selected' : '' }}>
+                            {{ strtoupper($desa) }}
+                        </option>
+                    @endforeach
                 @endif
-            </section>
+            </select>
+            {{-- Form filter periode (mobile) --}}
+            <form method="GET" action="{{ route('gizi.index') }}"
+                class="flex flex-col md:flex-row md:items-center gap-3 md:gap-4 mt-2">
+                <input type="hidden" name="view" value="detail">
+                @if ($selectedDesa)
+                    <input type="hidden" name="desa" value="{{ $selectedDesa }}">
+                @endif
+                <div class="flex items-center gap-2 flex-1 md:flex-initial">
+                    <label class="hidden md:block text-sm font-medium text-gray-700 whitespace-nowrap">
+                        Periode:
+                    </label>
+                    <select name="period" required
+                        class="flex-1 md:flex-initial md:min-w-[180px] text-sm rounded-lg border-gray-300 focus:ring-red-500 focus:border-red-500 shadow-sm">
+                        @forelse($availablePeriods ?? [] as $p)
+                            @php $ym = \Carbon\Carbon::parse($p)->format('Y-m'); @endphp
+                            <option value="{{ $ym }}" {{ $activePeriodYm === $ym ? 'selected' : '' }}>
+                                {{ \Carbon\Carbon::parse($p)->isoFormat('MMMM Y') }}
+                            </option>
+                        @empty
+                            @php $ymNow = now()->format('Y-m'); @endphp
+                            <option value="{{ $ymNow }}" selected>
+                                {{ now()->isoFormat('MMMM Y') }}
+                            </option>
+                        @endforelse
+                    </select>
+                </div>
+                <button type="submit"
+                    class="w-full md:w-auto px-6 py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-red-500 to-red-600 rounded-lg hover:from-red-600 hover:to-red-700 active:scale-95 transition-all duration-200 shadow-md hover:shadow-lg">
+                    <span class="flex items-center justify-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                        Tampilkan
+                    </span>
+                </button>
+            </form>
         </div>
     </div>
-</x-app-layout>
+    {{-- Konten Utama --}}
+    <div class="order-1 lg:order-2 w-full flex-1 min-w-0 z-30">
+
+        {{-- Header desktop detail + filter periode --}}
+        <div class="rounded-xl hidden md:block shadow-sm border p-4 bg-white mb-3">
+            <div class="flex flex-col gap-4">
+                <div class="flex flex-col md:flex-row justify-between md:items-center">
+                    <div>
+                        <h3 class="text-center md:text-left text-sm md:text-lg font-extrabold text-gray-800">
+                            Detail Data Gizi per Desa/Kelurahan
+                        </h3>
+                    </div>
+                    {{-- Form filter periode (desktop) --}}
+                    <form method="GET" action="{{ route('gizi.index') }}"
+                        class="hidden md:flex flex-col md:flex-row md:items-center gap-3 md:gap-4">
+                        <input type="hidden" name="view" value="detail">
+                        @if ($selectedDesa)
+                            <input type="hidden" name="desa" value="{{ $selectedDesa }}">
+                        @endif
+                        <div class="flex items-center gap-2 flex-1 md:flex-initial">
+                            <label class="hidden md:block text-sm font-medium text-gray-700 whitespace-nowrap">
+                                Periode:
+                            </label>
+                            <select name="period" required
+                                class="flex-1 md:flex-initial md:min-w-[180px] text-sm rounded-lg border-gray-300 focus:ring-red-500 focus:border-red-500 shadow-sm">
+                                @forelse($availablePeriods ?? [] as $p)
+                                    @php $ym = \Carbon\Carbon::parse($p)->format('Y-m'); @endphp
+                                    <option value="{{ $ym }}"
+                                        {{ $activePeriodYm === $ym ? 'selected' : '' }}>
+                                        {{ \Carbon\Carbon::parse($p)->isoFormat('MMMM Y') }}
+                                    </option>
+                                @empty
+                                    @php $ymNow = now()->format('Y-m'); @endphp
+                                    <option value="{{ $ymNow }}" selected>
+                                        {{ now()->isoFormat('MMMM Y') }}
+                                    </option>
+                                @endforelse
+                            </select>
+                        </div>
+                        <button type="submit"
+                            class="w-full md:w-auto px-6 py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-red-500 to-red-600 rounded-lg hover:from-red-600 hover:to-red-700 active:scale-95 transition-all duration-200 shadow-md hover:shadow-lg">
+                            <span class="flex items-center justify-center gap-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                </svg>
+                                Tampilkan
+                            </span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {{-- Card utama detail (statistik + tabel) --}}
+        <div class="bg-white/30 backdrop-blur-md border border-gray-200/30 rounded-xl px-2 py-2">
+            @if (!$selectedDesa)
+                {{-- State jika belum memilih desa --}}
+                <div class="flex flex-col items-center justify-center py-12 sm:py-16 px-4 text-center">
+                    <div
+                        class="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-gray-100 flex items-center justify-center mb-4">
+                        <svg class="w-10 h-10 sm:w-12 sm:h-12 text-gray-400" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h4 class="text-lg font-semibold text-gray-900 mb-2">Pilih Desa</h4>
+                        <p class="text-sm text-gray-500 max-w-md">
+                            Pilih desa dari daftar untuk melihat detail data gizi
+                        </p>
+                    </div>
+                </div>
+            @else
+                <div class="spaye-y-4">
+                    {{-- Statistik ringkas per desa --}}
+                    <div x-data="{ isOpen: false }">
+                        {{-- Header toggle statistik --}}
+                        <button type="button" @click="isOpen = !isOpen"
+                            class="w-full text-left text-sm font-bold text-gray-900 mb-3 flex items-center justify-between">
+                            <span class="flex items-center gap-2">
+                                <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2z" />
+                                </svg>
+                                Statistik Ringkas ({{ $selectedDesa }})
+                            </span>
+                            <span class="text-gray-500">
+                                <svg x-show="isOpen" class="w-5 h-5" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M5 15l7-7 7 7" />
+                                </svg>
+                                <svg x-show="!isOpen" style="display: none;" class="w-5 h-5" fill="none"
+                                    stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </span>
+                        </button>
+                        {{-- Grid statistik --}}
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-3" x-show="isOpen"
+                            x-transition:enter="transition ease-out duration-200"
+                            x-transition:enter-start="opacity-0 -translate-y-2"
+                            x-transition:enter-end="opacity-100 translate-y-0"
+                            x-transition:leave="transition ease-in duration-150"
+                            x-transition:leave-start="opacity-100 translate-y-0"
+                            x-transition:leave-end="opacity-0 -translate-y-2" style="display: none;">
+                            {{-- Total anak --}}
+                            <div
+                                class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl border border-blue-200 p-4 hover:shadow-md transition-shadow">
+                                <p class="text-[10px] sm:text-xs font-bold text-blue-700 uppercase tracking-wide mb-2">
+                                    Total Anak
+                                </p>
+                                <p class="text-2xl sm:text-3xl font-bold text-blue-900">
+                                    {{ $detailStat->total_anak ?? 0 }}
+                                </p>
+                            </div>
+                            {{-- Stunting --}}
+                            <div
+                                class="bg-gradient-to-br from-red-50 to-red-100 rounded-xl border border-red-200 p-4 hover:shadow-md transition-shadow">
+                                <p class="text-[10px] sm:text-xs font-bold text-red-700 uppercase tracking-wide mb-2">
+                                    Stunting
+                                </p>
+                                <p class="text-2xl sm:text-3xl font-bold text-red-900">
+                                    {{ $detailStat->total_stunting ?? 0 }}
+                                </p>
+                                <p class="text-[10px] text-red-600 mt-1">TB/U &lt; -2</p>
+                            </div>
+                            {{-- Rata-rata tinggi --}}
+                            <div
+                                class="bg-gradient-to-br from-emerald-50 to-emerald-100 rounded-xl border border-emerald-200 p-4 hover:shadow-md transition-shadow">
+                                <p
+                                    class="text-[10px] sm:text-xs font-bold text-emerald-700 uppercase tracking-wide mb-2">
+                                    Avg Tinggi
+                                </p>
+                                <p class="text-2xl sm:text-3xl font-bold text-emerald-900">
+                                    {{ $detailStat && $detailStat->avg_tinggi ? number_format($detailStat->avg_tinggi, 1) : '-' }}
+                                </p>
+                                <p class="text-[10px] text-emerald-600 mt-1">cm</p>
+                            </div>
+                            {{-- Rata-rata ZS TB/U --}}
+                            <div
+                                class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl border border-purple-200 p-4 hover:shadow-md transition-shadow">
+                                <p
+                                    class="text-[10px] sm:text-xs font-bold text-purple-700 uppercase tracking-wide mb-2">
+                                    Avg ZS TB/U
+                                </p>
+                                <div
+                                    class="text-2xl sm:text-3xl font-bold text-purple-900 flex items-center h-9 sm:h-10">
+                                    @if ($detailStat && !is_null($detailStat->avg_zs_tbu))
+                                        <x-zscore-badge :value="$detailStat->avg_zs_tbu" />
+                                    @else
+                                        <span class="text-gray-400 text-2xl sm:text-3xl">-</span>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="border-t border-gray-200 mb-1"></div>
+                    {{-- Tabel data individu --}}
+                    <div>
+                        {{-- Header tabel + label periode --}}
+                        <div class="flex gap-2">
+                            <h5 class="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2">
+                                <svg class="w-5 h-5 text-gray-700" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                                Data Individu
+                            </h5>
+                            <div class="text-sm text-gray-500">
+                                {{ $currentPeriodLabel }}
+                            </div>
+                        </div>
+                        {{-- Wrapper tabel + scroll --}}
+                        <div class="relative">
+                            <div class="max-h-[64vh] md:max-h-[63vh] overflow-y-auto overflow-x-auto">
+                                <table class="w-full min-w-[900px] text-sm text-left text-gray-700">
+                                    {{-- Header tabel sticky --}}
+                                    <thead class="sticky top-0 z-20 bg-white shadow-sm">
+                                        <tr class="border-b border-gray-200/80">
+                                            <th
+                                                class="px-3 md:px-4 py-3 text-left text-[10px] md:text-xs font-semibold tracking-wider uppercase text-gray-600">
+                                                No
+                                            </th>
+                                            <th
+                                                class="px-3 md:px-4 py-3 text-left text-[10px] md:text-xs font-semibold tracking-wider uppercase text-gray-600">
+                                                Tanggal Input
+                                            </th>
+                                            <th
+                                                class="px-3 md:px-4 py-3 text-center text-[10px] md:text-xs font-semibold tracking-wider uppercase text-gray-600">
+                                                Berat (kg)
+                                            </th>
+                                            <th
+                                                class="px-3 md:px-4 py-3 text-center text-[10px] md:text-xs font-semibold tracking-wider uppercase text-gray-600">
+                                                Tinggi (cm)
+                                            </th>
+                                            <th
+                                                class="px-3 md:px-4 py-3 text-center text-[10px] md:text-xs font-semibold tracking-wider uppercase text-gray-600">
+                                                BB/U
+                                            </th>
+                                            <th
+                                                class="px-3 md:px-4 py-3 text-center text-[10px] md:text-xs font-semibold tracking-wider uppercase text-gray-600">
+                                                ZS BB/U
+                                            </th>
+                                            <th
+                                                class="px-3 md:px-4 py-3 text-center text-[10px] md:text-xs font-semibold tracking-wider uppercase text-gray-600">
+                                                TB/U
+                                            </th>
+                                            <th
+                                                class="px-3 md:px-4 py-3 text-center text-[10px] md:text-xs font-semibold tracking-wider uppercase text-gray-600">
+                                                ZS TB/U
+                                            </th>
+                                            <th
+                                                class="px-3 md:px-4 py-3 text-center text-[10px] md:text-xs font-semibold tracking-wider uppercase text-gray-600">
+                                                BB/TB
+                                            </th>
+                                            <th
+                                                class="px-3 md:px-4 py-3 text-center text-[10px] md:text-xs font-semibold tracking-wider uppercase text-gray-600">
+                                                ZS BB/TB
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    {{-- Body tabel --}}
+                                    <tbody class="bg-white divide-y divide-gray-100">
+                                        @forelse ($dataDetail as $row)
+                                            <tr class="transition-colors even:bg-gray-50/60 hover:bg-emerald-50/60">
+                                                {{-- Nomor urut global (pagination aware) --}}
+                                                <td
+                                                    class="whitespace-nowrap px-4 py-3 text-xs md:text-sm text-gray-600 font-medium align-top">
+                                                    {{ $dataDetail->firstItem() + $loop->index }}
+                                                </td>
+                                                {{-- Tanggal input --}}
+                                                <td
+                                                    class="whitespace-nowrap px-4 py-3 text-xs md:text-sm text-gray-700 align-top">
+                                                    {{ \Carbon\Carbon::parse($row->created_at)->format('d/m/Y H:i') }}
+                                                </td>
+                                                {{-- Berat --}}
+                                                <td
+                                                    class="whitespace-nowrap px-4 py-3 text-xs md:text-sm text-gray-900 text-center font-semibold align-top">
+                                                    {{ number_format($row->berat, 2) }}
+                                                </td>
+                                                {{-- Tinggi --}}
+                                                <td
+                                                    class="whitespace-nowrap px-4 py-3 text-xs md:text-sm text-gray-900 text-center font-semibold align-top">
+                                                    {{ number_format($row->tinggi, 2) }}
+                                                </td>
+                                                {{-- Status BB/U --}}
+                                                <td
+                                                    class="whitespace-nowrap px-4 py-3 text-[11px] md:text-sm text-gray-900 text-center font-semibold align-top">
+                                                    {{ $row->status_bb_u ?? '-' }}
+                                                </td>
+                                                {{-- Z-score BB/U --}}
+                                                <td class="whitespace-nowrap px-4 py-3 text-xs text-center align-top">
+                                                    <div class="flex flex-col items-center gap-0.5 sm:gap-1">
+                                                        <x-zscore-badge :value="$row->zs_bb_u" />
+                                                    </div>
+                                                </td>
+                                                {{-- Status TB/U --}}
+                                                <td
+                                                    class="whitespace-nowrap px-4 py-3 text-[11px] md:text-sm text-gray-900 text-center font-semibold align-top">
+                                                    {{ $row->status_tb_u ?? '-' }}
+                                                </td>
+                                                {{-- Z-score TB/U --}}
+                                                <td class="whitespace-nowrap px-4 py-3 text-xs text-center align-top">
+                                                    <div class="flex flex-col items-center gap-0.5 sm:gap-1">
+                                                        <x-zscore-badge :value="$row->zs_tb_u" />
+                                                    </div>
+                                                </td>
+                                                {{-- Status BB/TB --}}
+                                                <td
+                                                    class="whitespace-nowrap px-4 py-3 text-[11px] md:text-sm text-gray-900 text-center font-semibold align-top">
+                                                    {{ $row->status_bb_tb ?? '-' }}
+                                                </td>
+                                                {{-- Z-score BB/TB --}}
+                                                <td class="whitespace-nowrap px-4 py-3 text-xs text-center align-top">
+                                                    <div class="flex flex-col items-center gap-0.5 sm:gap-1">
+                                                        <x-zscore-badge :value="$row->zs_bb_tb" />
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        @empty
+                                            {{-- Empty state tabel --}}
+                                            <tr>
+                                                <td colspan="10"
+                                                    class="px-6 py-10 text-center text-sm text-gray-500">
+                                                    <div class="flex flex-col items-center gap-3">
+                                                        <svg class="mx-auto h-10 w-10 text-gray-400" fill="none"
+                                                            viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                stroke-width="2"
+                                                                d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+                                                        </svg>
+                                                        <div>
+                                                            <p class="font-medium">
+                                                                Tidak ada data individu untuk desa ini pada periode ini.
+                                                            </p>
+                                                            <p class="text-xs text-gray-400 mt-1">
+                                                                Coba pilih periode lain atau pastikan data sudah diinput
+                                                                oleh divisi terkait.
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        @endforelse
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        {{-- Pagination bawaan Laravel --}}
+                        @if ($dataDetail && $dataDetail->hasPages())
+                            <div class="mt-4">
+                                {{ $dataDetail->links() }}
+                            </div>
+                        @endif
+                    </div>
+                </div>
+            @endif
+        </div>
+    </div>
+</div>
