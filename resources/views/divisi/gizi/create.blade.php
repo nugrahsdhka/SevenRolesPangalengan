@@ -260,27 +260,71 @@
                             Lihat Contoh Format
                         </button>
                     </div>
+
                     <form action="{{ route('gizi.import') }}" method="POST" enctype="multipart/form-data"
+                        x-data="{
+                            isDragging: false,
+                            files: [],
+                            get hasFiles() {
+                                return this.files.length > 0;
+                            },
+                            handleFiles(selected) {
+                                if (!selected || !selected.length) return;
+
+                                // DataTransfer untuk sync ke <input type='file'>
+                                const dt = new DataTransfer();
+
+                                // Tambahkan file-file yang sudah ada dulu
+                                this.files.forEach(f => dt.items.add(f));
+
+                                // Tambahkan file baru (hindari duplikat berdasarkan nama+size+lastModified)
+                                Array.from(selected).forEach(file => {
+                                    const exists = this.files.some(f =>
+                                        f.name === file.name &&
+                                        f.size === file.size &&
+                                        f.lastModified === file.lastModified
+                                    );
+                                    if (!exists) {
+                                        this.files.push(file);
+                                        dt.items.add(file);
+                                    }
+                                });
+
+                                // Sync ke input file
+                                this.$refs.fileInput.files = dt.files;
+                            },
+                            clearFiles() {
+                                this.files = [];
+                                this.$refs.fileInput.value = '';
+                            }
+                        }"
                         class="space-y-4">
+
                         @csrf
+
                         <div class="space-y-2">
-                            <label for="import_period" class="text-xs font-medium text-gray-700">Periode
-                                Import</label>
+                            <label for="import_period" class="text-xs font-medium text-gray-700">
+                                Periode Import
+                            </label>
                             <input type="month" id="import_period" name="period" required
                                 value="{{ $activePeriodYm }}"
                                 class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all">
                         </div>
-                        <div @dragover.prevent="isDragging = true" @dragleave.prevent="isDragging = false"
+
+                        <div
+                            @dragover.prevent="isDragging = true"
+                            @dragleave.prevent="isDragging = false"
                             @drop.prevent="isDragging=false; handleFiles($event.dataTransfer.files)"
-                            :class="isDragging ? 'border-red-500 bg-red-50 scale-[1.02]' :
-                                'border-gray-300 bg-gray-50'"
+                            :class="isDragging ? 'border-red-500 bg-red-50 scale-[1.02]' : 'border-gray-300 bg-gray-50'"
                             class="relative border-2 border-dashed rounded-xl p-6 sm:p-8 text-center transition-all duration-200 cursor-pointer hover:border-red-400 hover:bg-red-50/50"
                             @click="$refs.fileInput.click()">
+
+                            {{-- Ikon + animasi drag --}}
                             <div class="flex justify-center mb-3">
                                 <div class="relative">
                                     <svg class="w-12 h-12 text-gray-300 transition-transform duration-200"
-                                        :class="isDragging ? 'scale-110 text-red-400' : ''" fill="none"
-                                        stroke="currentColor" viewBox="0 0 24 24">
+                                        :class="isDragging ? 'scale-110 text-red-400' : ''"
+                                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
                                             d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                                     </svg>
@@ -292,47 +336,73 @@
                                     </div>
                                 </div>
                             </div>
-                            <div x-show="!fileName">
+
+                            {{-- Teks default (belum ada file) --}}
+                            <div x-show="!hasFiles">
                                 <p class="text-sm font-medium text-gray-700 mb-1">
-                                    <span class="text-red-600">Klik untuk upload</span> atau
-                                    drag & drop file
+                                    <span class="text-red-600">Klik untuk upload</span> atau drag & drop file
                                 </p>
                                 <p class="text-xs text-gray-500">
-                                    Excel (XLSX, XLS, CSV) • Maksimal 2MB
+                                    Excel (XLSX, XLS, CSV) • Maks 10MB
                                 </p>
                             </div>
-                            <div x-show="fileName" x-transition
-                                class="flex flex-col sm:flex-row items-center justify-center gap-3 p-3 bg-white rounded-lg border border-green-200 mt-2">
-                                <div class="flex items-center gap-2">
-                                    <div
-                                        class="flex-shrink-0 w-9 h-9 bg-green-100 rounded-full flex items-center justify-center">
-                                        <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                        </svg>
+
+                            {{-- Daftar file (vertikal + scrollable) --}}
+                            <div x-show="hasFiles" x-transition
+                                class="mt-2 p-3 bg-white rounded-lg border border-green-200 text-left w-full mx-auto max-w-md">
+                                <div class="flex items-center justify-between mb-2">
+                                    <div class="flex items-center gap-2">
+                                        <div
+                                            class="flex-shrink-0 w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                                            <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                        </div>
+                                        <span class="text-xs font-semibold text-gray-700">
+                                            File terpilih (<span x-text="files.length"></span>)
+                                        </span>
                                     </div>
-                                    <span class="text-xs font-medium text-gray-700 break-all"
-                                        x-text="fileName"></span>
+
+                                    <button type="button" @click.stop="clearFiles()"
+                                        class="flex-shrink-0 p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                    </button>
                                 </div>
-                                <button type="button" @click.stop="fileName=''; $refs.fileInput.value=''"
-                                    class="flex-shrink-0 p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M6 18L18 6M6 6l12 12" />
-                                    </svg>
-                                </button>
+
+                                {{-- LIST VERTIKAL + SCROLL --}}
+                                <ul class="text-xs text-gray-700 space-y-1 max-h-24 overflow-y-auto pr-1">
+                                    <template x-for="(file, index) in files" :key="index">
+                                        <li class="flex items-center gap-2">
+                                            <span class="text-[10px] text-gray-400" x-text="(index + 1) + '.'"></span>
+                                            <span class="truncate" x-text="file.name"></span>
+                                        </li>
+                                    </template>
+                                </ul>
                             </div>
-                            <input type="file" name="file" x-ref="fileInput"
-                                @change="handleFiles($event.target.files)" class="hidden" accept=".xlsx,.xls,.csv"
+
+                            {{-- Input file tersembunyi --}}
+                            <input
+                                type="file"
+                                name="files[]"
+                                x-ref="fileInput"
+                                @change="handleFiles($event.target.files)"
+                                class="hidden"
+                                accept=".xlsx,.xls,.csv"
+                                multiple
                                 required>
                         </div>
+
                         <div class="pt-1 flex justify-end">
-                            <button type="submit" :disabled="!fileName"
-                                :class="fileName
-                                    ?
-                                    'bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 shadow-md hover:shadow-lg' :
-                                    'bg-gray-200 cursor-not-allowed'"
+                            <button type="submit"
+                                :disabled="!hasFiles"
+                                :class="hasFiles
+                                    ? 'bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 shadow-md hover:shadow-lg'
+                                    : 'bg-gray-200 cursor-not-allowed'"
                                 class="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-white rounded-lg transition-all duration-200">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -342,6 +412,7 @@
                             </button>
                         </div>
                     </form>
+
                     {{-- MODAL FORMAT EXCEL --}}
                     <div x-show="showFormatModal" x-transition:enter="transition ease-out duration-300"
                         x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"

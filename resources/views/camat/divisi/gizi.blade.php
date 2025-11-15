@@ -281,7 +281,7 @@
     {{-- ================= TABLE CARD: AGREGASI PER DESA ================= --}}
     <div class="bg-white/30 backdrop-blur-md border border-gray-200/30 rounded-xl shadow-lg px-2 py-1">
         <div class="relative">
-            <div class="max-h-[64vh] md:max-h-[63vh] overflow-y-auto overflow-x-auto bg-white">
+            <div class="max-h-[64vh] md:max-h-[52vh] overflow-y-auto overflow-x-auto bg-white">
                 <table class="w-full min-w-[1000px]">
                     <thead class="sticky top-0 z-20 bg-gray-50 shadow-sm">
                         <tr class="border-b border-gray-200">

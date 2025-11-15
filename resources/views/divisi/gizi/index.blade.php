@@ -245,10 +245,10 @@
 
                             {{-- TABLE CARD --}}
                             <div
-                                class="bg-white/30 backdrop-blur-md border border-gray-200/30 rounded-xl shadow-lg px-2 py-2">
+                                class="bg-white/30 backdrop-blur-md border border-gray-200/30 rounded-xl px-2 py-2">
                                 <div class="relative">
                                     <div
-                                        class="max-h-[64vh] md:max-h-[63vh] overflow-y-auto overflow-x-auto bg-white">
+                                        class="max-h-[64vh] md:max-h-[53vh] overflow-y-auto overflow-x-auto bg-white">
                                         <table class="w-full min-w-[1200px]">
                                             <thead class="sticky top-0 z-20 bg-gray-50 shadow-sm">
                                                 <tr class="border-b border-gray-200">

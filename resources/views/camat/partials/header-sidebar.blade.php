@@ -272,7 +272,7 @@
                         <div>
                             <p class="text-xs font-semibold text-gray-700 mb-1">Tips</p>
                             <p class="text-xs text-gray-600 leading-relaxed">
-                                Review data per divisi sebelum melakukan approve massal untuk menghindari kesalahan publikasi.
+                                Periksa kembali data yang di approved!
                             </p>
                         </div>
                     </div>

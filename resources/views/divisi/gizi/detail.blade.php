@@ -376,7 +376,7 @@
                         </div>
                         {{-- Wrapper tabel + scroll --}}
                         <div class="relative">
-                            <div class="max-h-[64vh] md:max-h-[63vh] overflow-y-auto overflow-x-auto">
+                            <div class="max-h-[64vh] md:max-h-[49vh] overflow-y-auto overflow-x-auto">
                                 <table class="w-full min-w-[900px] text-sm text-left text-gray-700">
                                     {{-- Header tabel sticky --}}
                                     <thead class="sticky top-0 z-20 bg-white shadow-sm">

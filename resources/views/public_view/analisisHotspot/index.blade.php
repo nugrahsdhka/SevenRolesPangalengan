@@ -9,25 +9,93 @@
     <div class="p-1">
         <div class="bg-white backdrop-blur-lg rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
             <div class="p-3">
-                <div class="flex items-center justify-between gap-4">
-                    <div>
-                        <h1 class="text-xl font-bold text-gray-900">
-                            Analisis Hotspot
-                        </h1>
-                        <p class="mt-1 text-sm text-gray-500">
-                            Stunting Kecamatan Pangalengan
-                        </p>
+                <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
+                    {{-- Title Section --}}
+                    <div class="w-full lg:w-auto">
+                        <div class="flex justify-between">
+                            <div>
+                                <h1 class="text-xl font-bold text-gray-900">
+                                    Analisis Hotspot
+                                </h1>
+                                <p class="mt-1 text-sm text-gray-500">
+                                    Stunting Kecamatan Pangalengan
+                                </p>
+                            </div>
+    
+                            <button id="openInfoModalBtnDesktop"
+                                class="block md:hidden flex-shrink-0 self-center sm:self-auto p-3 text-white bg-gradient-to-r from-red-600 to-pink-600 rounded-xl
+                                    shadow-lg hover:shadow-xl hover:from-red-700 hover:to-pink-700
+                                    transform hover:scale-110 active:scale-95 transition-all duration-200
+                                    group relative">
+                                <svg class="w-6 h-6 transition-transform group-hover:rotate-12 duration-200" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" clip-rule="evenodd"
+                                        d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" />
+                                </svg>
+                            </button>
+                        </div>
                     </div>
 
-                    {{-- Tombol Modal --}}
-                    <button id="openInfoModalBtn"
-                        class="p-2.5 text-white bg-gradient-to-r from-red-600 to-pink-600 rounded-xl
-                                hover:shadow-lg transform hover:scale-105 transition-all duration-200">
-                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" clip-rule="evenodd"
-                                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" />
-                        </svg>
-                    </button>
+                    {{-- Filter & Button Section --}}
+                    <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full lg:w-auto">
+                        {{-- Filter Periode --}}
+                        <div class="flex-1 sm:flex-initial">
+                            <div class="bg-white/95 backdrop-blur-lg rounded-2xl shadow-lg border border-gray-200/50 overflow-hidden hover:shadow-xl transition-shadow duration-300">
+                                <form id="periodeForm" class="p-3 sm:p-4 flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
+                                    <div class="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3 flex-1">
+                                        <label class="flex items-center gap-2 text-sm font-semibold text-gray-700 whitespace-nowrap">
+                                            <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                            </svg>
+                                            Periode
+                                        </label>
+                                        <select id="periodeInput"
+                                            class="w-full sm:flex-1 sm:min-w-[160px] px-4 py-2.5 border border-gray-300 rounded-xl text-sm font-medium text-gray-700
+                                                focus:ring-2 focus:ring-red-500 focus:border-red-500 focus:outline-none
+                                                hover:border-gray-400 transition-colors duration-200">
+
+                                            @forelse ($availablePeriods as $p)
+                                                @php
+                                                    $ym = \Carbon\Carbon::parse($p)->format('Y-m');
+                                                @endphp
+
+                                                <option value="{{ $ym }}">
+                                                    {{ \Carbon\Carbon::parse($p)->isoFormat('MMMM Y') }}
+                                                </option>
+                                            @empty
+                                                <option value="{{ now()->format('Y-m') }}" selected>
+                                                    {{ now()->isoFormat('MMMM Y') }}
+                                                </option>
+                                            @endforelse
+                                        </select>
+                                    </div>
+
+                                    <button type="button" id="applyPeriodeBtn"
+                                        class="w-full sm:w-auto px-6 py-2.5 bg-gradient-to-r from-red-600 to-pink-600 text-white rounded-xl text-sm font-semibold
+                                            shadow-md hover:shadow-xl hover:from-red-700 hover:to-pink-700
+                                            transform hover:scale-105 active:scale-95 transition-all duration-200
+                                            flex items-center justify-center gap-2">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                        </svg>
+                                        Tampilkan
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+
+                        {{-- Tombol Info Modal --}}
+                        <button id="openInfoModalBtnMobile"
+                            class="hidden md:block flex-shrink-0 self-center sm:self-auto p-3 text-white bg-gradient-to-r from-red-600 to-pink-600 rounded-xl
+                                shadow-lg hover:shadow-xl hover:from-red-700 hover:to-pink-700
+                                transform hover:scale-110 active:scale-95 transition-all duration-200
+                                group relative">
+                            <svg class="w-6 h-6 transition-transform group-hover:rotate-12 duration-200" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" clip-rule="evenodd"
+                                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" />
+                            </svg>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -104,7 +172,7 @@
                                 <li>
                                     <span
                                         class="inline-block w-3 h-3 rounded-full mr-2 bg-gray-400 align-middle"></span>
-                                    <strong>Abu-abu (N/A):</strong> Data belum tersedia / belum dipublikasi.
+                                    <strong>Abu-abu (N/A):</strong> Data belum tersedia
                                 </li>
                             </ul>
                         </li>
@@ -215,129 +283,120 @@
         {{-- Leaflet --}}
         <script>
             document.addEventListener('DOMContentLoaded', () => {
-                const map = L.map('map');
+
+                let map = L.map('map');
+                let geoLayer = null;
 
                 L.tileLayer(
-                    'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+                    'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+                    {
                         maxZoom: 19,
-                        attribution: '&copy; <a href="https://www.esri.com/en-us/home" target="_blank" rel="noopener noreferrer">Esri</a>'
+                        attribution: '&copy; Esri'
                     }
                 ).addTo(map);
 
-                // Ambil data dari DB + GeoJSON
-                Promise.all([
-                        fetch('{{ route('api.hotspot') }}').then(r => r.json()),
+                const periodeInput = document.getElementById('periodeInput');
+                const applyBtn = document.getElementById('applyPeriodeBtn');
+
+                function loadHotspotData() {
+                    const period = periodeInput.value;
+
+                    Promise.all([
+                        fetch(`{{ route('api.hotspot') }}?period=${period}`).then(r => r.json()),
                         fetch('{{ asset('maps/PetaDesaKecPangalengan.geojson') }}').then(r => r.json())
                     ])
                     .then(([stats, geojson]) => {
-                        console.log('API hotspot:', stats);
-
-                        // Fungsi warna (sama seperti DataStunting)
-                        function getColor(zs) {
-                            if (zs === null || zs === undefined || isNaN(zs)) {
-                                return '#9E9E9E'; // abu-abu N/A
-                            }
-                            if (zs < -3) return '#D32F2F'; // merah tua (Sangat Pendek)
-                            if (zs < -2) return '#F57C00'; // oranye (Pendek)
-                            if (zs <= 2) return '#388E3C'; // hijau tua (Normal)
-                            return '#1976D2'; // biru tua (Tinggi)
+                        if (geoLayer) {
+                            map.removeLayer(geoLayer);
                         }
 
-                        const layer = L.geoJSON(geojson, {
+                        function getColor(zs) {
+                            if (zs === null || zs === undefined || isNaN(zs)) return '#9E9E9E';
+                            if (zs < -3) return '#D32F2F';
+                            if (zs < -2) return '#F57C00';
+                            if (zs <= 2) return '#388E3C';
+                            return '#1976D2';
+                        }
+
+                        geoLayer = L.geoJSON(geojson, {
                             style: feature => {
-                                const rawName = feature.properties.NAME_4 || '';
-                                const desaKey = rawName.trim().toUpperCase();
-                                const item = stats[desaKey] || null;
+                                const rawName = feature.properties.NAME_4?.trim().toUpperCase() ?? '';
+                                const item = stats[rawName] ?? null;
                                 const zs = item ? item.avg_zs_tbu : null;
 
                                 return {
                                     color: '#FFF',
-                                    weight: 0.25,
+                                    weight: 0.4,
                                     fillColor: getColor(zs),
                                     fillOpacity: 0.45
                                 };
                             },
                             onEachFeature: (feature, layer) => {
-                                const rawName = feature.properties.NAME_4 || '';
-                                const desaKey = rawName.trim().toUpperCase();
-                                const item = stats[desaKey] || null;
+                                const rawName = feature.properties.NAME_4?.trim().toUpperCase() ?? '';
+                                const item = stats[rawName] ?? null;
 
-                                layer.bindTooltip(rawName, {
-                                    direction: 'top',
-                                    permanent: false,
-                                    sticky: true,
-                                    offset: L.point(0, -12),
-                                    className: 'desa-tooltip'
-                                });
-
-                                // Popup detail saat diklik
                                 let html = `
-                                <div class="space-y-3">
-                                    <div class="border-b border-gray-200 pb-2">
-                                        <h3 class="text-lg font-bold text-gray-900">${rawName}</h3>
-                                    </div>
-                            `;
+                                    <div class="space-y-3">
+                                        <div class="border-b border-gray-200 pb-2">
+                                            <h3 class="text-lg font-bold text-gray-900">${rawName}</h3>
+                                        </div>
+                                `;
 
                                 if (item) {
                                     html += `
-                                    <div class="space-y-2">
-                                        <div class="flex justify-between items-center">
-                                            <span class="text-gray-600 text-sm">Status Desa:</span>
-                                            <span class="font-semibold text-gray-900 text-xs bg-blue-50 px-3 py-1 rounded-full">${item.kategori}</span>
+                                        <div class="space-y-2">
+                                            <div class="flex justify-between">
+                                                <span class="text-gray-600 text-sm">Status Desa:</span>
+                                                <span class="font-semibold bg-blue-50 px-3 py-1 rounded-full text-xs">${item.kategori}</span>
+                                            </div>
+
+                                            <div class="flex justify-between">
+                                                <span class="text-gray-600 text-sm">Rata-rata ZS TB/U:</span>
+                                                <span class="font-bold text-sm" style="color:${getColor(item.avg_zs_tbu)}">
+                                                    ${item.avg_zs_tbu}
+                                                </span>
+                                            </div>
+
+                                            <div class="flex justify-between">
+                                                <span class="text-gray-600 text-sm">Kasus Stunting:</span>
+                                                <span class="text-red-600 font-semibold text-sm">${item.total_kasus_stunting}</span>
+                                            </div>
+
+                                            <div class="flex justify-between">
+                                                <span class="text-gray-600 text-sm">Total Anak:</span>
+                                                <span class="text-gray-900 font-semibold text-sm">${item.total_anak}</span>
+                                            </div>
                                         </div>
-                                        <div class="flex justify-between items-center">
-                                            <span class="text-gray-600 text-sm">Rata-rata ZS TB/U:</span>
-                                            <span class="font-bold text-sm" style="color:${getColor(item.avg_zs_tbu)}">${item.avg_zs_tbu}</span>
-                                        </div>
-                                        <div class="flex justify-between items-center">
-                                            <span class="text-gray-600 text-sm">Kasus Stunting:</span>
-                                            <span class="font-semibold text-red-600 text-sm">${item.total_kasus_stunting}</span>
-                                        </div>
-                                        <div class="flex justify-between items-center">
-                                            <span class="text-gray-600 text-sm">Total Anak:</span>
-                                            <span class="font-semibold text-gray-900 text-sm">${item.total_anak}</span>
-                                        </div>
-                                    </div>
-                                `;
+                                    `;
                                 } else {
                                     html += `
-                                    <div class="bg-gray-50 rounded-lg p-3">
-                                        <p class="text-sm text-gray-600 text-center">
-                                            <svg class="w-5 h-5 inline-block mr-1 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                            </svg>
-                                            Data stunting belum tersedia / belum dipublikasi.
-                                        </p>
-                                    </div>
-                                `;
+                                        <div class="bg-gray-50 rounded-lg p-3">
+                                            <p class="text-sm text-gray-600 text-center">
+                                                Data belum tersedia
+                                            </p>
+                                        </div>
+                                    `;
                                 }
 
                                 html += `</div>`;
-
-                                layer.bindPopup(html, {
-                                    maxWidth: 300,
-                                    className: 'custom-popup'
-                                });
+                                layer.bindPopup(html);
                             }
                         }).addTo(map);
 
-                        // Atur posisi awal dan minimal zoom
-                        const bounds = layer.getBounds();
-
-                        // fitBounds dulu biar semua desa masuk layar
-                        map.fitBounds(bounds, {
-                            padding: [20, 20]
-                        });
+                        const bounds = geoLayer.getBounds();
+                        map.fitBounds(bounds, { padding: [20, 20] });
 
                         const minZoom = 12;
-                        if (map.getZoom() < minZoom) {
-                            map.setZoom(minZoom);
-                        }
-                    })
-                    .catch(err => {
-                        console.error('Gagal memuat data hotspot:', err);
-                    });
+                        if (map.getZoom() < minZoom) map.setZoom(minZoom);
+
+                    }).catch(err => console.error(err));
+                }
+
+                // Load awal
+                loadHotspotData();
+
+                // Jika user klik tombol "Tampilkan"
+                applyBtn.addEventListener('click', loadHotspotData);
             });
         </script>
 
@@ -346,41 +405,47 @@
             document.addEventListener('DOMContentLoaded', function() {
                 const modalOverlay = document.getElementById('infoModalOverlay');
                 const modalContent = document.getElementById('infoModalContent');
-                const openBtn = document.getElementById('openInfoModalBtn');
+
+                // Semua tombol open modal
+                const openButtons = [
+                    document.getElementById('openInfoModalBtn'),
+                    document.getElementById('openInfoModalBtnMobile'),
+                    document.getElementById('openInfoModalBtnDesktop'),
+                ].filter(Boolean); // buang null
+
                 const closeBtnHeader = document.getElementById('closeInfoModalBtnHeader');
                 const closeBtnFooter = document.getElementById('closeInfoModalBtnFooter');
 
                 function openModal() {
-                    if (modalOverlay) {
-                        modalOverlay.classList.remove('hidden');
-                        // Trigger reflow
-                        void modalContent.offsetWidth;
-                        modalContent.classList.remove('scale-95', 'opacity-0');
-                        modalContent.classList.add('scale-100', 'opacity-100');
-                    }
+                    modalOverlay.classList.remove('hidden');
+
+                    // Trigger reflow
+                    void modalContent.offsetWidth;
+
+                    modalContent.classList.remove('scale-95', 'opacity-0');
+                    modalContent.classList.add('scale-100', 'opacity-100');
                 }
 
                 function closeModal() {
-                    if (modalOverlay) {
-                        modalContent.classList.add('scale-95', 'opacity-0');
-                        modalContent.classList.remove('scale-100', 'opacity-100');
-                        setTimeout(() => {
-                            modalOverlay.classList.add('hidden');
-                        }, 300); // Wait for animation
-                    }
+                    modalContent.classList.add('scale-95', 'opacity-0');
+                    modalContent.classList.remove('scale-100', 'opacity-100');
+
+                    setTimeout(() => {
+                        modalOverlay.classList.add('hidden');
+                    }, 300);
                 }
 
-                if (openBtn) {
-                    openBtn.addEventListener('click', openModal);
-                }
-                if (closeBtnHeader) {
-                    closeBtnHeader.addEventListener('click', closeModal);
-                }
-                if (closeBtnFooter) {
-                    closeBtnFooter.addEventListener('click', closeModal);
-                }
+                // Bind semua tombol opener
+                openButtons.forEach(btn => {
+                    btn.addEventListener('click', openModal);
+                });
+
+                // Bind tombol penutup
+                if (closeBtnHeader) closeBtnHeader.addEventListener('click', closeModal);
+                if (closeBtnFooter) closeBtnFooter.addEventListener('click', closeModal);
+
+                // Klik di luar konten modal = tutup
                 if (modalOverlay) {
-                    // Klik di luar modal untuk menutup
                     modalOverlay.addEventListener('click', function(event) {
                         if (event.target === modalOverlay) {
                             closeModal();
@@ -388,7 +453,7 @@
                     });
                 }
 
-                // Tutup modal dengan tombol Escape
+                // Tombol ESC
                 document.addEventListener('keydown', function(event) {
                     if (event.key === 'Escape' && !modalOverlay.classList.contains('hidden')) {
                         closeModal();

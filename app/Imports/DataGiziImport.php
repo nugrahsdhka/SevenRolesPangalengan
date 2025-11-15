@@ -70,9 +70,9 @@ class DataGiziImport implements ToModel, WithHeadingRow, WithValidation
     public function rules(): array
     {
         return [
-            'desakel' => 'required_without_all:desa_kel,desa_kelurahan|string|max:100',
-            'desa_kel' => 'required_without_all:desakel,desa_kelurahan|string|max:100',
-            'desa_kelurahan' => 'required_without_all:desakel,desa_kel|string|max:100',
+            'desakel'         => 'required_without_all:desa_kel,desa_kelurahan|string|max:100',
+            'desa_kel'        => 'required_without_all:desakel,desa_kelurahan|string|max:100',
+            'desa_kelurahan'  => 'required_without_all:desakel,desa_kel|string|max:100',
 
             'berat'   => 'required|numeric|min:0|max:999.99',
             'tinggi'  => 'required|numeric|min:0|max:999.99',

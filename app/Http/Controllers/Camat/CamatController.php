@@ -18,18 +18,61 @@ class CamatController extends Controller
     {
         $perPage = 15;
 
-        $periodYm = $request->input('period', session('camat_gizi_period', now()->format('Y-m')));
-        session(['camat_gizi_period' => $periodYm]); // simpan periode aktif di session
-
-        [$year, $month] = explode('-', $periodYm);
-
-        $status = $request->input('status', 'pending');
-
+        // =========================
+        //  1. Ambil semua periode tersedia dulu
+        //     (dibulatkan ke tanggal 1 tiap bulan)
+        // =========================
         $availablePeriods = DataGizi::select(DB::raw('DATE_FORMAT(period, "%Y-%m-01") as period_date'))
             ->distinct()
             ->orderBy('period_date', 'desc')
-            ->pluck('period_date');
+            ->pluck('period_date');   // contoh isi: ['2025-11-01', '2025-10-01', ...]
 
+        // =========================
+        //  2. Tentukan periodYm (Y-m) prioritas:
+        //     a. ?period di URL (kalau ada)
+        //     b. session('camat_gizi_period') (kalau ada)
+        //     c. periode terbaru dari DB (kalau ada data)
+        //     d. now()->format('Y-m') (kalau DB kosong)
+        // =========================
+        $requestedPeriod = $request->input('period');               // dari query string
+        $sessionPeriod   = session('camat_gizi_period');            // terakhir dipakai
+
+        if ($availablePeriods->isNotEmpty()) {
+            // periode terbaru di DB → jadikan Y-m
+            $latestPeriodYm = Carbon::parse($availablePeriods->first())->format('Y-m');
+        } else {
+            $latestPeriodYm = now()->format('Y-m');
+        }
+
+        if ($requestedPeriod) {
+            // user pilih manual via dropdown / URL
+            $periodYm = $requestedPeriod;
+        } elseif ($sessionPeriod) {
+            // pakai periode yang terakhir dipakai di halaman camat
+            $periodYm = $sessionPeriod;
+        } else {
+            // pertama kali buka:
+            // kalau ada data → pakai periode terbaru
+            // kalau tidak ada data sama sekali → pakai now()
+            $periodYm = $availablePeriods->isNotEmpty()
+                ? $latestPeriodYm
+                : now()->format('Y-m');
+        }
+
+        // Simpan periode aktif ke session
+        session(['camat_gizi_period' => $periodYm]);
+
+        // Pecah jadi year + month
+        [$year, $month] = explode('-', $periodYm);
+
+        // =========================
+        //  STATUS TAB
+        // =========================
+        $status = $request->input('status', 'pending');
+
+        // =========================
+        //  QUERY DATA GIZI (AGREGASI PER DESA)
+        // =========================
         $giziQuery = DataGizi::query()
             ->select(
                 'desa_kelurahan',
@@ -52,8 +95,7 @@ class CamatController extends Controller
             )
             ->whereYear('period', $year)
             ->whereMonth('period', $month)
-            // 🔴 INI YANG PENTING: filter sesuai tab status
-            ->where('status', $status)
+            ->where('status', $status) // sesuai tab aktif
             ->groupBy('desa_kelurahan', 'status')
             ->orderByRaw("FIELD(status, 'pending', 'approved', 'published')")
             ->orderBy('tanggal_input_terbaru', 'desc');
@@ -61,7 +103,7 @@ class CamatController extends Controller
         $allData['gizi'] = $giziQuery->paginate($perPage, ['*'], 'gizi_page');
 
         // =========================
-        //  STATUS COUNTS PER PERIODE (UNTUK BADGE TAB)
+        //  STATUS COUNTS PER PERIODE (BADGE TAB)
         // =========================
         $statusCountsRaw = DataGizi::select(
                 'status',
@@ -81,29 +123,24 @@ class CamatController extends Controller
 
         // =========================
         //  TAB LAIN (Pencegahan, Penanggulangan, Desa)
-        //  (masih sama seperti kodenmu sebelumnya)
         // =========================
-
-        // Pencegahan
         $allData['pencegahan'] = DataPencegahan::with('user')
             ->orderByRaw("FIELD(status, 'pending', 'approved', 'published')")
             ->latest('id')
             ->paginate($perPage, ['*'], 'pencegahan_page');
 
-        // Penanggulangan
         $allData['penanggulangan'] = DataPenanggulangan::with('user')
             ->orderByRaw("FIELD(status, 'pending', 'approved', 'published')")
             ->latest('id')
             ->paginate($perPage, ['*'], 'penanggulangan_page');
 
-        // Desa
         $allData['desa'] = DataDesa::with('user')
             ->orderByRaw("FIELD(status, 'pending', 'approved', 'published')")
             ->latest('id')
             ->paginate($perPage, ['*'], 'desa_page');
 
         // =========================
-        //  LOAD USER UNTUK GIZI (karena agregat)
+        //  LOAD USER UNTUK GIZI
         // =========================
         foreach ($allData['gizi'] as $item) {
             if ($item->user_id) {
@@ -114,7 +151,7 @@ class CamatController extends Controller
         }
 
         // =========================
-        //  BULK ACTION STATUS (Gizi by periode)
+        //  BULK ACTION FLAGS (Gizi by periode)
         // =========================
         $giziBase = DataGizi::whereYear('period', $year)->whereMonth('period', $month);
 
@@ -153,7 +190,6 @@ class CamatController extends Controller
             'statusCounts'
         ));
     }
-
 
     public function updateStatus(Request $request)
     {

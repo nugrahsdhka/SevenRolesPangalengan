@@ -16,9 +16,6 @@ use App\Imports\DataGiziImport;
 
 class DivisiGiziController extends Controller
 {
-    /**
-     * Helper: daftar periode tersedia untuk role user (desc)
-     */
     private function getAvailablePeriodsForRole(string $roleName)
     {
         return DataGizi::whereHas('user.roles', fn($q) => $q->where('name', $roleName))
@@ -30,54 +27,62 @@ class DivisiGiziController extends Controller
             ->toArray();
     }
 
-    /**
-     * Helper: resolve current period (request ? latest)
-     */
-    private function resolveCurrentPeriod(Request $request, string $roleName): ?string
+    private function resolveCurrentPeriod(Request $request, string $roleName): string
     {
-        $requested = $request->query('period') ?? $request->input('period');
+        // 1. Ambil dari query / input
+        $requested = $request->query('period') ?? $request->input('period'); // Y-m atau Y-m-d
+        $sessionKey = 'gizi_period_' . $roleName;
+
+        // 2. Daftar periode yang ada di DB untuk role ini (Y-m-01)
+        $available = $this->getAvailablePeriodsForRole($roleName); // array of 'Y-m-01'
+
+        // 3. Normalisasi prioritas → hasil akhir: $periodYm (Y-m)
         if ($requested) {
-            // normalisasi ke Y-m-01
-            $req = preg_match('/^\d{4}-\d{2}$/', $requested) ? ($requested . '-01') : $requested;
-            return date('Y-m-01', strtotime($req));
+            // kalau user kirim 'Y-m', tambahkan '-01'
+            if (preg_match('/^\d{4}-\d{2}$/', $requested)) {
+                $periodYm = $requested;
+            } else {
+                $periodYm = date('Y-m', strtotime($requested));
+            }
+        } elseif (session()->has($sessionKey)) {
+            $periodYm = session($sessionKey);
+        } elseif (!empty($available)) {
+            // pakai periode terbaru di DB
+            $periodYm = date('Y-m', strtotime($available[0]));
+        } else {
+            // kalau sama sekali belum ada data → pakai bulan sekarang
+            $periodYm = now()->format('Y-m');
         }
 
-        $list = $this->getAvailablePeriodsForRole($roleName);
-        return $list[0] ?? null; // latest or null
+        // 4. Simpan ke session supaya konsisten saat reload
+        session([$sessionKey => $periodYm]);
+
+        // 5. Return format 'Y-m-01' (dipakai untuk whereDate('period', ...))
+        return $periodYm . '-01';
     }
 
     public function index(Request $request)
     {
-        $currentUser = Auth::user();
-        $userRoleName = $currentUser->roles->first()->name;
+        $currentUser   = Auth::user();
+        $userRoleName  = $currentUser->roles->first()->name;
 
         // Section dari sidebar: 'tambah', 'data', 'detail'
         $view = $request->get('view', 'data');
 
         // Inisialisasi variabel tambahan untuk view detail
-        $desaList = collect();
+        $desaList     = collect();
         $selectedDesa = null;
-        $dataDetail = collect();
-        $detailStat = null;
+        $dataDetail   = collect();
+        $detailStat   = null;
 
-        // --- Period (asumsi kamu sudah punya $currentPeriod & $availablePeriods) ---
-        $periodYm = $request->get('period'); // 'YYYY-MM'
+        // ================== PERIODE ==================
+        $availablePeriods = $this->getAvailablePeriodsForRole($userRoleName);  // array 'Y-m-01'
+        $currentPeriod    = $this->resolveCurrentPeriod($request, $userRoleName); // 'Y-m-01'
+        $periodYm         = date('Y-m', strtotime($currentPeriod));             // untuk dipakai di route/Blade kalau perlu
 
-        // Resolve current period: from request, or latest available, or current month
-        $availablePeriods = $this->getAvailablePeriodsForRole($userRoleName);
-        $currentPeriod = $this->resolveCurrentPeriod($request, $userRoleName);
-
-        if (!$currentPeriod) {
-            $currentPeriod = $periodYm ? ($periodYm . '-01') : now()->startOfMonth()->toDateString();
-            if (!in_array($currentPeriod, $availablePeriods)) {
-                $availablePeriods = array_merge([$currentPeriod], $availablePeriods);
-                rsort($availablePeriods);
-            }
-        }
-
-        // --- Status tab (hanya relevan untuk view "data") ---
+        // ================== STATUS TAB ==================
         $status = $request->get('status', 'pending');
-        if (!in_array($status, ['pending', 'approved', 'published'])) {
+        if (! in_array($status, ['pending', 'approved', 'published'])) {
             $status = 'pending';
         }
 
@@ -94,9 +99,6 @@ class DivisiGiziController extends Controller
             ->pluck('desa_count', 'status')
             ->toArray();
 
-        // ===================================================================
-        // Query Agregasi (untuk halaman "Data yang Sudah Diinput")
-        // ===================================================================
         $aggregatedData = $base->clone()
             ->where('status', $status)
             ->select(
@@ -120,9 +122,6 @@ class DivisiGiziController extends Controller
             ->paginate(50)
             ->onEachSide(1);
 
-        // ===================================================================
-        // Data tambahan untuk view "detail": list desa + detail per desa
-        // ===================================================================
         if ($view === 'detail') {
             // Daftar desa di periode & role ini
             $desaList = $base->clone()
@@ -180,7 +179,8 @@ class DivisiGiziController extends Controller
             'desaList',
             'selectedDesa',
             'dataDetail',
-            'detailStat'
+            'detailStat',
+            'periodYm'
         ));
     }
 
@@ -372,63 +372,74 @@ class DivisiGiziController extends Controller
     public function import(Request $request)
     {
         $request->validate([
-            'period' => ['required','regex:/^\d{4}-\d{2}(-\d{2})?$/'],
-            'file' => 'required|mimes:xlsx,xls,csv|max:2048',
+            'period'   => ['required', 'regex:/^\d{4}-\d{2}(-\d{2})?$/'],
+            'files'    => ['required', 'array'],
+            'files.*'  => 'file|mimes:xlsx,xls,csv|max:10240', // 10MB per file
         ]);
 
-        $period = preg_match('/^\d{4}-\d{2}$/', $request->period) ? ($request->period.'-01') : $request->period;
+        $period = preg_match('/^\d{4}-\d{2}$/', $request->period)
+            ? ($request->period . '-01')
+            : $request->period;
+
         $periodYm = date('Y-m', strtotime($period));
         $userRoleName = Auth::user()->roles->first()->name;
 
-        // ===================================================================
-        // CEK BARU: Blokir 'import' jika periode ini sudah 'locked'
-        // ===================================================================
-        $isPeriodLocked = DataGizi::whereDate('period', $period)
-            ->whereIn('status', ['approved', 'published'])
-            ->whereHas('user.roles', fn($q) => $q->where('name', $userRoleName))
-            ->exists();
+        $periodHasData = DataGizi::whereDate('period', $period)->exists();
 
-        if ($isPeriodLocked) {
-            return redirect()->route('gizi.index', ['period' => $periodYm])
-                ->with('error', "Gagal Import: Periode " . date('F Y', strtotime($period)) . " sudah memiliki data yang di-Approve atau di-Publish. Import ditutup untuk periode ini.");
+        if ($periodHasData) {
+            return back()
+                ->with('error', 'Data di periode ini sudah ada, gunakan input manual atau hapus data sebelumnya!')
+                ->withInput();
         }
-        // ===================================================================
-        // END CEK BARU
-        // ===================================================================
+
+        if ($periodHasData) {
+            return back()
+                ->with('error', 'Data sudah ada, gunakan input manual atau hapus data sebelumnya!')
+                ->withInput();
+        }
 
         try {
-            $file = $request->file('file');
+            $files = $request->file('files');
 
-            // Lewatkan period ke import agar setiap row diset ke period ini (jika file tidak punya kolom period)
-            Excel::import(new DataGiziImport($period, Auth::id()), $file);
+            foreach ($files as $file) {
+                Excel::import(new DataGiziImport($period, Auth::id()), $file);
+            }
 
-            return redirect()->route('gizi.index', ['period' => date('Y-m', strtotime($period))])
-                ->with('success', 'Data Gizi berhasil di-import dari Excel.');
+            return redirect()->route('gizi.index', ['period' => $periodYm])
+                ->with('success', 'Data Gizi berhasil di-import.');
 
         } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
             $failures = $e->failures();
             $firstFailure = $failures[0];
+
             $errorMessage = "Gagal import: "
                 . $firstFailure->errors()[0]
-                . " (baris " . $firstFailure->row() . ", kolom " . $firstFailure->attribute() . "). Pastikan format sesuai.";
-            return redirect()->route('gizi.index', ['period' => $request->period])->with('error', $errorMessage);
+                . " (baris " . $firstFailure->row()
+                . ", kolom " . $firstFailure->attribute()
+                . "). Pastikan format sesuai.";
+
+            return redirect()->route('gizi.index', ['period' => $periodYm])
+                ->with('error', $errorMessage);
 
         } catch (\Exception $e) {
             Log::error('Error importing Excel: ' . $e->getMessage());
-            return redirect()->route('gizi.index', ['period' => $request->period])
+
+            return redirect()->route('gizi.index', ['period' => $periodYm])
                 ->with('error', 'Terjadi kesalahan saat import data. Pastikan format file benar dan coba lagi.');
         }
     }
 
     public function detail(Request $request, $desa)
     {
-        $currentUser = Auth::user();
-        $userRoleName = $currentUser->roles->first()->name;
+        $currentUser   = Auth::user();
+        $userRoleName  = $currentUser->roles->first()->name;
         $desaKelurahan = urldecode($desa);
 
-        // Periode aktif untuk detail
-        $availablePeriods = $this->getAvailablePeriodsForRole($userRoleName);
-        $currentPeriod = $this->resolveCurrentPeriod($request, $userRoleName);
+        // ================== PERIODE DETAIL ==================
+        $availablePeriods = $this->getAvailablePeriodsForRole($userRoleName);      // 'Y-m-01'
+        $currentPeriod    = $this->resolveCurrentPeriod($request, $userRoleName);  // 'Y-m-01'
+        $periodYm         = date('Y-m', strtotime($currentPeriod));
+
 
         $base = DataGizi::whereHas('user.roles', fn($q) => $q->where('name', $userRoleName))
             ->where('desa_kelurahan', strtoupper($desaKelurahan));
@@ -468,6 +479,13 @@ class DivisiGiziController extends Controller
             ')
             ->first();
 
-        return view('divisi.gizi.detail', compact('dataGizi', 'desaKelurahan', 'statistik', 'availablePeriods', 'currentPeriod'));
+        return view('divisi.gizi.detail', compact(
+            'dataGizi',
+            'desaKelurahan',
+            'statistik',
+            'availablePeriods',
+            'currentPeriod',
+            'periodYm',
+        ));
     }
 }

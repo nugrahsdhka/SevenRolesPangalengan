@@ -166,7 +166,7 @@
 
                             <div>
                                 <p class="text-sm text-gray-500 mt-1">
-                                    Periode aktif 
+                                    Periode
                                     <span class="font-semibold text-gray-800">
                                         {{ $currentPeriodLabel }}
                                     </span>
@@ -184,14 +184,14 @@
                     {{-- STATISTIK RINGKAS --}}
                     <div x-data="{ isOpen: false }">
                         <button type="button" @click="isOpen = !isOpen"
-                            class="w-full text-left text-sm font-bold text-gray-900 mb-3 flex items-center justify-between">
+                            class="w-full text-left text-sm font-bold text-gray-900 mb-3 flex items-center gap-3">
                             <span class="flex items-center gap-2">
                                 <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor"
                                     viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2z" />
                                 </svg>
-                                Statistik Ringkas ({{ strtoupper($desaKelurahan) }})
+                                Statistik Ringkas
                             </span>
                             <span class="text-gray-500">
                                 <svg x-show="isOpen" class="w-5 h-5" fill="none" stroke="currentColor"
@@ -284,7 +284,7 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                 </svg>
-                                Data Individu (Approved & Published)
+                                Data Individu 
                             </h5>
                             <div class="text-xs sm:text-sm text-gray-500">
                                 {{ $currentPeriodLabel }}
@@ -421,7 +421,7 @@
                                                                 Belum ada data individu untuk periode ini.
                                                             </p>
                                                             <p class="text-xs text-gray-400 mt-1">
-                                                                Periode aktif mengikuti pilihan di halaman Review Data
+                                                                Periode mengikuti pilihan di halaman Review Data
                                                                 Gizi.
                                                             </p>
                                                         </div>

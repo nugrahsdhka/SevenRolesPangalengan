@@ -132,7 +132,7 @@ Route::middleware('auth', 'verified')->group(function () {
         Route::get('/published-data', [AdminController::class, 'publishedData'])->name('published.index');
         Route::post('/publish-data', [AdminController::class, 'publish'])->name('publish');
 
-        Route::get('/published-data/gizi/{desa_kelurahan}', [AdminController::class, 'showGiziDetail'])->name('published.gizi.detail');
+        Route::get('/published-data/gizi/{desa_kelurahan}', [AdminController::class, 'showGiziDetail'])->name('gizi.detail');
 
         Route::patch('faskes/{faskes}/toggle-active', [FaskesController::class, 'toggleActive'])
             ->name('faskes.toggle-active');
