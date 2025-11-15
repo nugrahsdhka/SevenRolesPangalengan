@@ -10,7 +10,7 @@
     <div class="p-1">
         <div class="bg-white backdrop-blur-lg rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
             <div class="p-3">
-                <div class="flex items-center justify-between gap-4">
+                <div class="flex items-center justify-between gap-4 py-3">
                     <div>
                         <h1 class="text-xl font-bold text-gray-900">
                             Peta Fasilitas Kesehatan

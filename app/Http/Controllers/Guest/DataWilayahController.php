@@ -52,6 +52,6 @@ class DataWilayahController extends Controller
             ->paginate($perPage);
 
         // 3. Kirim 'dataWilayah' DAN 'search' ke view.
-        return view('public_view.dataWilayah.index', compact('dataWilayah', 'search'));
+        return view('public.dataWilayah.index', compact('dataWilayah', 'search'));
     }
 }

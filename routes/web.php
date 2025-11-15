@@ -29,7 +29,8 @@ Route::get('/', [HomeController::class, 'index'])->name('welcome');
 
 // Data Stunting
 Route::get('/data-stunting', [DataStuntingController::class, 'index'])->name('data-stunting');
-Route::get('/data-stunting/chart-data-zs', [DataStuntingController::class, 'getChartDataZs'])->name('data-stunting.chart-data-zs');
+Route::get('/data-stunting/chart-zs', [DataStuntingController::class, 'getChartDataZs'])
+    ->name('data-stunting.chart-zs');
 
 // Data Wilayah
 Route::get('/data-wilayah', [DataWilayahController::class, 'index'])->name('data-wilayah');

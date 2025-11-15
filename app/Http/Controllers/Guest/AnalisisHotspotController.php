@@ -19,7 +19,7 @@ class AnalisisHotspotController extends Controller
             ->orderByDesc('period_start')
             ->pluck('period_start'); // collection: 'Y-m-d'
 
-        return view('public_view.analisisHotspot.index', compact('availablePeriods'));
+        return view('public.analisisHotspot.index', compact('availablePeriods'));
     }
 
     public function getChartDataHotspot(Request $request)

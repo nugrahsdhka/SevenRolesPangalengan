@@ -17,6 +17,6 @@ class PetaController extends Controller
             ->get();
 
         // Kirim ke view
-        return view('public_view.peta.index', compact('faskes'));
+        return view('public.peta.index', compact('faskes'));
     }
 }

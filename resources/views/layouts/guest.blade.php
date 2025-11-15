@@ -38,10 +38,11 @@
             'password.email',
             'password.reset',
             'password.store',
+            'peta-faskes',
         ];
     @endphp
 
-    @if (!in_array(Route::currentRouteName(), $hideFooterRoutes))
+    @if (Route::currentRouteName() === 'welcome')
         <footer class="text-xs text-gray-500 text-center mb-4">
             &copy; {{ date('Y') }} Rumah Stunting Pangalengan. All rights reserved.
         </footer>

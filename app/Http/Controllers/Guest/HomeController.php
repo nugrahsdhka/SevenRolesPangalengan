@@ -86,7 +86,7 @@ class HomeController extends Controller
         // 5.4. Data Stunting (total_stunting dan total_anak sudah ada dari atas)
 
         // 6. Kirim semua data ke view
-        return view('public_view.home.welcome', compact(
+        return view('public.home.welcome', compact(
             'total_faskes',
             'total_desa',
             'rata_rata_kasus',
