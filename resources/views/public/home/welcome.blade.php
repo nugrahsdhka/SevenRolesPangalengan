@@ -55,24 +55,46 @@
 
     {{-- ====== MODERN HEADER WITH GLASSMORPHISM ====== --}}
     <header class="text-red-100 relative overflow-hidden bg-gradient-to-br from-red-800 via-red-800 to-rose-700">
-        {{-- Desktop View --}}
-        <div class="hidden md:block relative bg-red-800 py-3 border-b border-red-600/50">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <p class="text-center text-sm font-medium tracking-wide">
-                    Sistem Informasi Data Stunting Kecamatan Pangalengan
-                </p>
+
+        {{-- Title paling atas --}}
+        <div class="hidden">
+            {{-- Desktop View --}}
+            <div class="hidden md:block relative bg-red-800 py-3 border-b border-red-600/50">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <p class="text-center text-sm font-medium tracking-wide">
+                        Sistem Informasi Data Stunting Kecamatan Pangalengan
+                    </p>
+                </div>
+            </div>
+    
+            {{-- Mobile View --}}
+            <div class="block md:hidden relative bg-red-800 py-3 border-b border-red-600/50">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <p class="text-center text-sm font-medium tracking-wide">
+                        Sistem Informasi
+                    </p>
+                    <p class="text-center text-sm font-medium tracking-wide">
+                        Data Stunting Kecamatan Pangalengan
+                    </p>
+                </div>
             </div>
         </div>
 
-        {{-- Mobile View --}}
-        <div class="block md:hidden relative bg-red-800 py-3 border-b border-red-600/50">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="relative bg-red-800 py-3 border-b border-red-600/50">
+            <div class="flex justify-center gap-3 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-10 h-10 md:w-5 md:h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                    <line x1="12" y1="9" x2="12" y2="13"/>
+                    <line x1="12" y1="17" x2="12.01" y2="17"/>
+                </svg>
                 <p class="text-center text-sm font-medium tracking-wide">
-                    Sistem Informasi
+                    Web Masih Dalam Pengembangan, Data Yang Ditampilkan Adalah Data Dummy
                 </p>
-                <p class="text-center text-sm font-medium tracking-wide">
-                    Data Stunting Kecamatan Pangalengan
-                </p>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-10 h-10 md:w-5 md:h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                    <line x1="12" y1="9" x2="12" y2="13"/>
+                    <line x1="12" y1="17" x2="12.01" y2="17"/>
+                </svg>
             </div>
         </div>
 
