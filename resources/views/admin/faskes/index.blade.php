@@ -1,7 +1,7 @@
 {{-- resources/views/admin/faskes/index.blade.php --}}
 <x-app-layout>
     <x-slot name="title">
-        RSP | Faskes
+        Admin | Faskes
     </x-slot>
 
     <x-slot name="header">
@@ -22,8 +22,8 @@
         </div>
     </x-slot>
 
-    <div class="py-4 sm:py-6">
-        <div class="max-w-7xl mx-auto px-1 sm:px-6 lg:px-8 space-y-4">
+    <div class="py-2">
+        <div class="max-w-7xl mx-auto px-2 space-y-4">
 
             {{-- Flash success --}}
             @if (session('success'))
@@ -81,11 +81,24 @@
                         <tbody class="divide-y divide-gray-100">
                             @forelse ($faskes as $item)
                                 <tr class="hover:bg-gray-50/80" x-data>
+                                    @php
+                                        $namaPendek = implode(' ', array_slice(explode(' ', $item->nama_faskes), 0, 2));
+                                    @endphp
+
                                     {{-- Nama --}}
                                     <td class="px-3 sm:px-4 py-2 sm:py-3 align-top">
-                                        <div class="font-medium text-gray-900 text-sm sm:text-base">
+
+                                        {{-- MOBILE: tampilkan 2 kata --}}
+                                        <div class="font-medium text-gray-900 text-sm sm:hidden">
+                                            {{ $namaPendek }}
+                                        </div>
+
+                                        {{-- DESKTOP: tampilkan nama lengkap --}}
+                                        <div class="hidden sm:block font-medium text-gray-900 text-base">
                                             {{ $item->nama_faskes }}
                                         </div>
+
+                                        {{-- Alamat (tetap seperti biasa di desktop) --}}
                                         <div class="hidden sm:block text-xs text-gray-500 mt-0.5">
                                             {{ $item->alamat ?? '-' }}
                                         </div>
@@ -122,21 +135,25 @@
 
                                             <div class="flex flex-col items-center justify-center">
                                                 <button type="button"
-                                                    @click="
-                                                            window.dispatchEvent(new CustomEvent('open-confirm', {
-                                                                detail: {
-                                                                    form: $refs.toggleForm_{{ $item->id }},
-                                                                    title: '{{ $item->is_active ? 'Nonaktifkan Faskes' : 'Aktifkan Faskes' }}',
-                                                                    message: 'Nama: {{ addslashes($item->nama_faskes) }}\nDesa/Kel: {{ addslashes($item->desa_kelurahan ?? '-') }}\nLanjutkan?',
-                                                                    okText: '{{ $item->is_active ? 'Ya, Nonaktifkan' : 'Ya, Aktifkan' }}',
-                                                                    cancelText: 'Batal'
-                                                                }
-                                                            }))
-                                                        "
-                                                    class="relative inline-flex h-4 sm:h-5 w-8 sm:w-9 items-center rounded-full transition {{ $item->is_active ? 'bg-green-500' : 'bg-gray-300' }}">
+                                                    @click.prevent="
+                                                        $dispatch('open-confirm', {
+                                                            form:       $refs.toggleForm_{{ $item->id }},
+                                                            title:      '{{ $item->is_active ? 'Nonaktifkan Faskes' : 'Aktifkan Faskes' }}',
+                                                            message:    '{{ $item->is_active 
+                                                                            ? 'Nonaktifkan Faskes ' . addslashes($item->nama_faskes) . '?'
+                                                                            : 'Aktifkan Faskes ' . addslashes($item->nama_faskes) . '?' }}',
+                                                            okText:     '{{ $item->is_active ? 'Ya, Nonaktifkan' : 'Ya, Aktifkan' }}',
+                                                            cancelText: 'Batal'
+                                                        })
+                                                    "
+                                                    class="relative inline-flex h-4 sm:h-5 w-8 sm:w-9 items-center rounded-full 
+                                                        transition {{ $item->is_active ? 'bg-green-500' : 'bg-gray-300' }}">
+
                                                     <span class="sr-only">Toggle status</span>
-                                                    <span
-                                                        class="inline-block h-3.5 sm:h-4 w-3.5 sm:w-4 transform rounded-full bg-white shadow transition {{ $item->is_active ? 'translate-x-4 sm:translate-x-4' : 'translate-x-1' }}"></span>
+
+                                                    <span class="inline-block h-3.5 sm:h-4 w-3.5 sm:w-4 rounded-full bg-white shadow transition
+                                                        {{ $item->is_active ? 'translate-x-4 sm:translate-x-4' : 'translate-x-1' }}">
+                                                    </span>
                                                 </button>
 
                                                 @if ($item->is_active)
@@ -158,23 +175,21 @@
                                                 Edit
                                             </a>
 
-                                            <form x-ref="deleteForm_{{ $item->id }}"
-                                                action="{{ route('admin.faskes.destroy', $item) }}" method="POST"
+                                            <form x-data x-ref="deleteForm_{{ $item->id }}"
+                                                action="{{ route('admin.faskes.destroy', $item) }}"
+                                                method="POST"
                                                 class="inline">
                                                 @csrf
                                                 @method('DELETE')
+
                                                 <button type="button"
-                                                    @click="
-                                                            window.dispatchEvent(new CustomEvent('open-confirm', {
-                                                                detail: {
-                                                                    form: $refs.deleteForm_{{ $item->id }},
-                                                                    title: 'Hapus Faskes',
-                                                                    message: 'Nama: {{ addslashes($item->nama_faskes) }}\nDesa/Kel: {{ addslashes($item->desa_kelurahan ?? '-') }}\nTindakan ini tidak bisa dibatalkan.\nLanjutkan?',
-                                                                    okText: 'Ya, Hapus',
-                                                                    cancelText: 'Batal'
-                                                                }
-                                                            }))
-                                                        "
+                                                    @click.prevent="$dispatch('open-confirm', {
+                                                        form: $refs.deleteForm_{{ $item->id }},
+                                                        title: 'Hapus Faskes',
+                                                        message: `Yakin ingin menhapus data faskes {{ addslashes($item->nama_faskes) }}? Tindakan ini tidak bisa dibatalkan. Lanjutkan?`,
+                                                        okText: 'Ya, Hapus',
+                                                        cancelText: 'Batal'
+                                                    })"
                                                     class="inline-flex items-center px-2 sm:px-2.5 py-1 rounded-md border border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300">
                                                     Hapus
                                                 </button>

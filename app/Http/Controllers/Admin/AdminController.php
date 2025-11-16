@@ -182,8 +182,58 @@ class AdminController extends Controller
         ]);
     }
 
+    public function destroy(Request $request)
+    {
+        $request->validate([
+            'model'      => 'required|string|in:DataGizi,DataPencegahan,DataPenanggulangan,DataDesa',
+            'active_tab' => 'required|string',
+        ]);
 
-    // ✅ METHOD: Untuk menampilkan detail Gizi
+        $modelName = 'App\\Models\\' . $request->model;
+
+        if (!class_exists($modelName)) {
+            return back()
+                ->with('error', 'Tipe data tidak valid.')
+                ->withInput();
+        }
+
+        // ===== DataGizi: hapus berdasarkan desa + periode =====
+        if ($request->model === 'DataGizi') {
+            $request->validate([
+                'desa_kelurahan' => 'required|string',
+                'period'         => 'nullable|string', // Y-m
+            ]);
+
+            $desaKelurahan = $request->desa_kelurahan;
+            $periodYm      = $request->input('period');
+
+            $query = $modelName::where('desa_kelurahan', $desaKelurahan);
+
+            if ($periodYm) {
+                [$year, $month] = explode('-', $periodYm);
+                $query->whereYear('period', $year)->whereMonth('period', $month);
+            }
+
+            $deletedCount = $query->delete();
+
+            return back()
+                ->with('success', "Semua data desa {$desaKelurahan} pada periode terkait berhasil dihapus ({$deletedCount} data).")
+                ->with('active_tab', $request->active_tab);
+        }
+
+        // ===== Model lain: hapus per ID =====
+        $request->validate([
+            'id' => 'required|integer',
+        ]);
+
+        $data = $modelName::findOrFail($request->id);
+        $data->delete();
+
+        return back()
+            ->with('success', 'Data berhasil dihapus secara permanen.')
+            ->with('active_tab', $request->active_tab);
+    }
+
     public function showGiziDetail(Request $request, $desaKelurahan)
     {
         // 1. Ambil data statistik untuk card di bagian atas
@@ -208,9 +258,6 @@ class AdminController extends Controller
         return view('detail.detailGizi', compact('desaKelurahan', 'statistik', 'dataGizi'));
     }
 
-    /**
-     * Aksi untuk PUBLISH atau PULL (tarik kembali) data.
-     */
     public function publish(Request $request)
     {
         $request->validate([
@@ -294,9 +341,6 @@ class AdminController extends Controller
             ->with('active_tab', $request->active_tab);
     }
 
-    /**
-     * METHOD AKSI MASSAL (BULK)
-     */
     public function bulkPublish(Request $request)
     {
         $request->validate([

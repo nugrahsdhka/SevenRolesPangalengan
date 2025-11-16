@@ -129,116 +129,175 @@
 
                             {{-- HEADER CARD: Judul + Tombol + Tabs + Periode --}}
                             <div class="rounded-xl shadow-sm border border-gray-200 bg-white px-4 py-4">
-                                <div class="space-y-4">
-                                    {{-- Header Section (judul + tombol tambah) --}}
-                                    <div
-                                        class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-                                        <div
-                                            class="flex flex-col sm:flex-row sm:items-center gap-4">
-                                            <h3
-                                                class="text-center md:text-left text-sm md:text-lg font-extrabold text-gray-800">
-                                                Data Gizi per Desa/Kelurahan
-                                            </h3>
+                                <div class="space-y-2">
+
+                                    {{-- Baris 1: Judul + Periode Aktif + Tombol Tambah --}}
+                                    <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between text-center lg:text-left">
+
+                                        {{-- Kiri: Judul + Periode Aktif --}}
+                                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-center lg:justify-start gap-4 w-full lg:w-auto">
+                                            <div class="w-full">
+                                                <h3 class="text-sm md:text-lg font-extrabold text-gray-800">
+                                                    Data Gizi per Desa/Kelurahan
+                                                </h3>
+
+                                                @php
+                                                    // Tentukan periode aktif untuk ditampilkan (label seperti "November 2025")
+                                                    $activePeriodYm = $periodYm ?? now()->format('Y-m');
+                                                    $activePeriodLabel = null;
+
+                                                    if (!empty($availablePeriods)) {
+                                                        foreach ($availablePeriods as $p) {
+                                                            $ym = \Carbon\Carbon::parse($p)->format('Y-m');
+                                                            if ($ym === $activePeriodYm) {
+                                                                $activePeriodLabel = \Carbon\Carbon::parse($p)->isoFormat('MMMM Y');
+                                                                break;
+                                                            }
+                                                        }
+                                                    }
+
+                                                    if (!$activePeriodLabel) {
+                                                        $activePeriodLabel = \Carbon\Carbon::createFromFormat('Y-m', $activePeriodYm)->isoFormat('MMMM Y');
+                                                    }
+                                                @endphp
+
+                                                <p class="text-xs text-gray-500 mt-1">
+                                                    Periode aktif:
+                                                    <span class="font-semibold text-gray-800">
+                                                        {{ $activePeriodLabel }}
+                                                    </span>
+                                                </p>
+                                            </div>
                                         </div>
 
-                                        <div
-                                            class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                                        {{-- Kanan: Tombol Tambah / Import Data --}}
+                                        <div class="w-full lg:w-auto flex flex-col sm:flex-row items-center justify-center lg:justify-end gap-3">
                                             <a href="{{ route('gizi.index', [
-                                                'view' => 'tambah',
-                                                'period' => $periodYm ?? now()->format('Y-m'),
-                                                'status' => 'pending',
-                                            ]) }}"
-                                                class="inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium text-white bg-gradient-to-r from-red-600 to-red-700 rounded-lg hover:from-red-700 hover:to-red-800 active:from-red-800 active:to-red-900 transition-all duration-200 shadow-md hover:shadow-lg">
-                                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24"
-                                                    stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                        stroke-width="2" d="M12 4v16m8-8H4" />
+                                                    'view'   => 'tambah',
+                                                    'period' => $periodYm ?? now()->format('Y-m'),
+                                                    'status' => 'pending',
+                                                ]) }}"
+                                                class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5
+                                                    text-sm font-medium text-white
+                                                    bg-gradient-to-r from-red-600 to-red-700
+                                                    rounded-lg hover:from-red-700 hover:to-red-800
+                                                    active:from-red-800 active:to-red-900
+                                                    transition-all duration-200 shadow-md hover:shadow-lg">
+                                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M12 4v16m8-8H4" />
                                                 </svg>
-                                                <span>Tambah / Import Data</span>
+                                                <span class="whitespace-nowrap">Tambah / Import Data</span>
                                             </a>
                                         </div>
                                     </div>
 
-                                    {{-- Status Tabs & Periode Selector --}}
-                                    <div
-                                        class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                                        {{-- Navigation Tabs --}}
-                                        <nav class="flex flex-col sm:flex-row sm:gap-2" role="tablist"
-                                            aria-label="Status data">
-                                            @foreach ($tabItems as $key => $meta)
-                                                @php $active = ($status === $key); @endphp
-                                                <a href="{{ route('gizi.index', [
-                                                    'view' => 'data',
-                                                    'period' => $periodYm ?? now()->format('Y-m'),
-                                                    'status' => $key,
-                                                ]) }}" role="tab"
+                                    {{-- Baris 2: Status Tabs + Periode Selector --}}
+                                    <div class="flex flex-col lg:flex-row lg:justify-between items-center gap-3 text-center lg:text-left w-full">
+
+                                        {{-- Status Tabs --}}
+                                        <div class="border-t border-gray-100 pt-3 w-full lg:w-auto lg:flex lg:items-center">
+                                            <nav class="flex flex-row flex-wrap gap-2 justify-center lg:justify-start"
+                                                role="tablist" aria-label="Status data">
+
+                                                @foreach ($tabItems as $key => $meta)
+                                                    @php $active = ($status === $key); @endphp
+
+                                                    <a href="{{ route('gizi.index', [
+                                                            'view'   => 'data',
+                                                            'period' => $periodYm ?? now()->format('Y-m'),
+                                                            'status' => $key,
+                                                        ]) }}"
+                                                    role="tab"
                                                     aria-selected="{{ $active ? 'true' : 'false' }}"
-                                                    class="group relative flex items-center justify-between sm:justify-center gap-3 px-4 py-3 sm:py-4 text-sm font-medium border-b-2 sm:border-b-3 transition-all duration-200
-                                                {{ $active
-                                                    ? $meta['text'] . ' ' . $meta['border'] . ' ' . $meta['bg']
-                                                    : 'text-gray-500 border-transparent hover:text-gray-700 hover:border-gray-300 hover:bg-gray-50' }}">
-                                                    <span class="flex items-center gap-2">
-                                                        {{-- Animated Dot Indicator --}}
-                                                        <span
-                                                            class="relative flex h-2 w-2 {{ $active ? '' : 'opacity-0 group-hover:opacity-50' }}">
-                                                            @if ($active && $counts[$key] > 0)
-                                                                <span
-                                                                    class="animate-ping absolute inline-flex h-full w-full rounded-full {{ $meta['dot'] }} opacity-75"></span>
-                                                            @endif
+                                                    class="
+                                                            group relative
+                                                            flex items-center justify-between sm:justify-center
+                                                            gap-3
+                                                            px-4 py-3 sm:py-4
+                                                            text-xs sm:text-sm font-medium border-b-2 transition-all duration-200
+                                                            {{ $active
+                                                                ? $meta['text'].' '.$meta['border'].' '.$meta['bg']
+                                                                : 'text-gray-500 border-transparent hover:text-gray-700 hover:border-gray-300 hover:bg-gray-50'
+                                                            }}
+                                                    ">
+
+                                                        {{-- Label + Dot + Badge (mobile = flex-col, desktop = flex-row) --}}
+                                                        <span class="flex flex-col sm:flex-row items-center sm:items-center gap-1 sm:gap-3">
+
+                                                            {{-- Label + Dot --}}
+                                                            <span class="flex items-center gap-2">
+                                                                {{-- Animated Dot Indicator --}}
+                                                                <span class="relative flex h-2 w-2 {{ $active ? '' : 'opacity-0 group-hover:opacity-50' }}">
+                                                                    @if ($active && ($counts[$key] ?? 0) > 0)
+                                                                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full {{ $meta['dot'] }} opacity-75"></span>
+                                                                    @endif
+                                                                    <span class="relative inline-flex rounded-full h-2 w-2 {{ $meta['dot'] }}"></span>
+                                                                </span>
+
+                                                                <span>{{ $meta['label'] }}</span>
+                                                            </span>
+
+                                                            {{-- Badge jumlah data --}}
                                                             <span
-                                                                class="relative inline-flex rounded-full h-2 w-2 {{ $meta['dot'] }}"></span>
+                                                                class="inline-flex items-center justify-center min-w-[2rem] px-2.5 py-1
+                                                                    rounded-full text-[11px] sm:text-xs font-semibold transition-all duration-200
+                                                                    {{ $active
+                                                                            ? $meta['badge_bg'].' '.$meta['badge_text'].' shadow-sm'
+                                                                            : 'bg-gray-100 text-gray-600 group-hover:bg-gray-200'
+                                                                    }}">
+                                                                {{ $counts[$key] ?? 0 }}
+                                                            </span>
+
                                                         </span>
-                                                        <span>{{ $meta['label'] }}</span>
-                                                    </span>
 
-                                                    {{-- Elegant Badge --}}
-                                                    <span
-                                                        class="inline-flex items-center justify-center min-w-[2rem] px-2.5 py-1 rounded-full text-xs font-semibold transition-all duration-200
-                                                        {{ $active
-                                                            ? $meta['badge_bg'] . ' ' . $meta['badge_text'] . ' shadow-sm'
-                                                            : 'bg-gray-100 text-gray-600 group-hover:bg-gray-200' }}">
-                                                        {{ $counts[$key] ?? 0 }}
-                                                    </span>
-
-                                                    {{-- Active Indicator Line --}}
-                                                    @if ($active)
-                                                        <span
-                                                            class="absolute bottom-0 left-0 right-0 h-0.5 {{ $meta['bg'] }} hidden sm:block"></span>
-                                                    @endif
-                                                </a>
-                                            @endforeach
-                                        </nav>
+                                                        {{-- Active Indicator Line (desktop) --}}
+                                                        @if ($active)
+                                                            <span class="absolute bottom-0 left-0 right-0 h-0.5 {{ $meta['bg'] }} hidden sm:block"></span>
+                                                        @endif
+                                                    </a>
+                                                @endforeach
+                                            </nav>
+                                        </div>
 
                                         {{-- Periode Selector --}}
-                                        <form method="GET" action="{{ route('gizi.index') }}"
-                                            class="flex flex-wrap items-center gap-2 sm:gap-3">
-                                            <input type="hidden" name="view" value="data" />
-                                            <label class="text-sm text-gray-600">Periode:</label>
+                                        <div class="w-full lg:w-auto">
+                                            <form method="GET" action="{{ route('gizi.index') }}"
+                                                class="w-full lg:w-auto flex flex-col sm:flex-row items-center justify-center lg:justify-end gap-2 sm:gap-3">
 
-                                            <select name="period" required
-                                                class="text-sm rounded-lg border-gray-300 focus:ring-red-500 focus:border-red-500">
-                                                @forelse($availablePeriods ?? [] as $p)
-                                                    @php $ym = \Carbon\Carbon::parse($p)->format('Y-m'); @endphp
-                                                    <option value="{{ $ym }}"
-                                                        {{ $periodYm === $ym ? 'selected' : '' }}>
-                                                        {{ \Carbon\Carbon::parse($p)->isoFormat('MMMM Y') }}
-                                                    </option>
-                                                @empty
-                                                    @php $ymNow = now()->format('Y-m'); @endphp
-                                                    <option value="{{ $ymNow }}" selected>
-                                                        {{ now()->isoFormat('MMMM Y') }}
-                                                    </option>
-                                                @endforelse
-                                            </select>
+                                                <input type="hidden" name="view" value="data" />
+                                                <input type="hidden" name="status" value="{{ $status ?? 'pending' }}" />
 
-                                            <input type="hidden" name="status"
-                                                value="{{ $status ?? 'pending' }}" />
+                                                <div class="w-full sm:w-auto flex flex-col sm:flex-row sm:items-center gap-2">
+                                                    <label class="text-xs sm:text-sm text-gray-600 sm:whitespace-nowrap">
+                                                        Periode:
+                                                    </label>
 
-                                            <button type="submit"
-                                                class="px-2 md:px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 active:bg-red-800 transition-all duration-200 shadow-sm hover:shadow-md">
-                                                Tampilkan
-                                            </button>
-                                        </form>
+                                                    <select name="period" required
+                                                            class="text-xs sm:text-sm rounded-lg border-gray-300 focus:ring-red-500 focus:border-red-500 w-full sm:w-52">
+                                                        @forelse($availablePeriods ?? [] as $p)
+                                                            @php
+                                                                $ym = \Carbon\Carbon::parse($p)->format('Y-m');
+                                                            @endphp
+                                                            <option value="{{ $ym }}"
+                                                                {{ ($periodYm ?? $activePeriodYm) === $ym ? 'selected' : '' }}>
+                                                                {{ \Carbon\Carbon::parse($p)->isoFormat('MMMM Y') }}
+                                                            </option>
+                                                        @empty
+                                                            @php $ymNow = now()->format('Y-m'); @endphp
+                                                            <option value="{{ $ymNow }}" selected>
+                                                                {{ now()->isoFormat('MMMM Y') }}
+                                                            </option>
+                                                        @endforelse
+                                                    </select>
+                                                </div>
+
+                                                <button type="submit"
+                                                        class="w-full sm:w-auto px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 active:bg-red-800 transition-all duration-200 shadow-sm hover:shadow-md">
+                                                    Tampilkan
+                                                </button>
+                                            </form>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -396,19 +455,22 @@
 
                                                                 <form
                                                                     action="{{ route('gizi.destroyAggregated') }}"
-                                                                    method="POST" x-data>
+                                                                    method="POST"
+                                                                    x-data>
                                                                     @csrf
-                                                                    <input type="hidden"
-                                                                        name="desa_kelurahan"
-                                                                        value="{{ $item->desa_kelurahan }}">
-                                                                    <input type="hidden"
-                                                                        name="status"
-                                                                        value="{{ $item->status }}">
-                                                                    <input type="hidden"
-                                                                        name="period"
-                                                                        value="{{ $periodYm ?? now()->format('Y-m') }}">
+
+                                                                    <input type="hidden" name="desa_kelurahan" value="{{ $item->desa_kelurahan }}">
+                                                                    <input type="hidden" name="status" value="{{ $item->status }}">
+                                                                    <input type="hidden" name="period" value="{{ $periodYm ?? now()->format('Y-m') }}">
+
                                                                     <button type="button"
-                                                                        @click.prevent="$dispatch('open-confirm', { form: $el.closest('form') })"
+                                                                        @click.prevent="$dispatch('open-confirm', {
+                                                                            form: $el.closest('form'),
+                                                                            title: 'Hapus Data Desa {{ $item->desa_kelurahan }}',
+                                                                            message: 'Yakin ingin menghapus seluruh data gizi desa {{ $item->desa_kelurahan }} pada periode ini? Tindakan ini tidak bisa dibatalkan.',
+                                                                            okText: 'Ya, Hapus',
+                                                                            cancelText: 'Batal'
+                                                                        })"
                                                                         class="text-sm font-medium text-red-600 transition hover:text-red-800 hover:underline">
                                                                         Hapus
                                                                     </button>

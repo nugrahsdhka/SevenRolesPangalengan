@@ -202,10 +202,11 @@
 
                 {{-- Bulk Approve / Unapprove --}}
                 <div class="flex flex-row items-center justify-between gap-3 w-full lg:w-auto">
-
                     @if ($hasPending)
-                        <form method="POST" action="{{ route('camat.bulk_status') }}"
-                            class="{{ $soloMode ? 'w-full' : 'w-1/2' }} sm:w-auto">
+                        <form method="POST"
+                            action="{{ route('camat.bulk_status') }}"
+                            class="{{ $soloMode ? 'w-full' : 'w-1/2' }} sm:w-auto"
+                            x-data>
                             @csrf
 
                             {{-- FIELD WAJIB UNTUK bulkUpdateStatus --}}
@@ -214,7 +215,14 @@
                             <input type="hidden" name="active_tab" value="gizi">
                             <input type="hidden" name="period" value="{{ $periodYm }}">
 
-                            <button type="submit"
+                            <button type="button"
+                                @click.prevent="$dispatch('open-confirm', {
+                                    form: $el.closest('form'),
+                                    title: 'Approve semua data Pending',
+                                    message: 'Yakin ingin meng-approve semua data gizi berstatus Pending untuk periode ini? Data akan siap dipublish oleh Admin.',
+                                    okText: 'Ya, Approve semua',
+                                    cancelText: 'Batal'
+                                })"
                                 class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5
                                     text-xs sm:text-sm font-medium text-white
                                     bg-gradient-to-r from-emerald-600 to-emerald-700
@@ -241,8 +249,10 @@
                     @endif
 
                     @if ($hasApproved)
-                        <form method="POST" action="{{ route('camat.bulk_status') }}"
-                            class="{{ $soloMode ? 'w-full' : 'w-1/2' }} sm:w-auto">
+                        <form method="POST"
+                            action="{{ route('camat.bulk_status') }}"
+                            class="{{ $soloMode ? 'w-full' : 'w-1/2' }} sm:w-auto"
+                            x-data>
                             @csrf
 
                             {{-- FIELD WAJIB UNTUK bulkUpdateStatus --}}
@@ -251,7 +261,14 @@
                             <input type="hidden" name="active_tab" value="gizi">
                             <input type="hidden" name="period" value="{{ $periodYm }}">
 
-                            <button type="submit"
+                            <button type="button"
+                                @click.prevent="$dispatch('open-confirm', {
+                                    form: $el.closest('form'),
+                                    title: 'Tarik semua data Approved',
+                                    message: 'Yakin ingin menarik semua data gizi berstatus Approved untuk periode ini kembali ke status Pending? Data tidak akan bisa dipublish oleh Admin sebelum di-approve lagi.',
+                                    okText: 'Ya, Tarik semua',
+                                    cancelText: 'Batal'
+                                })"
                                 class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5
                                     text-xs sm:text-sm font-medium text-amber-800
                                     bg-amber-50 rounded-lg border border-amber-300
@@ -408,28 +425,47 @@
 
                                             {{-- Approve / Tarik per DESA + PERIODE --}}
                                             @if ($item->status === 'pending')
-                                                <form method="POST" action="{{ route('camat.status') }}">
+                                                {{-- PENDING -> APPROVED (Approve) --}}
+                                                <form method="POST" action="{{ route('camat.status') }}" x-data>
                                                     @csrf
                                                     <input type="hidden" name="model" value="DataGizi">
                                                     <input type="hidden" name="new_status" value="approved">
                                                     <input type="hidden" name="desa_kelurahan" value="{{ $item->desa_kelurahan }}">
                                                     <input type="hidden" name="period" value="{{ $periodYm }}">
                                                     <input type="hidden" name="active_tab" value="gizi">
-                                                    <button type="submit"
+
+                                                    <button type="button"
+                                                        @click.prevent="$dispatch('open-confirm', {
+                                                            form: $el.closest('form'),
+                                                            title: 'Approve Data Desa {{ $item->desa_kelurahan }}',
+                                                            message: 'Yakin ingin meng-approve semua data gizi desa {{ $item->desa_kelurahan }} pada periode ini? Data akan dapat dipublish oleh Admin.',
+                                                            okText: 'Ya, Approve',
+                                                            cancelText: 'Batal'
+                                                        })"
                                                         class="text-xs font-medium text-emerald-600 hover:text-emerald-800 hover:underline">
                                                         Approve
                                                     </button>
                                                 </form>
+
                                             @elseif ($item->status === 'approved')
-                                                <form method="POST" action="{{ route('camat.status') }}">
+                                                {{-- APPROVED -> PENDING (Tarik) --}}
+                                                <form method="POST" action="{{ route('camat.status') }}" x-data>
                                                     @csrf
                                                     <input type="hidden" name="model" value="DataGizi">
                                                     <input type="hidden" name="new_status" value="pending">
                                                     <input type="hidden" name="desa_kelurahan" value="{{ $item->desa_kelurahan }}">
                                                     <input type="hidden" name="period" value="{{ $periodYm }}">
                                                     <input type="hidden" name="active_tab" value="gizi">
-                                                    <button type="submit"
-                                                        class="text-xs font-medium text-amber-600 hover:text-amber-800 hover:underline">
+
+                                                    <button type="button"
+                                                        @click.prevent="$dispatch('open-confirm', {
+                                                            form: $el.closest('form'),
+                                                            title: 'Tarik Data Desa {{ $item->desa_kelurahan }}',
+                                                            message: 'Yakin ingin menarik semua data gizi desa {{ $item->desa_kelurahan }} di periode ini kembali ke status Pending? Data tidak akan bisa dipublish oleh Admin sebelum di-approve lagi.',
+                                                            okText: 'Ya, Tarik',
+                                                            cancelText: 'Batal'
+                                                        })"
+                                                        class="text-xs font-medium text-red-600 hover:text-red-800 hover:underline">
                                                         Tarik
                                                     </button>
                                                 </form>
@@ -448,7 +484,13 @@
                                             <input type="hidden" name="active_tab" value="gizi">
 
                                             <button type="button"
-                                                @click.prevent="$dispatch('open-confirm', { form: $el.closest('form') })"
+                                                @click.prevent="$dispatch('open-confirm', {
+                                                    form: $el.closest('form'),
+                                                    title: 'Hapus Data Desa {{ $item->desa_kelurahan }}',
+                                                    message: 'Yakin ingin menghapus seluruh data gizi desa {{ $item->desa_kelurahan }} pada periode ini? Tindakan ini tidak bisa dibatalkan.',
+                                                    okText: 'Ya, Hapus',
+                                                    cancelText: 'Batal'
+                                                })"
                                                 class="text-xs font-medium text-red-600 hover:text-red-800 hover:underline">
                                                 Hapus Semua
                                             </button>

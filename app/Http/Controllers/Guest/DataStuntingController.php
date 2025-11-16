@@ -100,12 +100,25 @@ class DataStuntingController extends Controller
         ));
     }
 
-    // ✅ METHOD BARU UNTUK AMBIL DATA CHART ZS
     public function getChartDataZs(Request $request)
     {
-        $search      = $request->input('search');
-        $tingkat_zs  = $request->input('tingkat_zs');
-        $periodParam = $request->input('period'); // bisa null / "" / "2025-01"
+        $search        = $request->input('search');
+        $tingkat_zs    = $request->input('tingkat_zs');
+
+        // cek apakah key ?period ada di query string
+        $hasPeriodParam = $request->has('period');
+        $periodParam    = $request->input('period'); // bisa null / "" / "2025-01"
+
+        // 🔹 Kalau TIDAK ada param period di URL → default ke periode terbaru
+        if (!$hasPeriodParam) {
+            $latestPeriod = DataGizi::where('status', 'published')
+                ->whereNotNull('period')
+                ->select(DB::raw("DATE_FORMAT(period, '%Y-%m') as ym"))
+                ->orderBy('ym', 'desc')
+                ->value('ym'); // bisa null kalau memang nggak ada data sama sekali
+
+            $periodParam = $latestPeriod;
+        }
 
         $query = DataGizi::query()
             ->select(
@@ -114,9 +127,9 @@ class DataStuntingController extends Controller
             )
             ->where('status', 'published');
 
-        // 🔹 Filter periode (kalau dikirim dari URL)
-        // - period = null  → tidak difilter (semua periode)
-        // - period = ""    → tidak difilter (Semua Periode dipilih)
+        // 🔹 Filter periode:
+        // - period = null  → tidak difilter (kalau memang latestPeriod-nya null)
+        // - period = ""    → tidak difilter (user pilih "Semua Periode")
         // - period = "2025-01" → filter period = '2025-01-01'
         if ($periodParam !== null && $periodParam !== '') {
             $query->whereDate('period', '=', $periodParam . '-01');
@@ -132,7 +145,7 @@ class DataStuntingController extends Controller
             ->havingRaw('COUNT(*) > 0')
             ->havingRaw('avg_zs_tbu IS NOT NULL');
 
-        // 🔹 Filter status Z-Score (sesuai klasifikasi)
+        // 🔹 Filter status Z-Score
         if (!empty($tingkat_zs)) {
             if ($tingkat_zs === 'sangat_pendek') {
                 $query->having('avg_zs_tbu', '<', -3);
@@ -161,5 +174,4 @@ class DataStuntingController extends Controller
             'values' => $values,
         ]);
     }
-
 }

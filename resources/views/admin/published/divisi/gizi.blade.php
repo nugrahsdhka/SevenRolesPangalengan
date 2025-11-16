@@ -205,11 +205,12 @@
 
                 {{-- Bulk Publish / Unpublish (Admin) --}}
                 <div class="flex flex-row items-center justify-between gap-3 w-full lg:w-auto">
-
-                    {{-- Publish semua APPROVED -> jadi PUBLISHED --}}
+                    {{-- Bulk Pubished --}}
                     @if ($hasApproved)
-                        <form method="POST" action="{{ route('admin.bulk_publish') }}"
-                              class="{{ $soloMode ? 'w-full' : 'w-1/2' }} sm:w-auto">
+                        <form method="POST"
+                            action="{{ route('admin.bulk_publish') }}"
+                            class="{{ $soloMode ? 'w-full' : 'w-1/2' }} sm:w-auto"
+                            x-data>
                             @csrf
 
                             <input type="hidden" name="model_type" value="gizi">
@@ -217,7 +218,14 @@
                             <input type="hidden" name="active_tab" value="gizi">
                             <input type="hidden" name="period" value="{{ $periodYm }}">
 
-                            <button type="submit"
+                            <button type="button"
+                                    @click.prevent="$dispatch('open-confirm', {
+                                        form: $el.closest('form'),
+                                        title: 'Publish semua data Approved',
+                                        message: 'Yakin ingin mempublish semua data gizi berstatus Approved untuk periode ini? Data akan tampil di halaman publik.',
+                                        okText: 'Ya, Publish semua',
+                                        cancelText: 'Batal'
+                                    })"
                                     class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5
                                         text-xs sm:text-sm font-medium text-white
                                         bg-gradient-to-r from-emerald-600 to-emerald-700
@@ -227,7 +235,7 @@
 
                                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                          d="M5 13l4 4L19 7" />
+                                        d="M5 13l4 4L19 7" />
                                 </svg>
 
                                 @if ($soloMode)
@@ -240,10 +248,12 @@
                         </form>
                     @endif
 
-                    {{-- Tarik semua PUBLISHED -> kembali ke APPROVED --}}
+                    {{-- Bulk Approved --}}
                     @if ($hasPublished)
-                        <form method="POST" action="{{ route('admin.bulk_publish') }}"
-                              class="{{ $soloMode ? 'w-full' : 'w-1/2' }} sm:w-auto">
+                        <form method="POST"
+                            action="{{ route('admin.bulk_publish') }}"
+                            class="{{ $soloMode ? 'w-full' : 'w-1/2' }} sm:w-auto"
+                            x-data>
                             @csrf
 
                             <input type="hidden" name="model_type" value="gizi">
@@ -251,7 +261,14 @@
                             <input type="hidden" name="active_tab" value="gizi">
                             <input type="hidden" name="period" value="{{ $periodYm }}">
 
-                            <button type="submit"
+                            <button type="button"
+                                    @click.prevent="$dispatch('open-confirm', {
+                                        form: $el.closest('form'),
+                                        title: 'Tarik semua data Published',
+                                        message: 'Yakin ingin menarik semua data gizi berstatus Published untuk periode ini kembali ke status Approved? Data akan disembunyikan dari halaman publik.',
+                                        okText: 'Ya, Tarik semua',
+                                        cancelText: 'Batal'
+                                    })"
                                     class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5
                                         text-xs sm:text-sm font-medium text-amber-800
                                         bg-amber-50 rounded-lg border border-amber-300
@@ -260,7 +277,7 @@
 
                                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                          d="M6 18L18 6M6 6l12 12" />
+                                        d="M6 18L18 6M6 6l12 12" />
                                 </svg>
 
                                 @if ($soloMode)
@@ -405,47 +422,72 @@
                                                 Detail
                                             </a>
 
-                                            {{-- Publish / Tarik per DESA (ADMIN) --}}
                                             @if ($item->status === 'approved')
                                                 {{-- APPROVED -> PUBLISHED --}}
-                                                <form method="POST" action="{{ route('admin.publish') }}">
+                                                <form method="POST" action="{{ route('admin.publish') }}" x-data>
                                                     @csrf
                                                     <input type="hidden" name="model" value="DataGizi">
                                                     <input type="hidden" name="desa_kelurahan" value="{{ $item->desa_kelurahan }}">
                                                     <input type="hidden" name="current_status" value="approved">
                                                     <input type="hidden" name="active_tab" value="gizi">
                                                     <input type="hidden" name="period" value="{{ $periodYm }}">
-                                                    <button type="submit"
-                                                            class="text-xs font-medium text-emerald-600 hover:text-emerald-800 hover:underline">
+
+                                                    <button type="button"
+                                                        @click.prevent="$dispatch('open-confirm', {
+                                                            form: $el.closest('form'),
+                                                            title: 'Publish Data Desa {{ $item->desa_kelurahan }}',
+                                                            message: 'Yakin ingin mempublish data gizi desa {{ $item->desa_kelurahan }} untuk periode ini? Data akan tampil di halaman publik.',
+                                                            okText: 'Ya, Publish',
+                                                            cancelText: 'Batal'
+                                                        })"
+                                                        class="text-xs font-medium text-emerald-600 hover:text-emerald-800 hover:underline">
                                                         Publish
                                                     </button>
                                                 </form>
                                             @elseif ($item->status === 'published')
                                                 {{-- PUBLISHED -> APPROVED (Tarik) --}}
-                                                <form method="POST" action="{{ route('admin.publish') }}">
+                                                <form method="POST" action="{{ route('admin.publish') }}" x-data>
                                                     @csrf
                                                     <input type="hidden" name="model" value="DataGizi">
                                                     <input type="hidden" name="desa_kelurahan" value="{{ $item->desa_kelurahan }}">
                                                     <input type="hidden" name="current_status" value="published">
                                                     <input type="hidden" name="active_tab" value="gizi">
                                                     <input type="hidden" name="period" value="{{ $periodYm }}">
-                                                    <button type="submit"
-                                                            class="text-xs font-medium text-amber-600 hover:text-amber-800 hover:underline">
+
+                                                    <button type="button"
+                                                        @click.prevent="$dispatch('open-confirm', {
+                                                            form: $el.closest('form'),
+                                                            title: 'Tarik Data Desa {{ $item->desa_kelurahan }}',
+                                                            message: 'Yakin ingin menarik kembali data gizi desa {{ $item->desa_kelurahan }} dari status Published ke Approved? Data akan disembunyikan dari halaman publik.',
+                                                            okText: 'Ya, Tarik',
+                                                            cancelText: 'Batal'
+                                                        })"
+                                                        class="text-xs font-medium text-amber-600 hover:text-amber-800 hover:underline">
                                                         Tarik
                                                     </button>
                                                 </form>
                                             @endif
                                         </div>
 
-                                        {{-- Hapus Semua: untuk Admin belum ada route khusus, jadi dibuat dummy (#) --}}
                                         <form method="POST"
-                                              action="#"
+                                              action="{{ route('admin.destroy') }}"
                                               x-data>
                                             @csrf
                                             @method('DELETE')
+                                            <input type="hidden" name="model" value="DataGizi">
+                                            <input type="hidden" name="desa_kelurahan" value="{{ $item->desa_kelurahan }}">
+                                            <input type="hidden" name="period" value="{{ $periodYm }}">
+                                            <input type="hidden" name="active_tab" value="gizi">
+
                                             <button type="button"
-                                                class="text-xs font-medium text-red-400 cursor-not-allowed"
-                                                title="Fitur hapus semua belum tersedia di menu Admin">
+                                                @click.prevent="$dispatch('open-confirm', {
+                                                    form: $el.closest('form'),
+                                                    title: 'Hapus Data Desa {{ $item->desa_kelurahan }}',
+                                                    message: 'Yakin ingin menghapus seluruh data gizi desa {{ $item->desa_kelurahan }} pada periode ini? Tindakan ini tidak bisa dibatalkan.',
+                                                    okText: 'Ya, Hapus',
+                                                    cancelText: 'Batal'
+                                                })"
+                                                class="text-xs font-medium text-red-600 hover:text-red-800 hover:underline">
                                                 Hapus Semua
                                             </button>
                                         </form>

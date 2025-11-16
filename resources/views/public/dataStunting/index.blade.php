@@ -95,9 +95,13 @@
         const closeInfoModalButtonHeader = document.getElementById('closeInfoModalBtnHeader');
         const closeInfoModalButtonFooter = document.getElementById('closeInfoModalBtnFooter');
 
-        const openChartInfoModalButton = document.getElementById('openChartInfoModalBtn');
+        const openChartInfoModalBtn       = document.getElementById('openChartInfoModalBtn');          
+        const openChartInfoModalBtnMobile = document.getElementById('openChartInfoModalBtnMobile');    
+        const openChartInfoModalBtnDesktop= document.getElementById('openChartInfoModalBtnDesktop');   
+
         const chartInfoModalOverlay = document.getElementById('chartInfoModalOverlay');
         const chartInfoModalContent = document.getElementById('chartInfoModalContent');
+
         const closeChartInfoModalButtonHeader = document.getElementById('closeChartInfoModalBtnHeader');
         const closeChartInfoModalButtonFooter = document.getElementById('closeChartInfoModalBtnFooter');
 
@@ -608,9 +612,12 @@
                 });
             }
 
-            if (openChartInfoModalButton) {
-                openChartInfoModalButton.addEventListener('click', openChartInfoModal);
-            }
+            [openChartInfoModalBtn, openChartInfoModalBtnMobile, openChartInfoModalBtnDesktop]
+                .filter(Boolean)
+                .forEach(btn => {
+                    btn.addEventListener('click', openChartInfoModal);
+                });
+
             if (closeChartInfoModalButtonHeader) {
                 closeChartInfoModalButtonHeader.addEventListener('click', closeChartInfoModal);
             }

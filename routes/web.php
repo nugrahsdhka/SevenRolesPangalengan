@@ -151,6 +151,7 @@ Route::middleware('auth', 'verified')->group(function () {
         Route::patch('/users/{id}/restore', [UserController::class, 'restore'])->name('users.restore'); // ✅ RUTE BARU
 
         Route::post('/bulk-publish', [AdminController::class, 'bulkPublish'])->name('bulk_publish');
+        Route::delete('/delete', [AdminController::class, 'destroy'])->name('destroy');
     });
 
     Route::get('/profile', [ProfileController::class, 'index'])->name('profile.index'); // Halaman Tampilan
