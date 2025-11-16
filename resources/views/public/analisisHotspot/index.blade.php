@@ -6,7 +6,7 @@
     @include('layouts.nav_public')
 
     {{-- Header --}}
-    <div class="p-1">
+    <div class="p-2">
         <div class="bg-white backdrop-blur-lg rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
             <div class="p-3">
                 <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
@@ -103,7 +103,7 @@
 
     <section id="tab-map">
         <div class="bg-white rounded-lg overflow-hidden flex items-center justify-center">
-            <div class="p-1 w-full">
+            <div class="p-2 w-full">
                 {{-- Map Container --}}
                 <div id="map" class="rounded-lg w-full h-[73vh] md:h-[70vh]"></div>
             </div>

@@ -5,64 +5,54 @@
 
     @include('layouts.nav_public')
 
-{{-- Header --}}
-<div class="p-1">
-    <div class="bg-white backdrop-blur-lg rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
-        <div class="p-3">
+    {{-- Header --}}
+    <div class="p-2">
+        <div class="bg-white backdrop-blur-lg rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+            <div class="p-3">
 
-            {{-- FLEX: selalu justify-between untuk semua device --}}
-            <div class="flex items-center justify-between gap-4 md:py-3">
+                {{-- FLEX: selalu justify-between untuk semua device --}}
+                <div class="flex items-center justify-between gap-4 md:py-3">
 
-                {{-- Title Section --}}
-                <div class="flex flex-col">
-                    <div class="block md:hidden">
-                        <h1 class="text-xl font-bold text-gray-900">
+                    {{-- Title Section --}}
+                    <div class="flex flex-col">
+                        <h1 class="block md:hidden text-xl font-bold text-gray-900">
                             Peta Faskes
                         </h1>
-    
-                        <p class="mt-1 text-sm text-gray-500">
-                            Peta Faskes di Kecamatan Pangalengan
-                        </p>
-                    </div>
-                    <div class="md:block hidden">
-                        <h1 class="text-xl font-bold text-gray-900">
+                        <h1 class="hidden md:block text-xl font-bold text-gray-900">
                             Peta Fasilitas Kesehatan
                         </h1>
-    
                         <p class="mt-1 text-sm text-gray-500">
-                            Peta Fasilitas Fesehatan di Kecamatan Pangalengan
+                            Stunting Kecamatan Pangalengan
                         </p>
                     </div>
+
+                    {{-- Tombol Modal --}}
+                    <button id="openInfoModalBtn"
+                        class="p-3 text-white bg-gradient-to-r from-red-600 to-pink-600 rounded-xl
+                            shadow-lg hover:shadow-xl hover:from-red-700 hover:to-pink-700
+                            transform hover:scale-110 active:scale-95 transition-all duration-200
+                            group">
+                        <svg class="w-6 h-6 transition-transform group-hover:rotate-12 duration-200"
+                            fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" clip-rule="evenodd"
+                                d="M18 10a8 8 0 11-16 0 8 8 0 
+                                0116 0zm-7-4a1 1 0 11-2 0 1 1 
+                                0 012 0zM9 9a1 1 0 000 2v3a1 1 
+                                0 001 1h1a1 1 0 100-2v-3a1 1 
+                                0 00-1-1H9z" />
+                        </svg>
+                    </button>
+
                 </div>
 
-                {{-- Tombol Modal --}}
-                <button id="openInfoModalBtn"
-                    class="p-3 text-white bg-gradient-to-r from-red-600 to-pink-600 rounded-xl
-                           shadow-lg hover:shadow-xl hover:from-red-700 hover:to-pink-700
-                           transform hover:scale-110 active:scale-95 transition-all duration-200
-                           group">
-                    <svg class="w-6 h-6 transition-transform group-hover:rotate-12 duration-200"
-                         fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" clip-rule="evenodd"
-                            d="M18 10a8 8 0 11-16 0 8 8 0 
-                            0116 0zm-7-4a1 1 0 11-2 0 1 1 
-                            0 012 0zM9 9a1 1 0 000 2v3a1 1 
-                            0 001 1h1a1 1 0 100-2v-3a1 1 
-                            0 00-1-1H9z" />
-                    </svg>
-                </button>
-
             </div>
-
         </div>
     </div>
-</div>
-
 
     {{-- Konten Peta --}}
     <section id="tab-map">
         <div class="bg-white rounded-lg overflow-hidden flex items-center justify-center">
-            <div class="p-1 w-full">
+            <div class="p-2 w-full">
                 {{-- Map Container --}}
                 <div id="map" class="rounded-lg w-full h-[73vh] md:h-[70vh]"></div>
             </div>

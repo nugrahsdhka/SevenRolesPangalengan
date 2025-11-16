@@ -8,208 +8,212 @@
     <section id="tab-table" class="{{ $currentView === 'table' ? '' : 'hidden' }}">
         <div class="px-2 space-y-3">
     
-            {{-- Header Section: Title + Info Button (MOBILE) --}}
-            <div class="flex items-start justify-between gap-4 px-1 md:hidden">
-                {{-- Title Section - Mobile --}}
-                <div class="flex-1 mt-2">
-                    <div class="flex items-center gap-3">
-                        <div class="flex-1 min-w-0 flex items-center justify-center">
-                            <div class="text-center">
-                                <h1 class="text-xl sm:text-2xl font-bold text-gray-900 mb-1 tracking-tight">
-                                    Tabel Data Stunting
-                                </h1>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-    
-                {{-- Info Button - Mobile (Top Right) --}}
-                <button id="openInfoModalBtnMobile"
-                    class="mt-2 flex-shrink-0 w-12 h-12 flex items-center justify-center text-white bg-gradient-to-br from-red-600 via-red-500 to-pink-600 rounded-2xl shadow-lg hover:shadow-2xl hover:scale-110 active:scale-95 transition-all duration-300 group relative overflow-hidden">
-                    <div
-                        class="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    </div>
-                    <svg class="w-6 h-6 relative z-10 transition-transform group-hover:rotate-12 duration-300"
-                        fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" clip-rule="evenodd"
-                            d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" />
-                    </svg>
-                </button>
-            </div>
-    
-            {{-- ========== CARD FILTER (FORM) ========== --}}
-            <div class="bg-white border border-gray-200 rounded-2xl shadow-xl overflow-hidden">
-                <div class="flex flex-col lg:flex-row items-stretch gap-4">
-    
-                    {{-- Filter Card (isi form) --}}
-                    <div class="flex-1">
-                        <div
-                            class="bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-lg transition-all duration-300">
-                            <form action="{{ route('data-stunting') }}" method="GET" id="filterFormHeader"
-                                class="p-4 sm:p-5 lg:p-6">
-    
-                                <input type="hidden" name="view" value="{{ $currentView }}">
-    
-                                {{-- Responsive Grid --}}
-                                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-5">
-    
-                                    {{-- Periode Filter --}}
-                                    <div class="space-y-2">
-                                        <label class="flex items-center gap-2 text-sm font-bold text-gray-700">
-                                            <div
-                                                class="flex-shrink-0 w-5 h-5 bg-red-100 rounded-lg flex items-center justify-center">
-                                                <svg class="w-3.5 h-3.5 text-red-600" fill="none" stroke="currentColor"
-                                                    viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                                </svg>
-                                            </div>
-                                            <span>Periode</span>
-                                        </label>
-                                        <div class="relative">
-                                            <select id="periodeInput" name="period"
-                                                class="w-full px-4 py-3 pr-10 border-2 border-gray-200 rounded-xl text-sm font-medium text-gray-700 bg-white appearance-none cursor-pointer
-                                                            focus:ring-2 focus:ring-red-500 focus:border-red-500 focus:outline-none
-                                                            hover:border-gray-300 hover:shadow-sm transition-all duration-200">
-                                                <option value="" @selected(empty($selectedPeriod))>
-                                                    Semua Periode
-                                                </option>
-                                                @forelse ($availablePeriods as $ym)
-                                                    @php
-                                                        try {
-                                                            $periodCarbon = \Carbon\Carbon::createFromFormat('Y-m', $ym);
-                                                            $label = $periodCarbon->isoFormat('MMMM Y');
-                                                        } catch (\Exception $e) {
-                                                            $label = $ym;
-                                                        }
-                                                    @endphp
-                                                    <option value="{{ $ym }}" @selected($selectedPeriod === $ym)>
-                                                        {{ $label }}
-                                                    </option>
-                                                @empty
-                                                    <option value="{{ now()->format('Y-m') }}" selected>
-                                                        {{ now()->isoFormat('MMMM Y') }}
-                                                    </option>
-                                                @endforelse
-                                            </select>
-                                            <div
-                                                class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                                                <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg"
-                                                    viewBox="0 0 20 20" fill="currentColor">
-                                                    <path fill-rule="evenodd"
-                                                        d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                                                        clip-rule="evenodd" />
-                                                </svg>
-                                            </div>
-                                        </div>
+            <div class="p-0 mt-2">
+                <div class="bg-white backdrop-blur-lg rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+                    <div class="p-3 md:p-0">
+                        <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
+
+                            {{-- ================= TITLE SECTION (MOBILE ONLY) ================= --}}
+                            <div class="w-full lg:w-auto block md:hidden">
+                                <div class="flex items-start justify-between gap-3">
+                                    <div class="pt-1">
+                                        <h1 class="text-lg sm:text-xl font-bold text-gray-900 tracking-tight">
+                                            Tabel Data Stunting
+                                        </h1>
+                                        <p class="mt-1 text-sm text-gray-500">
+                                            Stunting Kecamatan Pangalengan
+                                        </p>
                                     </div>
-    
-                                    {{-- Search Filter --}}
-                                    <div class="space-y-2">
-                                        <label class="flex items-center gap-2 text-sm font-bold text-gray-700">
-                                            <div
-                                                class="flex-shrink-0 w-5 h-5 bg-red-100 rounded-lg flex items-center justify-center">
-                                                <svg class="w-3.5 h-3.5 text-red-600" xmlns="http://www.w3.org/2000/svg"
-                                                    viewBox="0 0 20 20" fill="currentColor">
-                                                    <path fill-rule="evenodd"
-                                                        d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
-                                                        clip-rule="evenodd" />
-                                                </svg>
-                                            </div>
-                                            <span>Pencarian Desa</span>
-                                        </label>
-                                        <div class="relative group">
-                                            <div
-                                                class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none z-10">
-                                                <svg class="h-5 w-5 text-gray-400 group-focus-within:text-red-500 transition-colors duration-200"
-                                                    xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
-                                                    fill="currentColor">
-                                                    <path fill-rule="evenodd"
-                                                        d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
-                                                        clip-rule="evenodd" />
-                                                </svg>
-                                            </div>
-                                            <input type="text" name="search" id="search"
-                                                class="block w-full pl-11 pr-4 py-3 text-sm border-2 border-gray-200 rounded-xl bg-white
-                                                           focus:ring-2 focus:ring-red-500 focus:border-red-500 focus:outline-none
-                                                           hover:border-gray-300 hover:shadow-sm transition-all duration-200
-                                                           placeholder-gray-400"
-                                                placeholder="Cari nama desa..." value="{{ $search ?? '' }}">
-                                        </div>
-                                    </div>
-    
-                                    {{-- Status ZS Filter --}}
-                                    <div class="space-y-2">
-                                        <label class="flex items-center gap-2 text-sm font-bold text-gray-700">
-                                            <div
-                                                class="flex-shrink-0 w-5 h-5 bg-red-100 rounded-lg flex items-center justify-center">
-                                                <svg class="w-3.5 h-3.5 text-red-600" fill="none"
-                                                    stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                        d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                                                </svg>
-                                            </div>
-                                            <span>Status (ZS TB/U)</span>
-                                        </label>
-                                        <div class="relative">
-                                            <select id="tingkat_zs" name="tingkat_zs"
-                                                class="block w-full pl-4 pr-10 py-3 text-sm border-2 border-gray-200 rounded-xl bg-white appearance-none cursor-pointer font-medium text-gray-700
-                                                            focus:ring-2 focus:ring-red-500 focus:border-red-500 focus:outline-none
-                                                            hover:border-gray-300 hover:shadow-sm transition-all duration-200">
-                                                <option value="" @selected(empty($tingkat_zs))>Semua Status</option>
-                                                <option value="na" @selected(($tingkat_zs ?? '') == 'na')>⚪ N/A</option>
-                                                <option value="sangat_pendek" @selected(($tingkat_zs ?? '') == 'sangat_pendek')>
-                                                    🔴 Sangat Pendek (&lt; -3)
-                                                </option>
-                                                <option value="pendek" @selected(($tingkat_zs ?? '') == 'pendek')>
-                                                    🟠 Pendek (-3 s/d &lt; -2)
-                                                </option>
-                                                <option value="normal" @selected(($tingkat_zs ?? '') == 'normal')>
-                                                    🟢 Normal (-2 s/d 2)
-                                                </option>
-                                                <option value="tinggi" @selected(($tingkat_zs ?? '') == 'tinggi')>
-                                                    🔵 Tinggi (&gt; 2)
-                                                </option>
-                                            </select>
-                                            <div
-                                                class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                                                <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg"
-                                                    viewBox="0 0 20 20" fill="currentColor">
-                                                    <path fill-rule="evenodd"
-                                                        d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                                                        clip-rule="evenodd" />
-                                                </svg>
-                                            </div>
-                                        </div>
-                                    </div>
-    
-                                    {{-- Submit Button --}}
-                                    <div class="flex items-end">
-                                        <button type="submit"
-                                            class="w-full px-6 py-3 bg-gradient-to-r from-red-600 via-red-500 to-pink-600 text-white rounded-xl text-sm font-bold
-                                                    shadow-lg hover:shadow-xl hover:from-red-700 hover:via-red-600 hover:to-pink-700
-                                                    transform hover:scale-105 active:scale-95 transition-all duration-300
-                                                    flex items-center justify-center gap-2 group relative overflow-hidden">
-                                            <div
-                                                class="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                            </div>
-                                            <svg class="w-5 h-5 relative z-10" fill="none" stroke="currentColor"
-                                                viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                            </svg>
-                                            <span class="relative z-10">Tampilkan</span>
-                                        </button>
-                                    </div>
+
+                                    <button id="openInfoModalBtnMobile"
+                                        class="flex-shrink-0 self-center sm:self-auto p-3 text-white bg-gradient-to-r from-red-600 to-pink-600 rounded-xl
+                                            shadow-lg hover:shadow-xl hover:from-red-700 hover:to-pink-700
+                                            transform hover:scale-110 active:scale-95 transition-all duration-200
+                                            group relative">
+                                        <svg class="w-6 h-6 transition-transform group-hover:rotate-12 duration-200"
+                                            fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" clip-rule="evenodd"
+                                                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" />
+                                        </svg>
+                                    </button>
                                 </div>
-                            </form>
+                            </div>
+
+                            {{-- ========= CARD FILTER (FORM) ========= --}}
+                            <div class="w-full">
+                                <div
+                                    class="w-full bg-white/95 backdrop-blur-lg rounded-2xl shadow-lg border border-gray-200/50 overflow-hidden hover:shadow-xl transition-shadow duration-300">
+                                    <form action="{{ route('data-stunting') }}" method="GET" id="filterFormHeader"
+                                        class="w-full p-4 sm:p-5 lg:p-6">
+
+                                        {{-- Pertahankan view saat ganti filter --}}
+                                        <input type="hidden" name="view" value="{{ $currentView }}">
+
+                                        {{-- Responsive Grid --}}
+                                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-5">
+
+                                            {{-- Periode Filter --}}
+                                            <div class="space-y-2">
+                                                <label class="flex items-center gap-2 text-sm font-bold text-gray-700">
+                                                    <div
+                                                        class="flex-shrink-0 w-5 h-5 bg-red-100 rounded-lg flex items-center justify-center">
+                                                        <svg class="w-3.5 h-3.5 text-red-600" fill="none" stroke="currentColor"
+                                                            viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                        </svg>
+                                                    </div>
+                                                    <span>Periode</span>
+                                                </label>
+                                                <div class="relative">
+                                                    <select id="periodeInput" name="period"
+                                                        class="w-full px-4 py-3 pr-10 border-2 border-gray-200 rounded-xl text-sm font-medium text-gray-700 bg-white appearance-none cursor-pointer
+                                                            focus:ring-2 focus:ring-red-500 focus:border-red-500 focus:outline-none
+                                                            hover:border-gray-300 hover:shadow-sm transition-all duration-200">
+                                                        <option value="" @selected(empty($selectedPeriod))>
+                                                            Semua Periode
+                                                        </option>
+                                                        @forelse ($availablePeriods as $ym)
+                                                            @php
+                                                                try {
+                                                                    $periodCarbon = \Carbon\Carbon::createFromFormat('Y-m', $ym);
+                                                                    $label = $periodCarbon->isoFormat('MMMM Y');
+                                                                } catch (\Exception $e) {
+                                                                    $label = $ym;
+                                                                }
+                                                            @endphp
+                                                            <option value="{{ $ym }}" @selected($selectedPeriod === $ym)>
+                                                                {{ $label }}
+                                                            </option>
+                                                        @empty
+                                                            <option value="{{ now()->format('Y-m') }}" selected>
+                                                                {{ now()->isoFormat('MMMM Y') }}
+                                                            </option>
+                                                        @endforelse
+                                                    </select>
+                                                    <div
+                                                        class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                                        <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg"
+                                                            viewBox="0 0 20 20" fill="currentColor">
+                                                            <path fill-rule="evenodd"
+                                                                d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                                                                clip-rule="evenodd" />
+                                                        </svg>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {{-- Search Filter --}}
+                                            <div class="space-y-2">
+                                                <label class="flex items-center gap-2 text-sm font-bold text-gray-700">
+                                                    <div
+                                                        class="flex-shrink-0 w-5 h-5 bg-red-100 rounded-lg flex items-center justify-center">
+                                                        <svg class="w-3.5 h-3.5 text-red-600" xmlns="http://www.w3.org/2000/svg"
+                                                            viewBox="0 0 20 20" fill="currentColor">
+                                                            <path fill-rule="evenodd"
+                                                                d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
+                                                                clip-rule="evenodd" />
+                                                        </svg>
+                                                    </div>
+                                                    <span>Pencarian Desa</span>
+                                                </label>
+                                                <div class="relative group">
+                                                    <div
+                                                        class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none z-10">
+                                                        <svg class="h-5 w-5 text-gray-400 group-focus-within:text-red-500 transition-colors duration-200"
+                                                            xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+                                                            fill="currentColor">
+                                                            <path fill-rule="evenodd"
+                                                                d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
+                                                                clip-rule="evenodd" />
+                                                        </svg>
+                                                    </div>
+                                                    <input type="text" name="search" id="search"
+                                                        class="block w-full pl-11 pr-4 py-3 text-sm border-2 border-gray-200 rounded-xl bg-white
+                                                            focus:ring-2 focus:ring-red-500 focus:border-red-500 focus:outline-none
+                                                            hover:border-gray-300 hover:shadow-sm transition-all duration-200
+                                                            placeholder-gray-400"
+                                                        placeholder="Cari nama desa..." value="{{ $search ?? '' }}">
+                                                </div>
+                                            </div>
+
+                                            {{-- Status ZS Filter --}}
+                                            <div class="space-y-2">
+                                                <label class="flex items-center gap-2 text-sm font-bold text-gray-700">
+                                                    <div
+                                                        class="flex-shrink-0 w-5 h-5 bg-red-100 rounded-lg flex items-center justify-center">
+                                                        <svg class="w-3.5 h-3.5 text-red-600" fill="none"
+                                                            stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                                                        </svg>
+                                                    </div>
+                                                <span>Status (ZS TB/U)</span>
+                                                </label>
+                                                <div class="relative">
+                                                    <select id="tingkat_zs" name="tingkat_zs"
+                                                        class="block w-full pl-4 pr-10 py-3 text-sm border-2 border-gray-200 rounded-xl bg-white appearance-none cursor-pointer font-medium text-gray-700
+                                                            focus:ring-2 focus:ring-red-500 focus:border-red-500 focus:outline-none
+                                                            hover:border-gray-300 hover:shadow-sm transition-all duration-200">
+                                                        <option value="" @selected(empty($tingkat_zs))>Semua Status</option>
+                                                        <option value="na" @selected(($tingkat_zs ?? '') == 'na')>⚪ N/A</option>
+                                                        <option value="sangat_pendek" @selected(($tingkat_zs ?? '') == 'sangat_pendek')>
+                                                            🔴 Sangat Pendek (&lt; -3)
+                                                        </option>
+                                                        <option value="pendek" @selected(($tingkat_zs ?? '') == 'pendek')>
+                                                            🟠 Pendek (-3 s/d &lt; -2)
+                                                        </option>
+                                                        <option value="normal" @selected(($tingkat_zs ?? '') == 'normal')>
+                                                            🟢 Normal (-2 s/d 2)
+                                                        </option>
+                                                        <option value="tinggi" @selected(($tingkat_zs ?? '') == 'tinggi')>
+                                                            🔵 Tinggi (&gt; 2)
+                                                        </option>
+                                                    </select>
+                                                    <div
+                                                        class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                                        <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg"
+                                                            viewBox="0 0 20 20" fill="currentColor">
+                                                            <path fill-rule="evenodd"
+                                                                d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                                                                clip-rule="evenodd" />
+                                                        </svg>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {{-- Submit Button --}}
+                                            <div class="flex items-end">
+                                                <button type="submit"
+                                                    class="w-full px-6 py-3 bg-gradient-to-r from-red-600 via-red-500 to-pink-600 text-white rounded-xl text-sm font-bold
+                                                        shadow-lg hover:shadow-xl hover:from-red-700 hover:via-red-600 hover:to-pink-700
+                                                        transform hover:scale-105 active:scale-95 transition-all duration-300
+                                                        flex items-center justify-center gap-2 group relative overflow-hidden">
+                                                    <div
+                                                        class="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                                    </div>
+                                                    <svg class="w-5 h-5 relative z-10" fill="none" stroke="currentColor"
+                                                        viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                                    </svg>
+                                                    <span class="relative z-10">Tampilkan</span>
+                                                </button>
+                                            </div>
+
+                                        </div>{{-- end grid --}}
+                                    </form>
+                                </div>
+                            </div>{{-- end card filter wrapper --}}
+
                         </div>
-                    </div> {{-- end Filter Card --}}
+                    </div>
                 </div>
             </div>
-    
+
+
             {{-- ========== CARD TABEL ========== --}}
             <div class="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
                 {{-- TITLE + INFO DESKTOP --}}
