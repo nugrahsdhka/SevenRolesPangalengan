@@ -6,69 +6,89 @@ use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Role;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
+use Spatie\Permission\PermissionRegistrar;
 
 class RoleAndUserSeeder extends Seeder
 {
     public function run(): void
     {
         // Reset cached roles and permissions
-        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+        app()[PermissionRegistrar::class]->forgetCachedPermissions();
 
-        // Buat Roles
-        $roleGizi = Role::create(['name' => 'Divisi Gizi']);
-        $rolePencegahan = Role::create(['name' => 'Divisi Pencegahan']);
-        $rolePenanggulangan = Role::create(['name' => 'Divisi Penanggulangan']);
-        $roleDesa = Role::create(['name' => 'Divisi Desa']);
-        $roleCamat = Role::create(['name' => 'Camat']);
-        $roleAdmin = Role::create(['name' => 'IT Admin']);
+        // ====== BUAT ROLES (AMAN DI-RUN BERKALI-KALI) ======
+        $roleGizi          = Role::firstOrCreate(['name' => 'Divisi Gizi',           'guard_name' => 'web']);
+        $rolePencegahan    = Role::firstOrCreate(['name' => 'Divisi Pencegahan',     'guard_name' => 'web']);
+        $rolePenanggulangan= Role::firstOrCreate(['name' => 'Divisi Penanggulangan', 'guard_name' => 'web']);
+        $roleDesa          = Role::firstOrCreate(['name' => 'Divisi Desa',           'guard_name' => 'web']);
+        $roleCamat         = Role::firstOrCreate(['name' => 'Camat',                 'guard_name' => 'web']);
+        $roleAdmin         = Role::firstOrCreate(['name' => 'IT Admin',              'guard_name' => 'web']);
 
-        // Buat User untuk setiap role
-        $userGizi = User::create([
-            'name' => 'User Gizi',
-            'email' => 'gizi@test.com',
-            'password' => Hash::make('gizi123456'),
-            'email_verified_at' => now(),
-        ]);
-        $userGizi->assignRole($roleGizi);
+        // ====== BUAT / UPDATE USER UNTUK SETIAP ROLE ======
 
-        $userPencegahan = User::create([
-            'name' => 'User Pencegahan',
-            'email' => 'pencegahan@test.com',
-            'password' => Hash::make('pencegahan123456'),
-            'email_verified_at' => now(),
-        ]);
-        $userPencegahan->assignRole($rolePencegahan);
+        // Divisi Gizi
+        $userGizi = User::updateOrCreate(
+            ['email' => 'gizi@test.com'],
+            [
+                'name'              => 'User Gizi',
+                'password'          => Hash::make('gizi123456'),
+                'email_verified_at' => now(),
+            ]
+        );
+        $userGizi->syncRoles([$roleGizi->name]);
 
-        $userPenanggulangan = User::create([
-            'name' => 'User Penanggulangan',
-            'email' => 'penanggulangan@test.com',
-            'password' => Hash::make('penanggulangan123456'),
-            'email_verified_at' => now(),
-        ]);
-        $userPenanggulangan->assignRole($rolePenanggulangan);
+        // Divisi Pencegahan
+        $userPencegahan = User::updateOrCreate(
+            ['email' => 'pencegahan@test.com'],
+            [
+                'name'              => 'User Pencegahan',
+                'password'          => Hash::make('pencegahan123456'),
+                'email_verified_at' => now(),
+            ]
+        );
+        $userPencegahan->syncRoles([$rolePencegahan->name]);
 
-        $userDesa = User::create([
-            'name' => 'User Desa',
-            'email' => 'desa@test.com',
-            'password' => Hash::make('desa123456'),
-            'email_verified_at' => now(),
-        ]);
-        $userDesa->assignRole($roleDesa);
+        // Divisi Penanggulangan
+        $userPenanggulangan = User::updateOrCreate(
+            ['email' => 'penanggulangan@test.com'],
+            [
+                'name'              => 'User Penanggulangan',
+                'password'          => Hash::make('penanggulangan123456'),
+                'email_verified_at' => now(),
+            ]
+        );
+        $userPenanggulangan->syncRoles([$rolePenanggulangan->name]);
 
-        $userCamat = User::create([
-            'name' => 'User Camat',
-            'email' => 'camat@test.com',
-            'password' => Hash::make('camat123456'),
-            'email_verified_at' => now(),
-        ]);
-        $userCamat->assignRole($roleCamat);
+        // Divisi Desa
+        $userDesa = User::updateOrCreate(
+            ['email' => 'desa@test.com'],
+            [
+                'name'              => 'User Desa',
+                'password'          => Hash::make('desa123456'),
+                'email_verified_at' => now(),
+            ]
+        );
+        $userDesa->syncRoles([$roleDesa->name]);
 
-        $userAdmin = User::create([
-            'name' => 'User IT Admin',
-            'email' => 'admin@test.com',
-            'password' => Hash::make('admin123456'),
-            'email_verified_at' => now(),
-        ]);
-        $userAdmin->assignRole($roleAdmin);
+        // Camat
+        $userCamat = User::updateOrCreate(
+            ['email' => 'camat@test.com'],
+            [
+                'name'              => 'User Camat',
+                'password'          => Hash::make('camat123456'),
+                'email_verified_at' => now(),
+            ]
+        );
+        $userCamat->syncRoles([$roleCamat->name]);
+
+        // IT Admin
+        $userAdmin = User::updateOrCreate(
+            ['email' => 'admin@test.com'],
+            [
+                'name'              => 'User IT Admin',
+                'password'          => Hash::make('admin123456'),
+                'email_verified_at' => now(),
+            ]
+        );
+        $userAdmin->syncRoles([$roleAdmin->name]);
     }
 }
