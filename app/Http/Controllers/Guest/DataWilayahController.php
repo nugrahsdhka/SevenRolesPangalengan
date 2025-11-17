@@ -13,45 +13,79 @@ class DataWilayahController extends Controller
     {
         $perPage = 15;
 
-        // 1. Ambil nilai 'search' dari request.
+        // Pencarian desa
         $search = $request->query('search');
 
-        // Mulai query
+        // ================== PERIODE: daftar & default ==================
+        $availablePeriods = DataGizi::where('status', 'published')
+            ->whereNotNull('period')
+            ->select(DB::raw("DATE_FORMAT(period, '%Y-%m') as ym"))
+            ->distinct()
+            ->orderBy('ym', 'desc')
+            ->pluck('ym');
+
+        $hasPeriodParam = $request->has('period');       // key ?period ada atau tidak
+        $selectedPeriod = $request->input('period');     // nilainya bisa: null / "" / "2025-01"
+
+        if (!$hasPeriodParam && $availablePeriods->isNotEmpty()) {
+            // Pertama kali buka halaman → pakai periode terbaru
+            $selectedPeriod = $availablePeriods->first();
+        } elseif ($hasPeriodParam && $selectedPeriod === '') {
+            // User pilih "Semua Periode"
+            $selectedPeriod = null;
+        }
+
+        // ================== QUERY AGREGASI PER DESA ==================
         $query = DataGizi::query()
             ->select(
                 'desa_kelurahan',
-                // Ambil tanggal 'created_at' pertama sebagai 'periode' untuk group tersebut
-                DB::raw('MIN(created_at) as periode'), // <-- REVISI
-                DB::raw('YEAR(created_at) as tahun'),
-                DB::raw('MONTH(created_at) as bulan'),
 
-                // ===== TAMBAHAN BARU =====
-                DB::raw('AVG(tinggi) as avg_tb'), // Rata-rata Tinggi Badan
-                DB::raw('AVG(berat) as avg_bb'), // Rata-rata Berat Badan
-                // =========================
+                // Periode diambil dari kolom period (bukan created_at)
+                DB::raw('MAX(period) as periode'),
+                DB::raw('YEAR(period) as tahun'),
+                DB::raw('MONTH(period) as bulan'),
 
+                // Rata-rata tinggi & berat
+                DB::raw('AVG(tinggi) as avg_tb'),
+                DB::raw('AVG(berat) as avg_bb'),
+
+                // Agregasi anak & Z-score
                 DB::raw('COUNT(*) as total_anak'),
                 DB::raw('SUM(CASE WHEN zs_tb_u < -2 THEN 1 ELSE 0 END) as total_kasus_stunting'),
                 DB::raw('SUM(zs_tb_u) as sum_zs_tbu'),
                 DB::raw('SUM(zs_bb_u) as sum_zs_bbu'),
                 DB::raw('SUM(zs_bb_tb) as sum_zs_bbtb')
             )
-            ->where('status', 'published');
+            ->where('status', 'published')
+            ->whereNotNull('period');
 
-        // 2. Terapkan filter pencarian JIKA $search tidak kosong
+        // Filter periode (kalau ada selectedPeriod yang aktif)
+        if (!empty($selectedPeriod)) {
+            $query->whereDate('period', '=', $selectedPeriod . '-01');
+        }
+
+        // Filter pencarian desa
         if ($search) {
-            // Kita filter data SEBELUM di-group by
             $query->where('desa_kelurahan', 'LIKE', '%' . $search . '%');
         }
 
-        // Lanjutkan query dengan grouping, ordering, dan paginasi
-        $dataWilayah = $query->groupBy('desa_kelurahan', 'tahun', 'bulan')
+        // Grouping & sorting
+        $dataWilayah = $query
+            ->groupBy('desa_kelurahan', 'tahun', 'bulan')
             ->orderBy('desa_kelurahan', 'asc')
             ->orderBy('tahun', 'desc')
             ->orderBy('bulan', 'desc')
-            ->paginate($perPage);
+            ->paginate($perPage)
+            ->appends([
+                'search' => $search,
+                'period' => $request->has('period') ? $request->input('period') : $selectedPeriod,
+            ]);
 
-        // 3. Kirim 'dataWilayah' DAN 'search' ke view.
-        return view('public.dataWilayah.index', compact('dataWilayah', 'search'));
+        return view('public.dataWilayah.index', compact(
+            'dataWilayah',
+            'search',
+            'availablePeriods',
+            'selectedPeriod',
+        ));
     }
 }

@@ -46,29 +46,31 @@
                                     <div
                                         class="bg-white/95 backdrop-blur-lg rounded-2xl shadow-lg border border-gray-200/50 overflow-hidden hover:shadow-xl transition-shadow duration-300">
                                         <form action="{{ route('data-stunting') }}"
-                                              method="GET"
-                                              id="chartFilterFormHeader"
-                                              class="p-3 sm:p-4 flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
-    
+                                            method="GET"
+                                            id="chartFilterFormHeader"
+                                            class="p-3 sm:p-4 flex flex-wrap items-end gap-3 sm:gap-4">
+
                                             {{-- Pastikan tetap di tab chart --}}
                                             <input type="hidden" name="view" value="chart">
-    
-                                            <div
-                                                class="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3 flex-1">
+
+                                            {{-- Periode --}}
+                                            <div class="flex-1 min-w-[200px]">
                                                 <label
-                                                    class="flex items-center gap-2 text-sm font-semibold text-gray-700 whitespace-nowrap">
-                                                    <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor"
-                                                        viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            stroke-width="2"
-                                                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                                    </svg>
+                                                    class="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-1">
+                                                    <div
+                                                        class="flex-shrink-0 w-5 h-5 bg-red-100 rounded-lg flex items-center justify-center">
+                                                        <svg class="w-3.5 h-3.5 text-red-600" fill="none" stroke="currentColor"
+                                                            viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                        </svg>
+                                                    </div>
                                                     Periode
                                                 </label>
-    
+
                                                 <select id="chartPeriodeInput"
                                                         name="period"
-                                                        class="w-full sm:flex-1 sm:min-w-[160px] px-4 py-2.5 border border-gray-300 rounded-xl text-sm font-medium text-gray-700
+                                                        class="w-full sm:w-48 px-4 py-2.5 border border-gray-300 rounded-xl text-sm font-medium text-gray-700
                                                             focus:ring-2 focus:ring-red-500 focus:border-red-500 focus:outline-none
                                                             hover:border-gray-400 transition-colors duration-200">
                                                     <option value="" @selected(empty($selectedPeriod))>
@@ -93,24 +95,28 @@
                                                     @endforelse
                                                 </select>
                                             </div>
-    
-                                            <button type="submit" id="applyChartPeriodeBtn"
-                                                class="w-full sm:w-auto px-6 py-2.5 bg-gradient-to-r from-red-600 to-pink-600 text-white rounded-xl text-sm font-semibold
-                                                    shadow-md hover:shadow-xl hover:from-red-700 hover:to-pink-700
-                                                    transform hover:scale-105 active:scale-95 transition-all duration-200
-                                                    flex items-center justify-center gap-2">
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor"
-                                                    viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                        stroke-width="2"
-                                                        d="M4 6h16M4 10h16M4 14h10M4 18h6" />
-                                                </svg>
-                                                <span>Tampilkan Chart</span>
-                                            </button>
+
+                                            {{-- Tombol Submit --}}
+                                            <div class="w-full sm:w-auto flex justify-end">
+                                                <button type="submit"
+                                                    class="w-full sm:w-auto px-6 py-2.5 bg-gradient-to-r from-red-600 to-pink-600 text-white rounded-xl text-sm font-semibold
+                                                        shadow-md hover:shadow-xl hover:from-red-700 hover:to-pink-700
+                                                        transform hover:scale-105 active:scale-95 transition-all duration-200
+                                                        flex items-center justify-center gap-2">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                        viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2"
+                                                            d="M4 6h16M4 10h16M4 14h10M4 18h6" />
+                                                    </svg>
+                                                    <span>Tampilkan Chart</span>
+                                                </button>
+                                            </div>
+
                                         </form>
                                     </div>
                                 </div>
-    
+
                                 {{-- Tombol Info Modal - Desktop (kanan) --}}
                                 <button id="openChartInfoModalBtnDesktop"
                                     class="hidden md:block flex-shrink-0 self-center sm:self-auto p-3 text-white bg-gradient-to-r from-red-600 to-pink-600 rounded-xl

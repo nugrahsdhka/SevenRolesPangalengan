@@ -5,103 +5,130 @@
 
     @include('layouts.nav_public')
 
-    {{-- Header --}}
-    <div class="p-2">
-        <div class="bg-white backdrop-blur-lg rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
-            <div class="p-3">
-                <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
-                    {{-- Title Section --}}
-                    <div class="w-full lg:w-auto">
-                        <div class="flex justify-between">
-                            <div>
-                                <h1 class="text-xl font-bold text-gray-900">
-                                    Analisis Hotspot
-                                </h1>
-                                <p class="mt-1 text-sm text-gray-500">
-                                    Stunting Kecamatan Pangalengan
-                                </p>
+
+
+    <section id="tab-map">
+        {{-- Header --}}
+        <div class="pt-3">
+            <div class="bg-white backdrop-blur-lg rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
+                <div class="p-3">
+                    <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
+
+                        {{-- Title Section --}}
+                        <div class="w-full lg:w-auto">
+                            <div class="flex justify-between">
+                                <div>
+                                    <h1 class="text-xl font-bold text-gray-900">
+                                        Analisis Hotspot
+                                    </h1>
+                                    <p class="mt-1 text-sm text-gray-500">
+                                        Stunting Kecamatan Pangalengan
+                                    </p>
+                                </div>
+
+                                {{-- Info Button - Mobile --}}
+                                <button id="openInfoModalBtnMobile"
+                                    class="block md:hidden flex-shrink-0 self-center sm:self-auto p-3 text-white bg-gradient-to-r from-red-600 to-pink-600 rounded-xl
+                                        shadow-lg hover:shadow-xl hover:from-red-700 hover:to-pink-700
+                                        transform hover:scale-110 active:scale-95 transition-all duration-200
+                                        group relative">
+                                    <svg class="w-6 h-6 transition-transform group-hover:rotate-12 duration-200"
+                                        fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" clip-rule="evenodd"
+                                            d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" />
+                                    </svg>
+                                </button>
                             </div>
-    
+                        </div>
+
+                        {{-- Filter & Button Section --}}
+                        <div class="flex items-stretch sm:items-center gap-3 w-full lg:w-auto">
+                            {{-- Filter Periode --}}
+                            <div class="flex">
+                                <div
+                                    class="bg-white/95 backdrop-blur-lg rounded-2xl shadow-lg border border-gray-200/50 overflow-hidden hover:shadow-xl transition-shadow duration-300">
+                                    <form id="periodeForm"
+                                        class="p-3 sm:p-4 flex flex-wrap items-end gap-3 sm:gap-4">
+
+                                        {{-- Periode --}}
+                                        <div class="flex-1 min-w-[200px]">
+                                            <label
+                                                class="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-1">
+                                                <div
+                                                    class="flex-shrink-0 w-5 h-5 bg-red-100 rounded-lg flex items-center justify-center">
+                                                    <svg class="w-3.5 h-3.5 text-red-600" fill="none"
+                                                        stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2"
+                                                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                    </svg>
+                                                </div>
+                                                Periode
+                                            </label>
+
+                                            <select id="periodeInput"
+                                                class="w-full sm:w-48 px-4 py-2.5 border border-gray-300 rounded-xl text-sm font-medium text-gray-700
+                                                        focus:ring-2 focus:ring-red-500 focus:border-red-500 focus:outline-none
+                                                        hover:border-gray-400 transition-colors duration-200">
+
+                                                @forelse ($availablePeriods as $p)
+                                                    @php
+                                                        $ym = \Carbon\Carbon::parse($p)->format('Y-m');
+                                                    @endphp
+                                                    <option value="{{ $ym }}">
+                                                        {{ \Carbon\Carbon::parse($p)->isoFormat('MMMM Y') }}
+                                                    </option>
+                                                @empty
+                                                    <option value="{{ now()->format('Y-m') }}" selected>
+                                                        {{ now()->isoFormat('MMMM Y') }}
+                                                    </option>
+                                                @endforelse
+                                            </select>
+                                        </div>
+
+                                        {{-- Tombol Apply Periode --}}
+                                        <div class="w-full sm:w-auto flex justify-end">
+                                            <button type="button" id="applyPeriodeBtn"
+                                                class="w-full sm:w-auto px-6 py-2.5 bg-gradient-to-r from-red-600 to-pink-600 text-white rounded-xl text-sm font-semibold
+                                                    shadow-md hover:shadow-xl hover:from-red-700 hover:to-pink-700
+                                                    transform hover:scale-105 active:scale-95 transition-all duration-200
+                                                    flex items-center justify-center gap-2">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2"
+                                                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2"
+                                                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                                </svg>
+                                                <span>Tampilkan</span>
+                                            </button>
+                                        </div>
+
+                                    </form>
+                                </div>
+                            </div>
+
+                            {{-- Tombol Info Modal - Desktop (kanan) --}}
                             <button id="openInfoModalBtnDesktop"
-                                class="block md:hidden flex-shrink-0 self-center sm:self-auto p-3 text-white bg-gradient-to-r from-red-600 to-pink-600 rounded-xl
+                                class="hidden md:block flex-shrink-0 self-center sm:self-auto p-3 text-white bg-gradient-to-r from-red-600 to-pink-600 rounded-xl
                                     shadow-lg hover:shadow-xl hover:from-red-700 hover:to-pink-700
                                     transform hover:scale-110 active:scale-95 transition-all duration-200
                                     group relative">
-                                <svg class="w-6 h-6 transition-transform group-hover:rotate-12 duration-200" fill="currentColor" viewBox="0 0 20 20">
+                                <svg class="w-6 h-6 transition-transform group-hover:rotate-12 duration-200"
+                                    fill="currentColor" viewBox="0 0 20 20">
                                     <path fill-rule="evenodd" clip-rule="evenodd"
                                         d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" />
                                 </svg>
                             </button>
                         </div>
-                    </div>
 
-                    {{-- Filter & Button Section --}}
-                    <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full lg:w-auto">
-                        {{-- Filter Periode --}}
-                        <div class="flex-1 sm:flex-initial">
-                            <div class="bg-white/95 backdrop-blur-lg rounded-2xl shadow-lg border border-gray-200/50 overflow-hidden hover:shadow-xl transition-shadow duration-300">
-                                <form id="periodeForm" class="p-3 sm:p-4 flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
-                                    <div class="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3 flex-1">
-                                        <label class="flex items-center gap-2 text-sm font-semibold text-gray-700 whitespace-nowrap">
-                                            <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                                            </svg>
-                                            Periode
-                                        </label>
-                                        <select id="periodeInput"
-                                            class="w-full sm:flex-1 sm:min-w-[160px] px-4 py-2.5 border border-gray-300 rounded-xl text-sm font-medium text-gray-700
-                                                focus:ring-2 focus:ring-red-500 focus:border-red-500 focus:outline-none
-                                                hover:border-gray-400 transition-colors duration-200">
-
-                                            @forelse ($availablePeriods as $p)
-                                                @php
-                                                    $ym = \Carbon\Carbon::parse($p)->format('Y-m');
-                                                @endphp
-
-                                                <option value="{{ $ym }}">
-                                                    {{ \Carbon\Carbon::parse($p)->isoFormat('MMMM Y') }}
-                                                </option>
-                                            @empty
-                                                <option value="{{ now()->format('Y-m') }}" selected>
-                                                    {{ now()->isoFormat('MMMM Y') }}
-                                                </option>
-                                            @endforelse
-                                        </select>
-                                    </div>
-
-                                    <button type="button" id="applyPeriodeBtn"
-                                        class="w-full sm:w-auto px-6 py-2.5 bg-gradient-to-r from-red-600 to-pink-600 text-white rounded-xl text-sm font-semibold
-                                            shadow-md hover:shadow-xl hover:from-red-700 hover:to-pink-700
-                                            transform hover:scale-105 active:scale-95 transition-all duration-200
-                                            flex items-center justify-center gap-2">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                                        </svg>
-                                        Tampilkan
-                                    </button>
-                                </form>
-                            </div>
-                        </div>
-
-                        {{-- Tombol Info Modal --}}
-                        <button id="openInfoModalBtnMobile"
-                            class="hidden md:block flex-shrink-0 self-center sm:self-auto p-3 text-white bg-gradient-to-r from-red-600 to-pink-600 rounded-xl
-                                shadow-lg hover:shadow-xl hover:from-red-700 hover:to-pink-700
-                                transform hover:scale-110 active:scale-95 transition-all duration-200
-                                group relative">
-                            <svg class="w-6 h-6 transition-transform group-hover:rotate-12 duration-200" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" clip-rule="evenodd"
-                                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" />
-                            </svg>
-                        </button>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <section id="tab-map">
         <div class="bg-white rounded-lg overflow-hidden flex items-center justify-center">
             <div class="p-2 w-full">
                 {{-- Map Container --}}
