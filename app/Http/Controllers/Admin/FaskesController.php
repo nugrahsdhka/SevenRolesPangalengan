@@ -10,7 +10,7 @@ class FaskesController extends Controller
 {
     public function index()
     {
-        $faskes = Faskes::orderBy('nama_faskes')->paginate(10);
+        $faskes = Faskes::orderBy('nama_faskes')->paginate(50);
 
         return view('admin.faskes.index', compact('faskes'));
     }

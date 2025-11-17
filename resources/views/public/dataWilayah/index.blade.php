@@ -182,193 +182,193 @@
 
                 {{-- ========== CARD TABEL ========== --}}
                 <div class="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
-                    <div class="bg-white">
-                        <div class="overflow-hidden rounded-xl border border-gray-200">
-                            <div class="overflow-x-auto">
-                                <table class="min-w-full divide-y divide-gray-200">
+                    <div class="relative">
+                        {{-- SCROLL CONTAINER: VERTICAL + HORIZONTAL --}}
+                        <div class="max-h-[64vh] md:max-h-[64vh] overflow-y-auto overflow-x-auto bg-white">
+                            <table class="w-full min-w-[1200px] divide-y divide-gray-200">
 
-                                    {{-- THEAD --}}
-                                    <thead class="bg-gradient-to-r from-gray-50 to-gray-100">
-                                        <tr class="uppercase">
+                                {{-- THEAD (STICKY) --}}
+                                <thead class="sticky top-0 z-20 bg-gradient-to-r from-gray-50 to-gray-100 shadow-sm">
+                                    <tr class="uppercase border-b border-gray-200">
 
-                                            <th scope="col"
-                                                class="px-6 py-4 text-left text-xs font-bold text-gray-700 tracking-wider">
-                                                desa
-                                            </th>
+                                        <th scope="col"
+                                            class="px-6 py-4 text-left text-xs font-bold text-gray-700 tracking-wider">
+                                            desa
+                                        </th>
 
-                                            <th scope="col"
-                                                class="px-6 py-4 text-center text-xs font-bold text-gray-700 tracking-wider whitespace-nowrap md:whitespace-normal">
-                                                <p>
-                                                    rata-rata
-                                                </p>
-                                                <p>tinggi (cm)</p>
-                                            </th>
+                                        <th scope="col"
+                                            class="px-6 py-4 text-center text-xs font-bold text-gray-700 tracking-wider whitespace-nowrap md:whitespace-normal">
+                                            <p>
+                                                rata-rata
+                                            </p>
+                                            <p>tinggi (cm)</p>
+                                        </th>
 
-                                            <th scope="col"
-                                                class="px-6 py-4 text-center text-xs font-bold text-gray-700 tracking-wider whitespace-nowrap md:whitespace-normal">
-                                                <p>
-                                                    rata-rata
-                                                </p>
-                                                <p>berat (kg)</p>
-                                            </th>
+                                        <th scope="col"
+                                            class="px-6 py-4 text-center text-xs font-bold text-gray-700 tracking-wider whitespace-nowrap md:whitespace-normal">
+                                            <p>
+                                                rata-rata
+                                            </p>
+                                            <p>berat (kg)</p>
+                                        </th>
 
-                                            <th scope="col"
-                                                class="px-6 py-4 text-center text-xs font-bold text-gray-700 tracking-wider">
-                                                total anak
-                                            </th>
+                                        <th scope="col"
+                                            class="px-6 py-4 text-center text-xs font-bold text-gray-700 tracking-wider">
+                                            total anak
+                                        </th>
 
-                                            <th scope="col"
-                                                class="px-6 py-4 text-center text-xs font-bold text-gray-700 tracking-wider whitespace-nowrap md:whitespace-normal">
-                                                <p>
-                                                    rata-rata
-                                                </p>
-                                                <p>zs bb/u</p>
-                                            </th>
+                                        <th scope="col"
+                                            class="px-6 py-4 text-center text-xs font-bold text-gray-700 tracking-wider whitespace-nowrap md:whitespace-normal">
+                                            <p>
+                                                rata-rata
+                                            </p>
+                                            <p>zs bb/u</p>
+                                        </th>
 
-                                            <th scope="col"
-                                                class="px-6 py-4 text-center text-xs font-bold text-gray-700 tracking-wider whitespace-nowrap md:whitespace-normal">
-                                                <p>
-                                                    rata-rata
-                                                </p>
-                                                <p>zs tb/u</p>
-                                            </th>
+                                        <th scope="col"
+                                            class="px-6 py-4 text-center text-xs font-bold text-gray-700 tracking-wider whitespace-nowrap md:whitespace-normal">
+                                            <p>
+                                                rata-rata
+                                            </p>
+                                            <p>zs tb/u</p>
+                                        </th>
 
-                                            <th scope="col"
-                                                class="px-6 py-4 text-center text-xs font-bold text-gray-700 tracking-wider whitespace-nowrap md:whitespace-normal">
-                                                <p>
-                                                    rata-rata
-                                                </p>
-                                                <p>zs bb/tb</p>
-                                            </th>
+                                        <th scope="col"
+                                            class="px-6 py-4 text-center text-xs font-bold text-gray-700 tracking-wider whitespace-nowrap md:whitespace-normal">
+                                            <p>
+                                                rata-rata
+                                            </p>
+                                            <p>zs bb/tb</p>
+                                        </th>
 
-                                            @php
-                                                $currentPeriod = request('period') ?? ($selectedPeriod ?? 'semua periode');
-                                            @endphp
+                                        @php
+                                            $currentPeriod = request('period') ?? ($selectedPeriod ?? 'semua periode');
+                                        @endphp
 
-                                            <th scope="col"
-                                                class="px-6 py-4 text-right text-xs font-bold text-gray-700 tracking-wider whitespace-nowrap">
+                                        <th scope="col"
+                                            class="px-6 py-4 text-right text-xs font-bold text-gray-700 tracking-wider whitespace-nowrap">
 
-                                                <p class="m-0">
-                                                    periode
-                                                </p>
+                                            <p class="m-0">
+                                                periode
+                                            </p>
 
-                                                <p class="m-0 text-[10px] text-gray-500 font-medium">
-                                                    ({{ $currentPeriod }})
-                                                </p>
-                                            </th>
+                                            <p class="m-0 text-[10px] text-gray-500 font-medium">
+                                                ({{ $currentPeriod }})
+                                            </p>
+                                        </th>
+                                    </tr>
+                                </thead>
+
+                                {{-- TBODY --}}
+                                <tbody class="bg-white divide-y divide-gray-100">
+                                    @forelse ($dataWilayah as $data)
+                                        @php
+                                            $avgZsBbU =
+                                                $data->total_anak > 0 && !is_null($data->sum_zs_bbu)
+                                                    ? $data->sum_zs_bbu / $data->total_anak
+                                                    : null;
+                                            $avgZsTbU =
+                                                $data->total_anak > 0 && !is_null($data->sum_zs_tbu)
+                                                    ? $data->sum_zs_tbu / $data->total_anak
+                                                    : null;
+                                            $avgZsBbTb =
+                                                $data->total_anak > 0 && !is_null($data->sum_zs_bbtb)
+                                                    ? $data->sum_zs_bbtb / $data->total_anak
+                                                    : null;
+                                        @endphp
+
+                                        <tr class="hover:bg-gray-50 transition-colors duration-150">
+
+                                            {{-- Desa --}}
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <span class="text-sm font-semibold text-gray-900">
+                                                    {{ $data->desa_kelurahan }}
+                                                </span>
+                                            </td>
+
+                                            {{-- Rata-rata Tinggi --}}
+                                            <td class="px-6 py-4 whitespace-nowrap text-center">
+                                                <span class="text-sm text-gray-700">
+                                                    {{ is_null($data->avg_tb) ? 'N/A' : number_format($data->avg_tb, 1) }}
+                                                </span>
+                                            </td>
+
+                                            {{-- Rata-rata Berat --}}
+                                            <td class="px-6 py-4 whitespace-nowrap text-center">
+                                                <span class="text-sm text-gray-700">
+                                                    {{ is_null($data->avg_bb) ? 'N/A' : number_format($data->avg_bb, 1) }}
+                                                </span>
+                                            </td>
+
+                                            {{-- Total Anak --}}
+                                            <td class="px-6 py-4 whitespace-nowrap text-center">
+                                                <span class="text-sm text-gray-700">
+                                                    {{ number_format($data->total_anak) }}
+                                                </span>
+                                            </td>
+
+                                            {{-- Rata-rata ZS BB/U --}}
+                                            <td class="px-6 py-4 whitespace-nowrap text-center">
+                                                @include('components.zscore-badge', [
+                                                    'value' => $avgZsBbU,
+                                                ])
+                                            </td>
+
+                                            {{-- Rata-rata ZS TB/U --}}
+                                            <td class="px-6 py-4 whitespace-nowrap text-center">
+                                                @include('components.zscore-badge', [
+                                                    'value' => $avgZsTbU,
+                                                ])
+                                            </td>
+
+                                            {{-- Rata-rata ZS BB/TB --}}
+                                            <td class="px-6 py-4 whitespace-nowrap text-center">
+                                                @include('components.zscore-badge', [
+                                                    'value' => $avgZsBbTb,
+                                                ])
+                                            </td>
+
+                                            {{-- Periode --}}
+                                            <td class="px-6 py-4 whitespace-nowrap text-right">
+                                                <div class="flex items-center gap-2 justify-end">
+                                                    <svg class="w-4 h-4 text-gray-400" fill="none"
+                                                        stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2"
+                                                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                    </svg>
+                                                    <span class="text-sm text-gray-700 font-medium">
+                                                        {{ $data->periode ? \Carbon\Carbon::parse($data->periode)->format("M 'y") : '-' }}
+                                                    </span>
+                                                </div>
+                                            </td>
                                         </tr>
-                                    </thead>
 
-                                    {{-- TBODY --}}
-                                    <tbody class="bg-white divide-y divide-gray-100">
-                                        @forelse ($dataWilayah as $data)
-                                            @php
-                                                $avgZsBbU =
-                                                    $data->total_anak > 0 && !is_null($data->sum_zs_bbu)
-                                                        ? $data->sum_zs_bbu / $data->total_anak
-                                                        : null;
-                                                $avgZsTbU =
-                                                    $data->total_anak > 0 && !is_null($data->sum_zs_tbu)
-                                                        ? $data->sum_zs_tbu / $data->total_anak
-                                                        : null;
-                                                $avgZsBbTb =
-                                                    $data->total_anak > 0 && !is_null($data->sum_zs_bbtb)
-                                                        ? $data->sum_zs_bbtb / $data->total_anak
-                                                        : null;
-                                            @endphp
-
-                                            <tr>
-                                                {{-- Desa --}}
-                                                <td class="px-6 py-4 whitespace-nowrap">
-                                                    <span class="text-sm font-semibold text-center text-gray-900">
-                                                        {{ $data->desa_kelurahan }}
-                                                    </span>
-                                                </td>
-
-                                                {{-- Rata-rata Tinggi --}}
-                                                <td class="px-6 py-4 whitespace-nowrap text-center">
-                                                    <span class="text-sm text-gray-700">
-                                                        {{ is_null($data->avg_tb) ? 'N/A' : number_format($data->avg_tb, 1) }}
-                                                    </span>
-                                                </td>
-
-                                                {{-- Rata-rata Berat --}}
-                                                <td class="px-6 py-4 whitespace-nowrap text-center">
-                                                    <span class="text-sm text-gray-700">
-                                                        {{ is_null($data->avg_bb) ? 'N/A' : number_format($data->avg_bb, 1) }}
-                                                    </span>
-                                                </td>
-
-                                                {{-- Total Anak --}}
-                                                <td class="px-6 py-4 whitespace-nowrap text-center">
-                                                    <span class="text-sm text-gray-700">
-                                                        {{ number_format($data->total_anak) }}
-                                                    </span>
-                                                </td>
-
-                                                {{-- Rata-rata ZS BB/U --}}
-                                                <td class="px-6 py-4 whitespace-nowrap text-center">
-                                                    @include('components.zscore-badge', [
-                                                        'value' => $avgZsBbU,
-                                                    ])
-                                                </td>
-
-                                                {{-- Rata-rata ZS TB/U --}}
-                                                <td class="px-6 py-4 whitespace-nowrap text-center">
-                                                    @include('components.zscore-badge', [
-                                                        'value' => $avgZsTbU,
-                                                    ])
-                                                </td>
-
-                                                {{-- Rata-rata ZS BB/TB --}}
-                                                <td class="px-6 py-4 whitespace-nowrap text-center">
-                                                    @include('components.zscore-badge', [
-                                                        'value' => $avgZsBbTb,
-                                                    ])
-                                                </td>
-
-                                                {{-- Periode --}}
-                                                <td class="px-6 py-4 whitespace-nowrap text-right">
-                                                    <div class="flex items-center gap-2 justify-end">
-                                                        <svg class="w-4 h-4 text-gray-400" fill="none"
-                                                            stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                                stroke-width="2"
-                                                                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                                        </svg>
-                                                        <span class="text-sm text-gray-700 font-medium">
-                                                            {{ $data->periode ? \Carbon\Carbon::parse($data->periode)->format("M 'y") : '-' }}
-                                                        </span>
-                                                    </div>
-                                                </td>
-                                            </tr>
-
-                                        @empty
-                                            <tr>
-                                                <td colspan="8" class="px-6 py-12 text-center">
-                                                    <div class="flex flex-col items-center justify-center">
-                                                        <svg class="w-16 h-16 text-gray-300 mb-4" fill="none"
-                                                            stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                                stroke-width="2"
-                                                                d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                        </svg>
-                                                        <p class="text-sm font-medium text-gray-500">
-                                                            Tidak ada data yang ditemukan
+                                    @empty
+                                        <tr>
+                                            <td colspan="8" class="px-6 py-12 text-center">
+                                                <div class="flex flex-col items-center justify-center">
+                                                    <svg class="w-16 h-16 text-gray-300 mb-4" fill="none"
+                                                        stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2"
+                                                            d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                    </svg>
+                                                    <p class="text-sm font-medium text-gray-500">
+                                                        Tidak ada data yang ditemukan
+                                                    </p>
+                                                    @if ($search)
+                                                        <p class="text-xs text-gray-400 mt-1">
+                                                            Coba ubah kata kunci pencarian Anda.
                                                         </p>
-                                                        @if ($search)
-                                                            <p class="text-xs text-gray-400 mt-1">
-                                                                Coba ubah kata kunci pencarian Anda.
-                                                            </p>
-                                                        @endif
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        @endforelse
-                                    </tbody>
+                                                    @endif
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
 
-                                </table>
-                            </div>
+                            </table>
                         </div>
                     </div>
                 </div>

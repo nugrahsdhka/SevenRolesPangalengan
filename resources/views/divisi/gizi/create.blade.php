@@ -161,6 +161,7 @@
                                     type="number"
                                     step="0.01"
                                     name="zs_bb_u"
+                                    required
                                     value="{{ old('zs_bb_u') }}"
                                     placeholder="Z-Score BB/U"
                                     class="mt-1 w-full px-3 py-2 text-xs border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
@@ -183,6 +184,7 @@
                                     type="number"
                                     step="0.01"
                                     name="zs_tb_u"
+                                    required
                                     value="{{ old('zs_tb_u') }}"
                                     placeholder="Z-Score TB/U"
                                     class="mt-1 w-full px-3 py-2 text-xs border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
@@ -205,6 +207,7 @@
                                     type="number"
                                     step="0.01"
                                     name="zs_bb_tb"
+                                    required
                                     value="{{ old('zs_bb_tb') }}"
                                     placeholder="Z-Score BB/TB"
                                     class="mt-1 w-full px-3 py-2 text-xs border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
@@ -306,10 +309,16 @@
                             <label for="import_period" class="text-xs font-medium text-gray-700">
                                 Periode Import
                             </label>
-                            <input type="month" id="import_period" name="period" required
-                                value="{{ $activePeriodYm }}"
-                                class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all">
+                            <input
+                                type="month"
+                                id="import_period"
+                                name="period"
+                                required
+                                value="{{ old('period', $activePeriodYm) }}"
+                                class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white
+                                    focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all">
                         </div>
+
 
                         <div
                             @dragover.prevent="isDragging = true"

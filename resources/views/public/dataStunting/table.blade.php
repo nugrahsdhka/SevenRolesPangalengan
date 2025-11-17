@@ -4,7 +4,7 @@
 @endphp
 
 {{-- ===== Konten Tab: TABLE ===== --}}
-<div class="pb-2">
+<div class="mb-2">
     <section id="tab-table" class="{{ $currentView === 'table' ? '' : 'hidden' }}">
         <div class="px-2 space-y-3">
             {{-- ========== HEADER: TITLE + FILTER (PERSIS LAYOUT DATA WILAYAH) ========== --}}
@@ -224,174 +224,174 @@
 
             {{-- ========== CARD TABEL ========== --}}
             <div class="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
-                {{-- TABLE WRAPPER --}}
-                <div class="overflow-x-auto bg-white">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        {{-- THEAD --}}
-                        <thead class="bg-gray-50">
-                            <tr class="uppercase">
-                                <th scope="col"
-                                    class="px-6 py-4 text-left text-xs font-bold text-gray-700 tracking-wider">
-                                    desa
-                                </th>
-                                <th scope="col"
-                                    class="px-6 py-4 text-center text-xs font-bold text-gray-700 tracking-wider">
-                                    kasus stunting
-                                </th>
-                                <th scope="col"
-                                    class="px-6 py-4 text-center text-xs font-bold text-gray-700 tracking-wider">
-                                    total anak
-                                </th>
-                                <th scope="col"
-                                    class="px-6 py-4 text-center text-xs font-bold text-gray-700 tracking-wider whitespace-nowrap md:whitespace-normal">
-                                    <p>
-                                        rata-rata
-                                    </p>
-                                    <p>zs tb/u</p>
-                                </th>
-                                <th scope="col"
-                                    class="px-6 py-4 text-center text-xs font-bold text-gray-700 tracking-wider whitespace-nowrap">
+                <div class="relative">
+                    {{-- TABLE WRAPPER (SCROLLABLE AREA) --}}
+                    <div class="max-h-[75vh] md:max-h-[56vh] overflow-y-auto overflow-x-auto bg-white">
+                        <table class="w-full min-w-[1200px]">
+                            {{-- THEAD --}}
+                            <thead class="sticky top-0 z-20 bg-gray-50 shadow-sm uppercase">
+                                <tr class="border-b border-gray-200">
+                                    <th scope="col"
+                                        class="px-6 py-4 text-left text-xs font-bold text-gray-700 tracking-wider">
+                                        desa
+                                    </th>
+                                    <th scope="col"
+                                        class="px-6 py-4 text-center text-xs font-bold text-gray-700 tracking-wider">
+                                        kasus stunting
+                                    </th>
+                                    <th scope="col"
+                                        class="px-6 py-4 text-center text-xs font-bold text-gray-700 tracking-wider">
+                                        total anak
+                                    </th>
+                                    <th scope="col"
+                                        class="px-6 py-4 text-center text-xs font-bold text-gray-700 tracking-wider whitespace-nowrap md:whitespace-normal">
+                                        <p>
+                                            rata-rata
+                                        </p>
+                                        <p>zs tb/u</p>
+                                    </th>
+                                    <th scope="col"
+                                        class="px-6 py-4 text-center text-xs font-bold text-gray-700 tracking-wider whitespace-nowrap">
 
-                                    <p class="m-0">
-                                        status desa
-                                    </p>
+                                        <p class="m-0">
+                                            status desa
+                                        </p>
 
-                                    <p class="m-0 text-[10px] text-gray-500 font-medium">
-                                        @if (empty(request('tingkat_zs')))
-                                            (semua status)
-                                        @elseif(request('tingkat_zs') === 'sangat_pendek')
-                                            (sangat pendek)
-                                        @elseif(request('tingkat_zs') === 'pendek')
-                                            (pendek)
-                                        @elseif(request('tingkat_zs') === 'normal')
-                                            (normal)
-                                        @elseif(request('tingkat_zs') === 'tinggi')
-                                            (tinggi)
-                                        @endif
-                                    </p>
-                                </th>
+                                        <p class="m-0 text-[10px] text-gray-500 font-medium">
+                                            @if (empty(request('tingkat_zs')))
+                                                (semua status)
+                                            @elseif(request('tingkat_zs') === 'sangat_pendek')
+                                                (sangat pendek)
+                                            @elseif(request('tingkat_zs') === 'pendek')
+                                                (pendek)
+                                            @elseif(request('tingkat_zs') === 'normal')
+                                                (normal)
+                                            @elseif(request('tingkat_zs') === 'tinggi')
+                                                (tinggi)
+                                            @endif
+                                        </p>
+                                    </th>
 
-                                @php
-                                    $currentPeriod = request('period') ?? ($selectedPeriod ?? 'semua periode');
-                                @endphp
+                                    @php
+                                        $currentPeriod = request('period') ?? ($selectedPeriod ?? 'semua periode');
+                                    @endphp
 
-                                <th scope="col"
-                                    class="px-6 py-4 text-right text-xs font-bold text-gray-700 tracking-wider whitespace-nowrap">
+                                    <th scope="col"
+                                        class="px-6 py-4 text-right text-xs font-bold text-gray-700 tracking-wider whitespace-nowrap">
 
-                                    <p class="m-0">
-                                        periode
-                                    </p>
+                                        <p class="m-0">
+                                            periode
+                                        </p>
 
-                                    <p class="m-0 text-[10px] text-gray-500 font-medium">
-                                        ({{ $currentPeriod }})
-                                    </p>
-                                </th>
-                            </tr>
-                        </thead>
-
-                        {{-- TBODY --}}
-                        <tbody class="bg-white divide-y divide-gray-100">
-                            @forelse ($dataStunting as $data)
-                                @php
-                                    $avgZsTbU = $data->avg_zs_tbu;
-                                @endphp
-
-                                <tr class="hover:bg-gray-50 transition-colors duration-150 group">
-
-                                    {{-- Desa --}}
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <span class="text-sm font-semibold text-gray-900">
-                                            {{ $data->desa_kelurahan }}
-                                        </span>
-                                    </td>
-
-                                    {{-- Kasus Stunting --}}
-                                    <td class="px-6 py-4 whitespace-nowrap text-center">
-                                        <span class="text-sm font-bold text-gray-900">
-                                            {{ number_format($data->total_kasus_stunting) }}
-                                        </span>
-                                    </td>
-
-                                    {{-- Total Anak --}}
-                                    <td class="px-6 py-4 whitespace-nowrap text-center">
-                                        <span class="text-sm text-gray-700">
-                                            {{ number_format($data->total_anak) }}
-                                        </span>
-                                    </td>
-
-                                    {{-- Rata-rata ZS TB/U --}}
-                                    <td class="px-6 py-4 whitespace-nowrap text-center">
-                                        @include('components.zscore-badge', ['value' => $avgZsTbU])
-                                    </td>
-
-                                    {{-- Status Desa --}}
-                                    <td class="whitespace-nowrap px-6 py-4 text-center">
-                                        @if (is_null($avgZsTbU) || $data->total_anak == 0)
-                                            <span
-                                                class="inline-flex items-center px-3.5 py-1.5 rounded-full text-xs font-bold shadow-sm
-                                                       bg-gradient-to-r from-gray-400 to-gray-500 text-white">
-                                                N/A
-                                            </span>
-                                        @elseif ($avgZsTbU < -3)
-                                            <span
-                                                class="inline-flex items-center px-3.5 py-1.5 rounded-full text-xs font-bold shadow-sm
-                                                       bg-gradient-to-r from-red-500 to-red-600 text-white">
-                                                Sangat Pendek
-                                            </span>
-                                        @elseif ($avgZsTbU < -2)
-                                            <span
-                                                class="inline-flex items-center px-3.5 py-1.5 rounded-full text-xs font-bold shadow-sm
-                                                       bg-gradient-to-r from-orange-500 to-orange-600 text-white">
-                                                Pendek
-                                            </span>
-                                        @elseif ($avgZsTbU <= 2)
-                                            <span
-                                                class="inline-flex items-center px-3.5 py-1.5 rounded-full text-xs font-bold shadow-sm
-                                                       bg-gradient-to-r from-green-500 to-green-600 text-white">
-                                                Normal
-                                            </span>
-                                        @else
-                                            <span
-                                                class="inline-flex items-center px-3.5 py-1.5 rounded-full text-xs font-bold shadow-sm
-                                                       bg-gradient-to-r from-blue-500 to-blue-600 text-white">
-                                                Tinggi
-                                            </span>
-                                        @endif
-                                    </td>
-
-                                    {{-- Periode --}}
-                                    <td class="px-6 py-4 whitespace-nowrap text-right">
-                                        <div class="flex items-center gap-2 justify-end">
-                                            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor"
-                                                viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                            </svg>
-                                            <span class="text-sm text-gray-700 font-medium">
-                                                {{ $data->periode ? \Carbon\Carbon::parse($data->periode)->format("M 'y") : '-' }}
-                                            </span>
-                                        </div>
-                                    </td>
+                                        <p class="m-0 text-[10px] text-gray-500 font-medium">
+                                            ({{ $currentPeriod }})
+                                        </p>
+                                    </th>
                                 </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="6" class="px-6 py-12 text-center">
-                                        <div class="flex flex-col items-center justify-center">
-                                            <svg class="w-16 h-16 text-gray-300 mb-4" fill="none"
-                                                stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                            </svg>
-                                            <p class="text-sm font-medium text-gray-500">
-                                                Tidak ada data yang ditemukan
-                                            </p>
-                                        </div>
-                                    </td>
-                                </tr>
-                            @endforelse
-                        </tbody>
+                            </thead>
 
-                    </table>
+                            {{-- TBODY --}}
+                            <tbody class="bg-white divide-y divide-gray-100">
+                                @forelse ($dataStunting as $data)
+                                    @php
+                                        $avgZsTbU = $data->avg_zs_tbu;
+                                    @endphp
+
+                                    <tr class="hover:bg-gray-50 transition-colors duration-150 group">
+                                        {{-- Desa --}}
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <span class="text-sm font-semibold text-gray-900">
+                                                {{ $data->desa_kelurahan }}
+                                            </span>
+                                        </td>
+
+                                        {{-- Kasus Stunting --}}
+                                        <td class="px-6 py-4 whitespace-nowrap text-center">
+                                            <span class="text-sm font-bold text-gray-900">
+                                                {{ number_format($data->total_kasus_stunting) }}
+                                            </span>
+                                        </td>
+
+                                        {{-- Total Anak --}}
+                                        <td class="px-6 py-4 whitespace-nowrap text-center">
+                                            <span class="text-sm text-gray-700">
+                                                {{ number_format($data->total_anak) }}
+                                            </span>
+                                        </td>
+
+                                        {{-- Rata-rata ZS TB/U --}}
+                                        <td class="px-6 py-4 whitespace-nowrap text-center">
+                                            @include('components.zscore-badge', ['value' => $avgZsTbU])
+                                        </td>
+
+                                        {{-- Status Desa --}}
+                                        <td class="whitespace-nowrap px-6 py-4 text-center">
+                                            @if (is_null($avgZsTbU) || $data->total_anak == 0)
+                                                <span
+                                                    class="inline-flex items-center px-3.5 py-1.5 rounded-full text-xs font-bold shadow-sm
+                                                        bg-gradient-to-r from-gray-400 to-gray-500 text-white">
+                                                    N/A
+                                                </span>
+                                            @elseif ($avgZsTbU < -3)
+                                                <span
+                                                    class="inline-flex items-center px-3.5 py-1.5 rounded-full text-xs font-bold shadow-sm
+                                                        bg-gradient-to-r from-red-500 to-red-600 text-white">
+                                                    Sangat Pendek
+                                                </span>
+                                            @elseif ($avgZsTbU < -2)
+                                                <span
+                                                    class="inline-flex items-center px-3.5 py-1.5 rounded-full text-xs font-bold shadow-sm
+                                                        bg-gradient-to-r from-orange-500 to-orange-600 text-white">
+                                                    Pendek
+                                                </span>
+                                            @elseif ($avgZsTbU <= 2)
+                                                <span
+                                                    class="inline-flex items-center px-3.5 py-1.5 rounded-full text-xs font-bold shadow-sm
+                                                        bg-gradient-to-r from-green-500 to-green-600 text-white">
+                                                    Normal
+                                                </span>
+                                            @else
+                                                <span
+                                                    class="inline-flex items-center px-3.5 py-1.5 rounded-full text-xs font-bold shadow-sm
+                                                        bg-gradient-to-r from-blue-500 to-blue-600 text-white">
+                                                    Tinggi
+                                                </span>
+                                            @endif
+                                        </td>
+
+                                        {{-- Periode --}}
+                                        <td class="px-6 py-4 whitespace-nowrap text-right">
+                                            <div class="flex items-center gap-2 justify-end">
+                                                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                </svg>
+                                                <span class="text-sm text-gray-700 font-medium">
+                                                    {{ $data->periode ? \Carbon\Carbon::parse($data->periode)->format("M 'y") : '-' }}
+                                                </span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="6" class="px-6 py-12 text-center">
+                                            <div class="flex flex-col items-center justify-center">
+                                                <svg class="w-16 h-16 text-gray-300 mb-4" fill="none"
+                                                    stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                </svg>
+                                                <p class="text-sm font-medium text-gray-500">
+                                                    Tidak ada data yang ditemukan
+                                                </p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 

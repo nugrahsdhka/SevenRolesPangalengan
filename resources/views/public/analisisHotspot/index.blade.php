@@ -9,7 +9,7 @@
 
     <section id="tab-map">
         {{-- Header --}}
-        <div class="pt-3">
+        <div class="px-2 mt-2">
             <div class="bg-white backdrop-blur-lg rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
                 <div class="p-3">
                     <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">

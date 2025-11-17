@@ -377,27 +377,29 @@ class DivisiGiziController extends Controller
             'files.*'  => 'file|mimes:xlsx,xls,csv|max:10240', // 10MB per file
         ]);
 
+        // Normalisasi period jadi Y-m-d (tanggal 1)
         $period = preg_match('/^\d{4}-\d{2}$/', $request->period)
             ? ($request->period . '-01')
             : $request->period;
 
-        $periodYm = date('Y-m', strtotime($period));
+        $periodYm     = date('Y-m', strtotime($period));
         $userRoleName = Auth::user()->roles->first()->name;
 
-        $periodHasData = DataGizi::whereDate('period', $period)->exists();
+        // Cek: apakah SUDAH ada data PUBLISHED di periode ini?
+        $periodHasData = DataGizi::whereDate('period', $period)
+            ->whereIn('status', ['published'])
+            // kalau mau hanya cek data divisi yang sama, bisa tambah whereHas user.roles di sini
+            // ->whereHas('user.roles', fn($q) => $q->where('name', $userRoleName))
+            ->exists();
 
+        // Kalau sudah published → BLOKIR import
         if ($periodHasData) {
             return back()
-                ->with('error', 'Data di periode ini sudah ada, gunakan input manual atau hapus data sebelumnya!')
+                ->with('error', 'Import ditolak: data untuk periode ini sudah berstatus "published". Hapus atau batalkan publikasi terlebih dahulu.')
                 ->withInput();
         }
 
-        if ($periodHasData) {
-            return back()
-                ->with('error', 'Data sudah ada, gunakan input manual atau hapus data sebelumnya!')
-                ->withInput();
-        }
-
+        // Kalau BELUM published → lanjut proses import
         try {
             $files = $request->file('files');
 
@@ -409,7 +411,7 @@ class DivisiGiziController extends Controller
                 ->with('success', 'Data Gizi berhasil di-import.');
 
         } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
-            $failures = $e->failures();
+            $failures     = $e->failures();
             $firstFailure = $failures[0];
 
             $errorMessage = "Gagal import: "

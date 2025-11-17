@@ -6,12 +6,11 @@
     @include('layouts.nav_public')
 
     {{-- Header --}}
-    <div class="p-2">
+    <div class="mt-2 px-2">
         <div class="bg-white backdrop-blur-lg rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
-            <div class="p-3">
-
+            <div class="p-3 md:py-4">
                 {{-- FLEX: selalu justify-between untuk semua device --}}
-                <div class="flex items-center justify-between gap-4 md:py-3">
+                <div class="flex items-center justify-between gap-4 md:py-2">
 
                     {{-- Title Section --}}
                     <div class="flex flex-col">
@@ -44,7 +43,6 @@
                     </button>
 
                 </div>
-
             </div>
         </div>
     </div>

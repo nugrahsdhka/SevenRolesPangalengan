@@ -141,7 +141,7 @@
                 <div class="bg-white">
                     <div class="p-3 sm:p-4">
                         <div id="chartContainer"
-                             class="relative w-full min-h-[320px] h-[56vh] sm:h-[60vh] md:h-[65vh] lg:h-[70vh]">
+                             class="relative w-full h-[55vh] md:h-[80vh]">
                             <canvas
                                 id="stuntingChart"
                                 data-chart-url="{{ route('data-stunting.chart-zs', [

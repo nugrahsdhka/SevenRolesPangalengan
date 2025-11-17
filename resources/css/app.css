@@ -64,3 +64,16 @@ html {
 .shimmer-effect:hover::before {
     left: 100%; /* Geser ke luar kanan saat hover */
 }
+
+/* Hilangin arrow native select untuk semua browser utama */
+.select-no-arrow {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-image: none !important;
+}
+
+/* Khusus IE/old Edge */
+.select-no-arrow::-ms-expand {
+    display: none;
+}
