@@ -95,7 +95,7 @@
                                             </td>
 
                                             {{-- Nama + Alamat (Title Case) --}}
-                                            <td class="px-3 sm:px-6 py-4 align-top w-[180px] max-w-[180px] sm:max-w-none">
+                                            <td class="px-3 sm:px-6 py-4 align-top w-[130px] sm:w-auto max-w-[130px] sm:max-w-none">
                                                 <div class="font-medium text-gray-900 text-base break-words">
                                                     {{ ucwords(strtolower($item->nama_faskes)) }}
                                                 </div>
@@ -115,18 +115,18 @@
                                             </td>
 
                                             {{-- Desa/Kel (Title Case) --}}
-                                            <td class="px-3 sm:px-6 py-4 align-top w-[20px] sm:w-auto max-w-[20px] sm:max-w-none text-center">
+                                            <td class="px-3 sm:px-6 py-4 align-top w-[15px] sm:w-auto max-w-[15px] sm:max-w-none text-center">
                                                 {{ ucwords(strtolower($item->desa_kelurahan ?? '-')) }}
                                             </td>
-
+                                            
                                             {{-- Koordinat --}}
-                                            <td class="px-3 sm:px-6 py-4 align-top text-center text-[11px] sm:text-sm text-gray-700 whitespace-nowrap">
+                                            <td class="px-3 sm:px-6 py-4 align-top w-[130px] sm:w-auto max-w-[130px] sm:max-w-none text-center">
                                                 <div>Lat: <span class="font-mono">{{ $item->lat }}</span></div>
                                                 <div>Lng: <span class="font-mono">{{ $item->lng }}</span></div>
                                             </td>
 
                                             {{-- Status --}}
-                                            <td class="px-3 sm:px-6 py-4 align-top text-center">
+                                            <td class="px-3 sm:px-6 py-4 align-top w-[30px] sm:w-auto max-w-[30px] sm:max-w-none text-center">
                                                 <form x-ref="toggleForm_{{ $item->id }}"
                                                     action="{{ route('admin.faskes.toggle-active', $item) }}"
                                                     method="POST"
@@ -164,7 +164,7 @@
                                             </td>
 
                                             {{-- Aksi --}}
-                                            <td class="px-3 sm:px-6 py-4 align-top text-right text-[11px] sm:text-xs whitespace-nowrap">
+                                            <td class="px-3 sm:px-6 py-4 align-top w-[130px] sm:w-auto max-w-[130px] sm:max-w-none text-center">
                                                 <div class="inline-flex items-center gap-1.5 sm:gap-2">
                                                     <a href="{{ route('admin.faskes.edit', $item) }}"
                                                         class="inline-flex items-center px-2 sm:px-2.5 py-1 rounded-md 
