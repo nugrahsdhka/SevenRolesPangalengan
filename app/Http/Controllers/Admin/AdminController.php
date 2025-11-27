@@ -236,9 +236,46 @@ class AdminController extends Controller
 
     public function showGiziDetail(Request $request, $desaKelurahan)
     {
-        // 1. Ambil data statistik untuk card di bagian atas
+        $perPage = 20;
+
+        // =========================
+        // 1. Tentukan periodYm (Y-m)
+        // =========================
+        $periodYm = $request->input('period'); // dari query ?period=2025-11 (misalnya)
+
+        if (! $periodYm) {
+            // kalau tidak dikirim dari URL, ambil periode TERBARU untuk desa ini
+            $latestPeriod = DataGizi::where('desa_kelurahan', $desaKelurahan)
+                ->whereIn('status', ['pending', 'approved', 'published'])
+                ->max('period'); // kolom 'period' di DB (tipe date)
+
+            if ($latestPeriod) {
+                $periodYm = \Carbon\Carbon::parse($latestPeriod)->format('Y-m');
+            } else {
+                // kalau benar-benar belum ada data untuk desa ini → pakai bulan sekarang
+                $periodYm = now()->format('Y-m');
+            }
+        }
+
+        // Normalisasi + safety: pastikan periodYm valid
+        try {
+            $period = \Carbon\Carbon::createFromFormat('Y-m', $periodYm)->startOfMonth();
+        } catch (\Exception $e) {
+            $period = now()->startOfMonth();
+            $periodYm = $period->format('Y-m');
+        }
+
+        $year  = $period->year;
+        $month = $period->month;
+
+        // =========================
+        // 2. Statistik untuk card di atas
+        //    (hanya approved + published)
+        // =========================
         $statistik = DataGizi::where('desa_kelurahan', $desaKelurahan)
-            ->whereIn('status', ['approved', 'published']) // Hanya data yg relevan dgn Admin
+            ->whereIn('status', ['approved', 'published'])
+            ->whereYear('period', $year)
+            ->whereMonth('period', $month)
             ->select(
                 DB::raw('COUNT(*) as total_anak'),
                 DB::raw('SUM(CASE WHEN zs_tb_u < -2 THEN 1 ELSE 0 END) as total_stunting'),
@@ -247,15 +284,29 @@ class AdminController extends Controller
             )
             ->first();
 
-        // 2. Ambil data individual dengan paginasi
-        $perPage = 20;
+        // =========================
+        // 3. Data individu per anak
+        //    (admin boleh lihat pending + approved + published)
+        // =========================
         $dataGizi = DataGizi::where('desa_kelurahan', $desaKelurahan)
-            ->whereIn('status', ['approved', 'published']) // Hanya data yg relevan dgn Admin
+            ->whereIn('status', ['pending', 'approved', 'published'])
+            ->whereYear('period', $year)
+            ->whereMonth('period', $month)
             ->orderBy('created_at', 'desc')
             ->paginate($perPage);
 
-        // 3. Tampilkan view detail
-        return view('detail.detailGizi', compact('desaKelurahan', 'statistik', 'dataGizi'));
+        // Biar pagination tetap bawa query ?period, ?from, ?status (kalau ada)
+        $dataGizi->appends($request->only('period', 'from', 'status'));
+
+        // =========================
+        // 4. Kirim ke view
+        // =========================
+        return view('detail.detailGizi', [
+            'desaKelurahan' => $desaKelurahan,
+            'statistik'     => $statistik,
+            'dataGizi'      => $dataGizi,
+            'periodYm'      => $periodYm,   // 🔹 ini yang dipakai Blade untuk label periode & backUrl
+        ]);
     }
 
     public function publish(Request $request)

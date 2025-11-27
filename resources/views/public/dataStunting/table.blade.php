@@ -254,7 +254,10 @@
                                         class="px-6 py-4 text-center text-xs font-bold text-gray-700 tracking-wider whitespace-nowrap">
 
                                         <p class="m-0">
-                                            status desa berdasarkan
+                                            status stunting desa
+                                        </p>
+                                        <p>
+                                            berdasarkan nilai
                                         </p>
                                         <p>
                                             rata-rata zs tb/u

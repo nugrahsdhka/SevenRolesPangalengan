@@ -24,6 +24,11 @@ class DataGizi extends Model
         'status_tb_u',
         'status_bb_tb',
         'status',            // pending | approved | published
+
+        // 🔹 kolom baru
+        'nama',
+        'nik',
+        'posyandu',
     ];
 
     protected $casts = [

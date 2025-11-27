@@ -473,7 +473,7 @@ class CamatController extends Controller
         $dataGizi = DataGizi::where('desa_kelurahan', $desaKelurahan)
             ->whereYear('period', $year)
             ->whereMonth('period', $month)
-            ->whereIn('status', ['approved', 'published'])
+            ->whereIn('status', ['pending','approved', 'published'])
             ->orderBy('created_at', 'desc')
             ->paginate($perPage);
 

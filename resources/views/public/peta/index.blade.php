@@ -25,22 +25,39 @@
                         </p>
                     </div>
 
-                    {{-- Tombol Modal --}}
-                    <button id="openInfoModalBtn"
-                        class="p-3 text-white bg-gradient-to-r from-red-600 to-pink-600 rounded-xl
-                            shadow-lg hover:shadow-xl hover:from-red-700 hover:to-pink-700
-                            transform hover:scale-110 active:scale-95 transition-all duration-200
-                            group">
-                        <svg class="w-6 h-6 transition-transform group-hover:rotate-12 duration-200"
-                            fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" clip-rule="evenodd"
-                                d="M18 10a8 8 0 11-16 0 8 8 0 
-                                0116 0zm-7-4a1 1 0 11-2 0 1 1 
-                                0 012 0zM9 9a1 1 0 000 2v3a1 1 
-                                0 001 1h1a1 1 0 100-2v-3a1 1 
-                                0 00-1-1H9z" />
-                        </svg>
-                    </button>
+                    {{-- Kanan: Filter + Tombol Modal --}}
+                    <div class="flex items-center gap-3">
+                        {{-- Filter Jenis Faskes --}}
+                        <div class="hidden md:flex flex-col items-end gap-1 sm:gap-2 text-xs md:text-sm">
+                            <label class="inline-flex items-center gap-1 cursor-pointer">
+                                <span class="text-gray-700">Puskesmas</span>
+                                <input id="filterPuskesmas" type="checkbox"
+                                    class="h-4 w-4 text-red-600 border-gray-300 rounded focus:ring-red-500">
+                            </label>
+                            <label class="inline-flex items-center gap-1 cursor-pointer">
+                                <span class="text-gray-700">Posyandu</span>
+                                <input id="filterPosyandu" type="checkbox"
+                                    class="h-4 w-4 text-red-600 border-gray-300 rounded focus:ring-red-500">
+                            </label>
+                        </div>
+
+                        {{-- Tombol Modal --}}
+                        <button id="openInfoModalBtn"
+                            class="p-3 text-white bg-gradient-to-r from-red-600 to-pink-600 rounded-xl
+                                shadow-lg hover:shadow-xl hover:from-red-700 hover:to-pink-700
+                                transform hover:scale-110 active:scale-95 transition-all duration-200
+                                group">
+                            <svg class="w-6 h-6 transition-transform group-hover:rotate-12 duration-200"
+                                fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" clip-rule="evenodd"
+                                    d="M18 10a8 8 0 11-16 0 8 8 0 
+                                    0116 0zm-7-4a1 1 0 11-2 0 1 1 
+                                    0 012 0zM9 9a1 1 0 000 2v3a1 1 
+                                    0 001 1h1a1 1 0 100-2v-3a1 1 
+                                    0 00-1-1H9z" />
+                            </svg>
+                        </button>
+                    </div>
 
                 </div>
             </div>
@@ -161,97 +178,167 @@
             integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
         {{-- Leaflet --}}
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const map = L.map('map');
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                const map = L.map('map');
 
-        // Basemap: Esri World Imagery
-        L.tileLayer(
-            'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-                maxZoom: 19,
-                attribution: '&copy; <a href="https://www.esri.com/en-us/home" target="_blank" rel="noopener noreferrer">Esri</a>'
-            }
-        ).addTo(map);
-
-        // Data faskes dari controller (Laravel → JS)
-        const faskes = @json($faskes);
-
-        // 1) Tambahkan batas wilayah Kecamatan Pangalengan
-        fetch('{{ asset('maps/PetaDesaKecPangalengan.geojson') }}')
-            .then(r => r.json())
-            .then(geojson => {
-                const batasLayer = L.geoJSON(geojson, {
-                    style: {
-                        color: '#fff',
-                        weight: 0.25,
-                        fillColor: '#16a34a', // hijau (faskes context)
-                        fillOpacity: 0.15
+                // Basemap: Esri World Imagery
+                L.tileLayer(
+                    'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+                        maxZoom: 19,
+                        attribution: '&copy; <a href="https://www.esri.com/en-us/home" target="_blank" rel="noopener noreferrer">Esri</a>'
                     }
-                }).addTo(map);
+                ).addTo(map);
 
-                const bounds = batasLayer.getBounds();
-                map.fitBounds(bounds, {
-                    padding: [20, 20]
+                // Data faskes dari controller (Laravel → JS)
+                const faskes = @json($faskes);
+
+                // Simpan semua marker untuk kebutuhan filter
+                const markers = [];
+
+                // Ambil elemen checkbox filter
+                const filterPuskesmas = document.getElementById('filterPuskesmas');
+                const filterPosyandu = document.getElementById('filterPosyandu');
+
+                // 1) Tambahkan batas wilayah Kecamatan Pangalengan
+                fetch('{{ asset('maps/PetaDesaKecPangalengan.geojson') }}')
+                    .then(r => r.json())
+                    .then(geojson => {
+                        const batasLayer = L.geoJSON(geojson, {
+                            style: {
+                                color: '#fff',
+                                weight: 0.25,
+                                fillColor: '#16a34a', // hijau (faskes context)
+                                fillOpacity: 0.15
+                            }
+                        }).addTo(map);
+
+                        const bounds = batasLayer.getBounds();
+                        map.fitBounds(bounds, {
+                            padding: [20, 20]
+                        });
+
+                        const minZoom = 12;
+                        if (map.getZoom() < minZoom) {
+                            map.setZoom(minZoom);
+                        }
+                    })
+                    .catch(err => {
+                        console.error('Gagal memuat batas wilayah:', err);
+                        map.setView([-7.16, 107.57], 11);
+                    });
+
+                // 2) Peta jenis faskes → icon SVG
+                const iconMap = {
+                    Posyandu: "{{ asset('img/icons/posyandu-pin.svg') }}",
+                    Puskesmas: "{{ asset('img/icons/puskesmas-pin.svg') }}",
+                    Klinik: "{{ asset('img/icons/klinik-pin.svg') }}",
+                    'Rumah Sakit': "{{ asset('img/icons/rs-pin.svg') }}",
+                    'Praktik Dokter': "{{ asset('img/icons/praktik-dokter-pin.svg') }}",
+                    Lainnya: "{{ asset('img/icons/lainnya.svg') }}",
+                };
+
+                // 3) Generator icon berdasarkan jenis
+                function getFaskesIcon(jenis) {
+                    const url = iconMap[jenis] ?? "{{ asset('img/icons/default-pin.svg') }}";
+
+                    // Jika Puskesmas → icon lebih besar
+                    const size = (jenis === 'Puskesmas') ? [18, 28] : [14, 24];
+                    const anchor = (jenis === 'Puskesmas') ? [11, 36] : [7, 24];
+                    const popupYOffset = (jenis === 'Puskesmas') ? -28 : -20;
+
+                    return L.icon({
+                        iconUrl: url, // path icon SVG
+                        iconSize: size, // [width, height] dalam px
+                        iconAnchor: anchor, // titik bawah tengah pin
+                        popupAnchor: [0, popupYOffset] // popup muncul sedikit di atas icon
+                    });
+                }
+
+                // 4) Tambahkan marker faskes dengan icon sesuai jenis
+                faskes.forEach(item => {
+                    const {
+                        lat,
+                        lng,
+                        nama_faskes,
+                        jenis,
+                        alamat
+                    } = item;
+
+                    // Skip jika koordinat tidak valid
+                    if (!lat || !lng) return;
+
+                    const j = jenis || 'Lainnya';
+
+                    const marker = L.marker([lat, lng], {
+                        icon: getFaskesIcon(j),
+                        // Puskesmas selalu di atas marker lain
+                        zIndexOffset: (j === 'Puskesmas') ? 1000 : 0
+                    }).addTo(map);
+
+                    marker.bindPopup(`
+                        <div style="min-width: 220px">
+                            <strong>${nama_faskes || 'Fasilitas Kesehatan'}</strong><br>
+                            Jenis: <strong>${j || '-'}</strong><br>
+                            Alamat: ${alamat || '-'}<br>
+                            Koordinat: ${lat}, ${lng}
+                        </div>
+                    `);
+
+                    // Simpan ke array markers
+                    markers.push({
+                        marker,
+                        jenis: j
+                    });
                 });
 
-                const minZoom = 12;
-                if (map.getZoom() < minZoom) {
-                    map.setZoom(minZoom);
+                // 5) Fungsi apply filter berdasarkan checkbox
+                function applyFaskesFilter() {
+                    if (!filterPuskesmas || !filterPosyandu) return;
+
+                    const showPuskesmas = filterPuskesmas.checked;
+                    const showPosyandu = filterPosyandu.checked;
+
+                    // Jika tidak ada checkbox yang dicentang → tampilkan semua
+                    const anyChecked = showPuskesmas || showPosyandu;
+
+                    markers.forEach(item => {
+                        const jenisLower = (item.jenis || '').toLowerCase();
+                        let shouldShow = true;
+
+                        if (anyChecked) {
+                            if (jenisLower === 'puskesmas'.toLowerCase()) {
+                                shouldShow = showPuskesmas;
+                            } else if (jenisLower === 'posyandu'.toLowerCase()) {
+                                shouldShow = showPosyandu;
+                            } else {
+                                // Jika ada filter aktif, jenis lain disembunyikan
+                                shouldShow = false;
+                            }
+                        } else {
+                            // Tidak ada filter aktif → tampilkan semua
+                            shouldShow = true;
+                        }
+
+                        if (shouldShow) {
+                            if (!map.hasLayer(item.marker)) {
+                                item.marker.addTo(map);
+                            }
+                        } else {
+                            if (map.hasLayer(item.marker)) {
+                                map.removeLayer(item.marker);
+                            }
+                        }
+                    });
                 }
-            })
-            .catch(err => {
-                console.error('Gagal memuat batas wilayah:', err);
-                map.setView([-7.16, 107.57], 11);
+
+                // 6) Event listener untuk checkbox
+                if (filterPuskesmas && filterPosyandu) {
+                    filterPuskesmas.addEventListener('change', applyFaskesFilter);
+                    filterPosyandu.addEventListener('change', applyFaskesFilter);
+                }
             });
-
-        const iconMap = {
-            Posyandu: "{{ asset('img/icons/posyandu-pin.svg') }}",
-            Puskesmas: "{{ asset('img/icons/puskesmas-pin.svg') }}",
-            Klinik: "{{ asset('img/icons/klinik-pin.svg') }}",
-            'Rumah Sakit': "{{ asset('img/icons/rs-pin.svg') }}",
-        };
-
-        // Generator icon berdasarkan jenis
-        function getFaskesIcon(jenis) {
-            const url = iconMap[jenis] ?? "{{ asset('img/icons/default-pin.svg') }}";
-
-            return L.icon({
-                iconUrl: url,          // path icon SVG
-                iconSize: [14, 24],    // [width, height] dalam px
-                iconAnchor: [7, 24],   // titik bawah tengah pin
-                popupAnchor: [0, -20]  // popup muncul sedikit di atas icon
-            });
-        }
-
-        // 3) Tambahkan marker faskes dengan icon sesuai jenis
-        faskes.forEach(item => {
-            const {
-                lat,
-                lng,
-                nama_faskes,
-                jenis,
-                alamat
-            } = item;
-
-            // Skip jika koordinat tidak valid
-            if (!lat || !lng) return;
-
-            const marker = L.marker([lat, lng], {
-                icon: getFaskesIcon(jenis)
-            }).addTo(map);
-
-            marker.bindPopup(`
-                <div style="min-width: 220px">
-                    <strong>${nama_faskes || 'Fasilitas Kesehatan'}</strong><br>
-                    Jenis: <strong>${jenis || '-'}</strong><br>
-                    Alamat: ${alamat || '-'}<br>
-                    Koordinat: ${lat}, ${lng}
-                </div>
-            `);
-        });
-    });
-</script>
-
+        </script>
 
         {{-- Modal --}}
         <script>

@@ -50,6 +50,12 @@ class DataGiziImport implements ToModel, WithHeadingRow, WithValidation
         return new DataGizi([
             'user_id'        => $this->userId,
             'period'         => $this->period,            // <— DIKUNCI dari form
+
+            // 🔹 kolom baru (ambil langsung dari header "Nama", "NIK", "Posyandu")
+            'nama'           => $row['nama']      ?? null,
+            'nik'            => $row['nik']       ?? null,
+            'posyandu'       => $row['posyandu']  ?? null,
+
             'desa_kelurahan' => $desa,
             'berat'          => $row['berat']   ?? null,
             'tinggi'         => $row['tinggi']  ?? null,
@@ -70,6 +76,11 @@ class DataGiziImport implements ToModel, WithHeadingRow, WithValidation
     public function rules(): array
     {
         return [
+            // 🔹 rules tambahan untuk kolom baru
+            'nama'     => 'nullable|string|max:100',
+            'nik'      => 'nullable|string|max:20',
+            'posyandu' => 'nullable|string|max:100',
+
             'desakel'         => 'required_without_all:desa_kel,desa_kelurahan|string|max:100',
             'desa_kel'        => 'required_without_all:desakel,desa_kelurahan|string|max:100',
             'desa_kelurahan'  => 'required_without_all:desakel,desa_kel|string|max:100',

@@ -2,17 +2,17 @@
 
 namespace App\Http\Controllers\Divisi;
 
-use App\Http\Controllers\Controller;
 use App\Models\DataGizi;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\DB;
+use App\Imports\DataGiziFileImport;
+use Illuminate\Support\Facades\Log;
 
 // Excel
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
-use App\Imports\DataGiziImport;
 
 class DivisiGiziController extends Controller
 {
@@ -388,23 +388,24 @@ class DivisiGiziController extends Controller
         // Cek: apakah SUDAH ada data PUBLISHED di periode ini?
         $periodHasData = DataGizi::whereDate('period', $period)
             ->whereIn('status', ['published'])
-            // kalau mau hanya cek data divisi yang sama, bisa tambah whereHas user.roles di sini
-            // ->whereHas('user.roles', fn($q) => $q->where('name', $userRoleName))
             ->exists();
 
-        // Kalau sudah published → BLOKIR import
         if ($periodHasData) {
             return back()
                 ->with('error', 'Import ditolak: data untuk periode ini sudah berstatus "published". Hapus atau batalkan publikasi terlebih dahulu.')
                 ->withInput();
         }
 
-        // Kalau BELUM published → lanjut proses import
         try {
             $files = $request->file('files');
 
             foreach ($files as $file) {
-                Excel::import(new DataGiziImport($period, Auth::id()), $file);
+                // 🔴 DULU: Excel::import(new DataGiziImport($period, Auth::id()), $file);
+                // ✅ SEKARANG: pakai wrapper yang hanya proses Sheet1
+                Excel::import(
+                    new DataGiziFileImport($period, Auth::id()),
+                    $file
+                );
             }
 
             return redirect()->route('gizi.index', ['period' => $periodYm])
