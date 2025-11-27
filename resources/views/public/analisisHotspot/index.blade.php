@@ -44,7 +44,7 @@
                         {{-- Filter & Button Section --}}
                         <div class="flex items-stretch sm:items-center gap-3 w-full lg:w-auto">
                             {{-- Filter Periode --}}
-                            <div class="flex">
+                            <div class="flex w-full">
                                 <div
                                     class="bg-white/95 backdrop-blur-lg rounded-2xl shadow-lg border border-gray-200/50 overflow-hidden hover:shadow-xl transition-shadow duration-300">
                                     <form id="periodeForm"
