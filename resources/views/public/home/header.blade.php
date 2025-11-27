@@ -116,6 +116,7 @@
 
                 {{-- Header --}}
                 <div class="relative flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
+                    {{-- Kiri --}}
                     <div>
                         <h3 class="text-sm font-bold text-white flex items-center gap-2">
                             <svg class="w-2 h-2 md:w-4 md:h-4 text-red-300" fill="none" stroke="currentColor"
@@ -133,6 +134,7 @@
                         </p>
                     </div>
 
+                    {{-- Kanan --}}
                     <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 md:gap-3">
                         {{-- Select Periode --}}
                         <div class="flex gap-2">
@@ -146,7 +148,7 @@
                             {{-- Box Total Anak --}}
                             @if ($total_anak > 0)
                                 <div
-                                    class="text-right bg-red-600/30 backdrop-blur-sm rounded-xl px-4 py-2 border border-red-500/30">
+                                    class="w-full text-right bg-red-600/30 backdrop-blur-sm rounded-xl px-4 py-2 border border-red-500/30">
                                     <div class="text-2xl text-center font-bold text-white">{{ number_format($total_anak) }}
                                     </div>
                                     <div class="text-[10px] text-red-200/80 uppercase tracking-wide">Total Anak</div>
