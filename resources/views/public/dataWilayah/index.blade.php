@@ -373,104 +373,82 @@
                     </div>
                 </div>
 
-                {{-- Modal Informasi Kolom Tabel --}}
-                <div id="infoModalOverlay"
-                    class="fixed inset-0 bg-gray-600 bg-opacity-75 overflow-y-auto h-full w-full z-50 flex items-center justify-center p-4 hidden">
-                    <div id="infoModalContent"
-                        class="relative mx-auto border w-full max-w-md sm:max-w-lg md:max-w-xl shadow-lg rounded-xl bg-white transform transition-all duration-300 scale-95 opacity-0">
-                        {{-- Modal Header --}}
-                        <div class="flex justify-between items-center px-6 py-4 border-b border-gray-200">
-                            <p class="text-lg font-bold text-gray-800">Keterangan Kolom Tabel Data Wilayah</p>
-                            <button id="closeInfoModalBtnHeader"
-                                class="text-gray-400 hover:text-gray-600 transition-colors duration-200">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M6 18L18 6M6 6l12 12"></path>
-                                </svg>
-                            </button>
-                        </div>
+{{-- Modal Informasi Kolom Tabel --}}
+<div id="infoModalOverlay"
+    class="fixed inset-0 bg-gray-600 bg-opacity-75 overflow-y-auto h-full w-full z-50 flex items-center justify-center p-4 hidden">
+    <div id="infoModalContent"
+        class="relative mx-auto border w-full max-w-md sm:max-w-lg md:max-w-xl shadow-lg rounded-xl bg-white transform transition-all duration-300 scale-95 opacity-0">
+        {{-- Modal Header --}}
+        <div class="flex justify-between items-center px-6 py-4 border-b border-gray-200">
+            <p class="text-lg font-bold text-gray-800">Keterangan Kolom Tabel Data Wilayah</p>
+            <button id="closeInfoModalBtnHeader"
+                class="text-gray-400 hover:text-gray-600 transition-colors duration-200">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
 
-                        {{-- Modal Body --}}
-                        <div class="px-6 py-5 space-y-4 text-sm text-gray-700 max-h-[70vh] overflow-y-auto">
-                            <ul class="list-disc list-inside space-y-3 pl-4">
-                                <li>
-                                    <strong>Desa:</strong> Nama desa yang datanya diagregasi.
-                                </li>
+        {{-- Modal Body (disamakan dengan modal sebelumnya) --}}
+        <div class="px-6 py-5 space-y-4 text-sm text-gray-700 max-h-[70vh] overflow-y-auto">
+            <ul class="list-disc list-inside space-y-3 pl-4">
+                <li><strong>Desa:</strong> Nama desa/kelurahan yang datanya ditampilkan.</li>
+                <li><strong>Kasus Stunting:</strong> Jumlah anak di desa tersebut yang teridentifikasi
+                    stunting (memiliki Z-Score TB/U di bawah -2 SD).</li>
+                <li><strong>Total Anak:</strong> Jumlah total anak yang datanya diukur dan masuk dalam
+                    perhitungan di desa tersebut pada periode ini.</li>
+                <li><strong>Rata-Rata ZS TB/U:</strong> Rata-rata Z-Score (Standar Deviasi) untuk indikator
+                    <strong>Tinggi Badan menurut Umur (TB/U)</strong>.
+                </li>
+                <li><strong>Status Desa:</strong> Klasifikasi status stunting untuk desa tersebut.</li>
+                <li><strong>Periode:</strong> Bulan dan tahun saat data ini diinputkan dan dipublikasi.</li>
+                <li>
+                    <strong>Klasifikasi Warna Z-Score (TB/U):</strong>
+                    <ul class="ml-6 mt-1 space-y-1 text-xs list-none">
+                        <li>
+                            <span
+                                class="inline-block w-3 h-3 rounded-full mr-2 bg-blue-500 align-middle"></span>
+                            <strong>Biru (Tinggi):</strong> Rata-rata &gt; +2 SD
+                        </li>
+                        <li>
+                            <span
+                                class="inline-block w-3 h-3 rounded-full mr-2 bg-green-500 align-middle"></span>
+                            <strong>Hijau (Normal):</strong> Rata-rata -2 SD s/d +2 SD
+                        </li>
+                        <li>
+                            <span
+                                class="inline-block w-3 h-3 rounded-full mr-2 bg-orange-500 align-middle"></span>
+                            <strong>Oranye (Pendek):</strong> Rata-rata -3 SD s/d &lt; -2 SD
+                        </li>
+                        <li>
+                            <span
+                                class="inline-block w-3 h-3 rounded-full mr-2 bg-red-500 align-middle"></span>
+                            <strong>Merah (Sangat Pendek):</strong> Rata-rata &lt; -3 SD
+                        </li>
+                        <li>
+                            <span
+                                class="inline-block w-3 h-3 rounded-full mr-2 bg-gray-400 align-middle"></span>
+                            <strong>Abu-abu (N/A):</strong> Data tidak cukup
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+            <p class="mt-3 text-xs text-gray-500">
+                <em>*SD = Standar Deviasi dari median standar pertumbuhan WHO.</em>
+            </p>
+        </div>
 
-                                <li>
-                                    <strong>Rata-Rata Tinggi (cm):</strong> Rata-rata tinggi badan (TB) anak dalam
-                                    centimeter (cm) di desa tersebut pada periode ini.
-                                </li>
-                                <li>
-                                    <strong>Rata-Rata Berat (kg):</strong> Rata-rata berat badan (BB) anak dalam
-                                    kilogram (kg) di desa tersebut pada periode ini.
-                                </li>
+        {{-- Modal Footer --}}
+        <div class="px-6 py-4 bg-gray-50 border-t border-gray-200 text-right rounded-b-xl">
+            <button id="closeInfoModalBtnFooter"
+                class="px-5 py-2 bg-gray-600 text-white text-sm font-semibold rounded-lg shadow hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors duration-200">
+                Tutup
+            </button>
+        </div>
+    </div>
+</div>
 
-                                <li>
-                                    <strong>Total Anak:</strong> Jumlah total anak yang datanya masuk dalam agregasi di
-                                    periode tersebut.
-                                </li>
-
-                                <li>
-                                    <strong>Rata-Rata ZS (BB/U, TB/U, BB/TB):</strong> Rata-rata Z-Score (Standar
-                                    Deviasi) untuk tiga indikator:
-                                    <ul class="ml-6 mt-1 space-y-1 text-xs list-none">
-                                        <li><strong>BB/U:</strong> Berat Badan menurut Umur</li>
-                                        <li><strong>TB/U:</strong> Tinggi Badan menurut Umur (Indikator Stunting)</li>
-                                        <li><strong>BB/TB:</strong> Berat Badan menurut Tinggi Badan</li>
-                                    </ul>
-                                </li>
-
-                                <li>
-                                    <strong>Klasifikasi Warna Z-Score:</strong>
-                                    <ul class="ml-6 mt-1 space-y-1 text-xs list-none">
-                                        <li>
-                                            <span
-                                                class="inline-block w-3 h-3 rounded-full mr-2 bg-blue-500 align-middle"></span>
-                                            <strong> Biru (Tinggi/Gizi Lebih):</strong> (&gt; +2 SD)
-                                        </li>
-                                        <li>
-                                            <span
-                                                class="inline-block w-3 h-3 rounded-full mr-2 bg-green-500 align-middle"></span>
-                                            <strong>Hijau (Normal):</strong> (-2 SD s/d +2 SD)
-                                        </li>
-                                        <li>
-                                            <span
-                                                class="inline-block w-3 h-3 rounded-full mr-2 bg-orange-500 align-middle"></span>
-                                            <strong>Oranye (Kekurangan Gizi/Pendek):</strong> (-3 SD s/d &lt; -2 SD)
-                                        </li>
-                                        <li>
-                                            <span
-                                                class="inline-block w-3 h-3 rounded-full mr-2 bg-red-500 align-middle"></span>
-                                            <strong>Merah (Kekurangan Gizi Akut/Sangat Pendek):</strong> (&lt; -3 SD)
-                                        </li>
-                                        <li>
-                                            <span
-                                                class="inline-block w-3 h-3 rounded-full mr-2 bg-gray-400 align-middle"></span>
-                                            <strong>Abu-abu (N/A):</strong> (Data tidak cukup)
-                                        </li>
-                                    </ul>
-                                </li>
-
-                                <li>
-                                    <strong>Periode:</strong> Bulan dan tahun saat data ini diinputkan dan dipublikasi.
-                                </li>
-                            </ul>
-
-                            <p class="mt-3 text-xs text-gray-500">
-                                <em>*SD = Standar Deviasi dari median standar pertumbuhan WHO.</em>
-                            </p>
-                        </div>
-
-                        {{-- Modal Footer --}}
-                        <div class="px-6 py-4 bg-gray-50 border-t border-gray-200 text-right rounded-b-xl">
-                            <button id="closeInfoModalBtnFooter"
-                                class="px-5 py-2 bg-gray-600 text-white text-sm font-semibold rounded-lg shadow hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors duration-200">
-                                Tutup
-                            </button>
-                        </div>
-                    </div>
-                </div>
 
             </div>
         </section>

@@ -79,13 +79,17 @@
                                                     @forelse ($availablePeriods as $ym)
                                                         @php
                                                             try {
-                                                                $periodCarbon = \Carbon\Carbon::createFromFormat('Y-m', $ym);
+                                                                $periodCarbon = \Carbon\Carbon::createFromFormat(
+                                                                    'Y-m',
+                                                                    $ym,
+                                                                );
                                                                 $label = $periodCarbon->isoFormat('MMMM Y');
                                                             } catch (\Exception $e) {
                                                                 $label = $ym;
                                                             }
                                                         @endphp
-                                                        <option value="{{ $ym }}" @selected($selectedPeriod === $ym)>
+                                                        <option value="{{ $ym }}"
+                                                            @selected($selectedPeriod === $ym)>
                                                             {{ $label }}
                                                         </option>
                                                     @empty
@@ -105,7 +109,8 @@
                                                         {{-- Icon Status ZS TB/U --}}
                                                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
                                                             fill="currentColor" class="w-3.5 h-3.5 text-red-600">
-                                                            <path d="M3 3a1 1 0 000 2h1v9a1 1 0 001 1h2a1 1 0 001-1V5h2v6a1 1 0 001 1h2a1 1 0 001-1V5h1a1 1 0 100-2H3z" />
+                                                            <path
+                                                                d="M3 3a1 1 0 000 2h1v9a1 1 0 001 1h2a1 1 0 001-1V5h2v6a1 1 0 001 1h2a1 1 0 001-1V5h1a1 1 0 100-2H3z" />
                                                         </svg>
                                                     </div>
                                                     <span>Status ZS TB/U</span>
@@ -118,28 +123,23 @@
                                                             hover:border-gray-300 hover:shadow-sm transition-all duration-200">
 
                                                         {{-- Default: Semua Status --}}
-                                                        <option value=""
-                                                            @selected(request('tingkat_zs') === null || request('tingkat_zs') === '')>
+                                                        <option value="" @selected(request('tingkat_zs') === null || request('tingkat_zs') === '')>
                                                             Semua Status
                                                         </option>
 
-                                                        <option value="sangat_pendek"
-                                                            @selected(request('tingkat_zs') === 'sangat_pendek')>
+                                                        <option value="sangat_pendek" @selected(request('tingkat_zs') === 'sangat_pendek')>
                                                             🔴 Sangat Pendek (&lt; -3)
                                                         </option>
 
-                                                        <option value="pendek"
-                                                            @selected(request('tingkat_zs') === 'pendek')>
+                                                        <option value="pendek" @selected(request('tingkat_zs') === 'pendek')>
                                                             🟠 Pendek (-3 s/d &lt; -2)
                                                         </option>
 
-                                                        <option value="normal"
-                                                            @selected(request('tingkat_zs') === 'normal')>
+                                                        <option value="normal" @selected(request('tingkat_zs') === 'normal')>
                                                             🟢 Normal (-2 s/d 2)
                                                         </option>
 
-                                                        <option value="tinggi"
-                                                            @selected(request('tingkat_zs') === 'tinggi')>
+                                                        <option value="tinggi" @selected(request('tingkat_zs') === 'tinggi')>
                                                             🔵 Tinggi (&gt; 2)
                                                         </option>
                                                     </select>
@@ -147,41 +147,41 @@
                                                 </div>
                                             </div>
 
-                                                {{-- Search Desa --}}
-                                                <div class="flex-1 min-w-[200px]">
-                                                    <label
-                                                        class="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-1">
-                                                        <div
-                                                            class="flex-shrink-0 w-5 h-5 bg-red-100 rounded-lg flex items-center justify-center">
-                                                            <svg class="w-3.5 h-3.5 text-red-600"
-                                                                xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
-                                                                fill="currentColor">
-                                                                <path fill-rule="evenodd"
-                                                                    d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
-                                                                    clip-rule="evenodd" />
-                                                            </svg>
-                                                        </div>
-                                                        <span>Pencarian Desa</span>
-                                                    </label>
-                                                    <div class="relative group">
-                                                        <div
-                                                            class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none z-10">
-                                                            <svg class="h-5 w-5 text-gray-400 group-focus-within:text-red-500 transition-colors duration-200"
-                                                                xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
-                                                                fill="currentColor">
-                                                                <path fill-rule="evenodd"
-                                                                    d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
-                                                                    clip-rule="evenodd" />
-                                                            </svg>
-                                                        </div>
-                                                        <input type="text" name="search" id="search"
-                                                            class="block w-full pl-11 pr-4 py-2.5 text-sm border-2 border-gray-200 rounded-xl bg-white
+                                            {{-- Search Desa --}}
+                                            <div class="flex-1 min-w-[200px]">
+                                                <label
+                                                    class="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-1">
+                                                    <div
+                                                        class="flex-shrink-0 w-5 h-5 bg-red-100 rounded-lg flex items-center justify-center">
+                                                        <svg class="w-3.5 h-3.5 text-red-600"
+                                                            xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+                                                            fill="currentColor">
+                                                            <path fill-rule="evenodd"
+                                                                d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
+                                                                clip-rule="evenodd" />
+                                                        </svg>
+                                                    </div>
+                                                    <span>Pencarian Desa</span>
+                                                </label>
+                                                <div class="relative group">
+                                                    <div
+                                                        class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none z-10">
+                                                        <svg class="h-5 w-5 text-gray-400 group-focus-within:text-red-500 transition-colors duration-200"
+                                                            xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+                                                            fill="currentColor">
+                                                            <path fill-rule="evenodd"
+                                                                d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
+                                                                clip-rule="evenodd" />
+                                                        </svg>
+                                                    </div>
+                                                    <input type="text" name="search" id="search"
+                                                        class="block w-full pl-11 pr-4 py-2.5 text-sm border-2 border-gray-200 rounded-xl bg-white
                                                                 focus:ring-2 focus:ring-red-500 focus:border-red-500 focus:outline-none
                                                                 hover:border-gray-300 hover:shadow-sm transition-all duration-200
                                                                 placeholder-gray-400"
-                                                            placeholder="Cari nama desa..." value="{{ $search ?? '' }}">
-                                                    </div>
+                                                        placeholder="Cari nama desa..." value="{{ $search ?? '' }}">
                                                 </div>
+                                            </div>
 
                                             {{-- Tombol Submit --}}
                                             <div class="w-full sm:w-auto flex justify-end">
@@ -254,14 +254,15 @@
                                         class="px-6 py-4 text-center text-xs font-bold text-gray-700 tracking-wider whitespace-nowrap">
 
                                         <p class="m-0">
-                                            status desa
+                                            status desa berdasarkan
+                                        </p>
+                                        <p>
+                                            rata-rata zs tb/u
                                         </p>
 
                                         <p class="m-0 text-[10px] text-gray-500 font-medium">
-                                            @if (empty(request('tingkat_zs')))
-                                                (semua status)
-                                            @elseif(request('tingkat_zs') === 'sangat_pendek')
-                                                (sangat pendek)
+                                            @if (request('tingkat_zs') === 'sangat_pendek')
+                                                (sangat pendek) 
                                             @elseif(request('tingkat_zs') === 'pendek')
                                                 (pendek)
                                             @elseif(request('tingkat_zs') === 'normal')
@@ -362,9 +363,10 @@
                                         {{-- Periode --}}
                                         <td class="px-6 py-4 whitespace-nowrap text-right">
                                             <div class="flex items-center gap-2 justify-end">
-                                                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor"
-                                                    viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                <svg class="w-4 h-4 text-gray-400" fill="none"
+                                                    stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2"
                                                         d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                                 </svg>
                                                 <span class="text-sm text-gray-700 font-medium">
@@ -379,7 +381,8 @@
                                             <div class="flex flex-col items-center justify-center">
                                                 <svg class="w-16 h-16 text-gray-300 mb-4" fill="none"
                                                     stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2"
                                                         d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                                 </svg>
                                                 <p class="text-sm font-medium text-gray-500">
@@ -482,8 +485,8 @@
         const modal = document.getElementById('infoModalContent');
 
         const openButtons = [
-            document.getElementById('openInfoModalBtnMobile'),
-            document.getElementById('openInfoModalBtnDesktop'),
+            document.getElementById('openStuntingInfoModalBtnMobile'),
+            document.getElementById('openStuntingInfoModalBtnDesktop'),
         ].filter(Boolean);
 
         const closeButtons = [
@@ -542,3 +545,4 @@
         });
     });
 </script>
+

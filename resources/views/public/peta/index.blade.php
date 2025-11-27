@@ -161,94 +161,97 @@
             integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
         {{-- Leaflet --}}
-        <script>
-            document.addEventListener('DOMContentLoaded', () => {
-                const map = L.map('map');
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const map = L.map('map');
 
-                L.tileLayer(
-                    'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-                        maxZoom: 19,
-                        attribution: '&copy; <a href="https://www.esri.com/en-us/home" target="_blank" rel="noopener noreferrer">Esri</a>'
+        // Basemap: Esri World Imagery
+        L.tileLayer(
+            'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+                maxZoom: 19,
+                attribution: '&copy; <a href="https://www.esri.com/en-us/home" target="_blank" rel="noopener noreferrer">Esri</a>'
+            }
+        ).addTo(map);
+
+        // Data faskes dari controller (Laravel → JS)
+        const faskes = @json($faskes);
+
+        // 1) Tambahkan batas wilayah Kecamatan Pangalengan
+        fetch('{{ asset('maps/PetaDesaKecPangalengan.geojson') }}')
+            .then(r => r.json())
+            .then(geojson => {
+                const batasLayer = L.geoJSON(geojson, {
+                    style: {
+                        color: '#fff',
+                        weight: 0.25,
+                        fillColor: '#16a34a', // hijau (faskes context)
+                        fillOpacity: 0.15
                     }
-                ).addTo(map);
+                }).addTo(map);
 
-                // Data faskes dari controller
-                const faskes = @json($faskes);
-
-                // 1) Tambahkan batas wilayah Kecamatan Pangalengan
-                fetch('{{ asset('maps/PetaDesaKecPangalengan.geojson') }}')
-                    .then(r => r.json())
-                    .then(geojson => {
-                        const batasLayer = L.geoJSON(geojson, {
-                            style: {
-                                color: '#fff',
-                                weight: 0.25,
-                                fillColor: '#16a34a', // hijau (faskes context)
-                                fillOpacity: 0.15
-                            }
-                        }).addTo(map);
-
-                        const bounds = batasLayer.getBounds();
-                        map.fitBounds(bounds, {
-                            padding: [20, 20]
-                        });
-
-                        const minZoom = 12;
-                        if (map.getZoom() < minZoom) {
-                            map.setZoom(minZoom);
-                        }
-                    })
-                    .catch(err => {
-                        console.error('Gagal memuat batas wilayah:', err);
-                        map.setView([-7.16, 107.57], 11);
-                    });
-
-                // 2) Definisikan icon custom berbasis SVG (pin merah)
-                const faskesIcon = L.divIcon({
-                    className: 'faskes-marker-icon',
-                    iconSize: [30, 40], // lebar, tinggi
-                    iconAnchor: [15, 38], // titik yang nempel ke koordinat (tengah bawah)
-                    popupAnchor: [0, -32],
-                    html: `
-                        <svg xmlns="http://www.w3.org/2000/svg"
-                             viewBox="0 0 24 24"
-                             width="30" height="40">
-                            <!-- badan pin -->
-                            <path
-                                d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"
-                                fill="#ef4444"/>
-                            <!-- lingkaran tengah -->
-                            <circle cx="12" cy="9" r="4" fill="#b91c1c"/>
-                        </svg>
-                    `
+                const bounds = batasLayer.getBounds();
+                map.fitBounds(bounds, {
+                    padding: [20, 20]
                 });
 
-                // 3) Tambahkan marker faskes dengan icon SVG di atas
-                faskes.forEach(item => {
-                    const {
-                        lat,
-                        lng,
-                        nama_faskes,
-                        jenis,
-                        alamat
-                    } = item;
-                    if (!lat || !lng) return;
-
-                    const marker = L.marker([lat, lng], {
-                        icon: faskesIcon
-                    }).addTo(map);
-
-                    marker.bindPopup(`
-                        <div style="min-width: 220px">
-                            <strong>${nama_faskes || 'Fasilitas Kesehatan'}</strong><br>
-                            Jenis: <strong>${jenis || '-'}</strong><br>
-                            Alamat: ${alamat || '-'}<br>
-                            Koordinat: ${lat}, ${lng}
-                        </div>
-                    `);
-                });
+                const minZoom = 12;
+                if (map.getZoom() < minZoom) {
+                    map.setZoom(minZoom);
+                }
+            })
+            .catch(err => {
+                console.error('Gagal memuat batas wilayah:', err);
+                map.setView([-7.16, 107.57], 11);
             });
-        </script>
+
+        const iconMap = {
+            Posyandu: "{{ asset('img/icons/posyandu-pin.svg') }}",
+            Puskesmas: "{{ asset('img/icons/puskesmas-pin.svg') }}",
+            Klinik: "{{ asset('img/icons/klinik-pin.svg') }}",
+            'Rumah Sakit': "{{ asset('img/icons/rs-pin.svg') }}",
+        };
+
+        // Generator icon berdasarkan jenis
+        function getFaskesIcon(jenis) {
+            const url = iconMap[jenis] ?? "{{ asset('img/icons/default-pin.svg') }}";
+
+            return L.icon({
+                iconUrl: url,          // path icon SVG
+                iconSize: [14, 24],    // [width, height] dalam px
+                iconAnchor: [7, 24],   // titik bawah tengah pin
+                popupAnchor: [0, -20]  // popup muncul sedikit di atas icon
+            });
+        }
+
+        // 3) Tambahkan marker faskes dengan icon sesuai jenis
+        faskes.forEach(item => {
+            const {
+                lat,
+                lng,
+                nama_faskes,
+                jenis,
+                alamat
+            } = item;
+
+            // Skip jika koordinat tidak valid
+            if (!lat || !lng) return;
+
+            const marker = L.marker([lat, lng], {
+                icon: getFaskesIcon(jenis)
+            }).addTo(map);
+
+            marker.bindPopup(`
+                <div style="min-width: 220px">
+                    <strong>${nama_faskes || 'Fasilitas Kesehatan'}</strong><br>
+                    Jenis: <strong>${jenis || '-'}</strong><br>
+                    Alamat: ${alamat || '-'}<br>
+                    Koordinat: ${lat}, ${lng}
+                </div>
+            `);
+        });
+    });
+</script>
+
 
         {{-- Modal --}}
         <script>

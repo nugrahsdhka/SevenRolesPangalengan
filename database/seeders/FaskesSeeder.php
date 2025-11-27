@@ -55,7 +55,7 @@ class FaskesSeeder extends Seeder
                 DB::table('faskes')->where('id', $existing->id)->update([
                     'lat'        => $lat,
                     'lng'        => $lng,
-                    'jenis'      => 'posyandu',
+                    'jenis'      => 'Posyandu',
                     'is_active'  => true,
                     'updated_at' => now(),
                 ]);
@@ -68,7 +68,7 @@ class FaskesSeeder extends Seeder
                     'alamat'      => $alamat,
                     'lat'         => $lat,
                     'lng'         => $lng,
-                    'jenis'       => 'posyandu',
+                    'jenis'       => 'Posyandu',
                     'is_active'   => true,
                     'created_at'  => now(),
                     'updated_at'  => now(),
