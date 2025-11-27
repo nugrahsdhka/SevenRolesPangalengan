@@ -137,7 +137,7 @@
                     {{-- Kanan --}}
                     <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 md:gap-3">
                         {{-- Select Periode --}}
-                        <div class="flex gap-2">
+                        <div class="flex gap-2 w-full">
                             <x-period-dropdown
                                 :available-periods="$availablePeriods"
                                 :selected-period="$selectedPeriod"
@@ -148,7 +148,7 @@
                             {{-- Box Total Anak --}}
                             @if ($total_anak > 0)
                                 <div
-                                    class="w-full text-right bg-red-600/30 backdrop-blur-sm rounded-xl px-4 py-2 border border-red-500/30">
+                                    class="text-right bg-red-600/30 backdrop-blur-sm rounded-xl px-4 py-2 border border-red-500/30">
                                     <div class="text-2xl text-center font-bold text-white">{{ number_format($total_anak) }}
                                     </div>
                                     <div class="text-[10px] text-red-200/80 uppercase tracking-wide">Total Anak</div>
