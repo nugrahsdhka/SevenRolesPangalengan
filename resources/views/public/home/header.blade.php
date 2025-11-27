@@ -36,7 +36,7 @@
     </div>
 
     {{-- Main Header --}}
-    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="relative w-full px-4 sm:px-6 lg:px-8 py-8">
         <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
 
             {{-- Left: Logo & Info --}}

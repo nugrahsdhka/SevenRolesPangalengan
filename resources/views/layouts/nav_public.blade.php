@@ -1,5 +1,5 @@
 <nav class="sticky top-0 z-50 bg-white shadow-lg border-b border-gray-100">
-    <div class="hidden md:block max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="hidden md:block w-full max-w-7xl 2xl:max-w-none mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-center h-16">
             <div class="flex items-center space-x-1">
 

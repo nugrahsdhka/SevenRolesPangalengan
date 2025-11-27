@@ -89,8 +89,8 @@
         function loadingComponent() {
             return {
                 show: true,
-                minMs: 0, // <- TANPA penundaan ekstra
-                graceMs: 0, // <- TANPA grace tambahan
+                minMs: 0,
+                graceMs: 0,
                 _startedAt: performance.now(),
                 _pending: 0,
                 _hideTimer: null,
@@ -98,20 +98,29 @@
                 init() {
                     const hide = () => this._scheduleHide(true);
 
-                    // Freeze scroll saat tampil
-                    document.documentElement.style.overflow = 'hidden';
-                    document.body.style.overflow = 'hidden';
-
-                    if (document.readyState === 'complete') hide();
-                    else window.addEventListener('load', hide, {
-                        once: true
-                    });
-
-                    // Saat meninggalkan halaman (navigasi) tampilkan loader
-                    window.addEventListener('beforeunload', () => {
-                        this._pending = 0;
+                    // Kalau dokumen sudah complete, jangan tampilkan loader
+                    if (document.readyState === 'complete') {
+                        this._reallyHide();
+                    } else {
+                        // Kalau masih loading, tampilkan sampai event load
                         this._show();
+                        window.addEventListener('load', hide, { once: true });
+                    }
+
+                    // 🔐 Fix untuk back/forward (bfcache)
+                    window.addEventListener('pageshow', (event) => {
+                        if (event.persisted) {
+                            // Halaman datang dari cache → jangan stuck di loading
+                            this._pending = 0;
+                            this._reallyHide();
+                        }
                     });
+
+                    // ❌ INI YANG BIKIN STUCK — JANGAN DIPAKAI LAGI
+                    // window.addEventListener('beforeunload', () => {
+                    //     this._pending = 0;
+                    //     this._show();
+                    // });
 
                     // Expose API global
                     const self = this;
@@ -134,7 +143,7 @@
                         },
                     };
 
-                    // Intercept fetch agar loader ikut untuk request async
+                    // Intercept fetch
                     const _fetch = window.fetch;
                     window.fetch = async (...args) => {
                         try {
@@ -160,14 +169,22 @@
                     clearTimeout(this._hideTimer);
                     const elapsed = performance.now() - this._startedAt;
                     const wait = Math.max(0, this.minMs - elapsed);
+
                     const go = () => {
                         if (!force && this._pending > 0) {
-                            this._hideTimer = setTimeout(() => this._scheduleHide(false), this.graceMs);
+                            this._hideTimer = setTimeout(
+                                () => this._scheduleHide(false),
+                                this.graceMs
+                            );
                             return;
                         }
-                        this._hideTimer = setTimeout(() => this._reallyHide(), this.graceMs);
+                        this._hideTimer = setTimeout(
+                            () => this._reallyHide(),
+                            this.graceMs
+                        );
                     };
-                    wait > 0 ? this._hideTimer = setTimeout(go, wait) : go();
+
+                    wait > 0 ? (this._hideTimer = setTimeout(go, wait)) : go();
                 },
 
                 _reallyHide() {
