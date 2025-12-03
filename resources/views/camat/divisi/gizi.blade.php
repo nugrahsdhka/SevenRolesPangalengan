@@ -16,52 +16,52 @@
 
     $tabItems = [
         'pending' => [
-            'label'      => 'Pending',
-            'text'       => 'text-amber-700',
-            'border'     => 'border-amber-500',
-            'bg'         => 'bg-amber-50',
-            'dot'        => 'bg-amber-500',
-            'badge_bg'   => 'bg-amber-100',
+            'label' => 'Pending',
+            'text' => 'text-amber-700',
+            'border' => 'border-amber-500',
+            'bg' => 'bg-amber-50',
+            'dot' => 'bg-amber-500',
+            'badge_bg' => 'bg-amber-100',
             'badge_text' => 'text-amber-800',
         ],
         'approved' => [
-            'label'      => 'Approved',
-            'text'       => 'text-blue-700',
-            'border'     => 'border-blue-500',
-            'bg'         => 'bg-blue-50',
-            'dot'        => 'bg-blue-500',
-            'badge_bg'   => 'bg-blue-100',
+            'label' => 'Approved',
+            'text' => 'text-blue-700',
+            'border' => 'border-blue-500',
+            'bg' => 'bg-blue-50',
+            'dot' => 'bg-blue-500',
+            'badge_bg' => 'bg-blue-100',
             'badge_text' => 'text-blue-800',
         ],
         'published' => [
-            'label'      => 'Published',
-            'text'       => 'text-emerald-700',
-            'border'     => 'border-emerald-500',
-            'bg'         => 'bg-emerald-50',
-            'dot'        => 'bg-emerald-500',
-            'badge_bg'   => 'bg-emerald-100',
+            'label' => 'Published',
+            'text' => 'text-emerald-700',
+            'border' => 'border-emerald-500',
+            'bg' => 'bg-emerald-50',
+            'dot' => 'bg-emerald-500',
+            'badge_bg' => 'bg-emerald-100',
             'badge_text' => 'text-emerald-800',
         ],
     ];
 
     if (!isset($statusCounts)) {
         $statusCounts = [
-            'pending'   => 0,
-            'approved'  => 0,
+            'pending' => 0,
+            'approved' => 0,
             'published' => 0,
         ];
         foreach ($dataGizi as $row) {
             if (isset($statusCounts[$row->status])) {
-                $statusCounts[$row->status]++; 
+                $statusCounts[$row->status]++;
             }
         }
     }
 
-    $hasPending  = $bulkActions['has_pending']  ?? false;
+    $hasPending = $bulkActions['has_pending'] ?? false;
     $hasApproved = $bulkActions['has_approved'] ?? false;
 
     // true kalau dua-duanya aktif
-    $soloMode = ($hasPending xor $hasApproved); 
+    $soloMode = ($hasPending xor $hasApproved);
 @endphp
 
 
@@ -72,11 +72,11 @@
         <div class="space-y-2">
 
             {{-- Baris 1: Judul + Info Periode + Filter Periode --}}
-            <div
-                class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between text-center lg:text-left">
+            <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between text-center lg:text-left">
 
                 {{-- Judul + Periode Aktif --}}
-                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-center lg:justify-start gap-4 w-full lg:w-auto">
+                <div
+                    class="flex flex-col sm:flex-row sm:items-center sm:justify-center lg:justify-start gap-4 w-full lg:w-auto">
                     <div class="w-full">
                         <h3 class="text-sm md:text-lg font-extrabold text-gray-800">
                             Review Data Gizi per Desa/Kelurahan
@@ -91,8 +91,7 @@
                 </div>
 
                 {{-- Filter Periode (khusus tab Gizi Camat) --}}
-                <form method="GET"
-                    action="{{ route('camat.review') }}"
+                <form method="GET" action="{{ route('camat.review') }}"
                     class="w-full lg:w-auto flex flex-col sm:flex-row items-center justify-center lg:justify-end gap-2 sm:gap-3">
                     <input type="hidden" name="active_tab" value="gizi">
                     <input type="hidden" name="status" value="{{ $status }}">
@@ -102,9 +101,8 @@
                             Periode:
                         </label>
 
-                        <select name="period"
-                                required
-                                class="text-xs sm:text-sm rounded-lg border-gray-300 focus:ring-red-500 focus:border-red-500 w-full sm:w-52">
+                        <select name="period" required
+                            class="text-xs sm:text-sm rounded-lg border-gray-300 focus:ring-red-500 focus:border-red-500 w-full sm:w-52">
                             @forelse($availablePeriods ?? [] as $p)
                                 @php
                                     $ym = \Carbon\Carbon::parse($p)->format('Y-m');
@@ -123,7 +121,7 @@
                     </div>
 
                     <button type="submit"
-                            class="w-full sm:w-auto px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 active:bg-red-800 transition-all duration-200 shadow-sm hover:shadow-md">
+                        class="w-full sm:w-auto px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 active:bg-red-800 transition-all duration-200 shadow-sm hover:shadow-md">
                         Tampilkan
                     </button>
                 </form>
@@ -135,19 +133,18 @@
 
                 {{-- Baris 2: Status Tabs --}}
                 <div class="border-t border-gray-100 pt-3 w-full lg:w-auto lg:flex lg:items-center">
-                    <nav class="flex flex-row flex-wrap gap-2 justify-center lg:justify-start"
-                        role="tablist" aria-label="Status data">
+                    <nav class="flex flex-row flex-wrap gap-2 justify-center lg:justify-start" role="tablist"
+                        aria-label="Status data">
 
                         @foreach ($tabItems as $key => $meta)
                             @php $active = ($status === $key); @endphp
 
                             <a href="{{ route('camat.review', [
-                                    'active_tab' => 'gizi',
-                                    'period'     => $periodYm ?? now()->format('Y-m'),
-                                    'status'     => $key,
-                                ]) }}"
-                                role="tab"
-                                aria-selected="{{ $active ? 'true' : 'false' }}"
+                                'active_tab' => 'gizi',
+                                'period' => $periodYm ?? now()->format('Y-m'),
+                                'status' => $key,
+                            ]) }}"
+                                role="tab" aria-selected="{{ $active ? 'true' : 'false' }}"
                                 class="
                                     group relative
                                     flex flex-col sm:flex-row
@@ -157,11 +154,9 @@
                                     px-4 py-3 sm:py-4
                                     text-xs sm:text-sm font-medium border-b-2 transition-all duration-200
                                     {{ $active
-                                        ? $meta['text'].' '.$meta['border'].' '.$meta['bg']
-                                        : 'text-gray-500 border-transparent hover:text-gray-700 hover:border-gray-300 hover:bg-gray-50'
-                                    }}
-                                "
-                            >
+                                        ? $meta['text'] . ' ' . $meta['border'] . ' ' . $meta['bg']
+                                        : 'text-gray-500 border-transparent hover:text-gray-700 hover:border-gray-300 hover:bg-gray-50' }}
+                                ">
 
                                 {{-- Label + Dot (Hanya Desktop) --}}
                                 <span class="flex items-center gap-2">
@@ -169,9 +164,11 @@
                                     {{-- DOT desktop only --}}
                                     <span class="hidden sm:flex relative h-2 w-2">
                                         @if ($active && ($statusCounts[$key] ?? 0) > 0)
-                                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full {{ $meta['dot'] }} opacity-75"></span>
+                                            <span
+                                                class="animate-ping absolute inline-flex h-full w-full rounded-full {{ $meta['dot'] }} opacity-75"></span>
                                         @endif
-                                        <span class="relative inline-flex rounded-full h-2 w-2 {{ $meta['dot'] }}"></span>
+                                        <span
+                                            class="relative inline-flex rounded-full h-2 w-2 {{ $meta['dot'] }}"></span>
                                     </span>
 
                                     <span>{{ $meta['label'] }}</span>
@@ -182,16 +179,15 @@
                                     class="inline-flex items-center justify-center min-w-[2rem] px-2.5 py-1
                                         rounded-full text-[11px] sm:text-xs font-semibold
                                         {{ $active
-                                            ? $meta['badge_bg'].' '.$meta['badge_text'].' shadow-sm'
-                                            : 'bg-gray-100 text-gray-600 group-hover:bg-gray-200'
-                                        }}"
-                                >
+                                            ? $meta['badge_bg'] . ' ' . $meta['badge_text'] . ' shadow-sm'
+                                            : 'bg-gray-100 text-gray-600 group-hover:bg-gray-200' }}">
                                     {{ $statusCounts[$key] ?? 0 }}
                                 </span>
 
                                 {{-- Bottom border hanya desktop --}}
                                 @if ($active)
-                                    <span class="absolute bottom-0 left-0 right-0 h-0.5 {{ $meta['bg'] }} hidden sm:block"></span>
+                                    <span
+                                        class="absolute bottom-0 left-0 right-0 h-0.5 {{ $meta['bg'] }} hidden sm:block"></span>
                                 @endif
 
                             </a>
@@ -203,10 +199,8 @@
                 {{-- Bulk Approve / Unapprove --}}
                 <div class="flex flex-row items-center justify-between gap-3 w-full lg:w-auto">
                     @if ($hasPending)
-                        <form method="POST"
-                            action="{{ route('camat.bulk_status') }}"
-                            class="{{ $soloMode ? 'w-full' : 'w-1/2' }} sm:w-auto"
-                            x-data>
+                        <form method="POST" action="{{ route('camat.bulk_status') }}"
+                            class="{{ $soloMode ? 'w-full' : 'w-1/2' }} sm:w-auto" x-data>
                             @csrf
 
                             {{-- FIELD WAJIB UNTUK bulkUpdateStatus --}}
@@ -249,10 +243,8 @@
                     @endif
 
                     @if ($hasApproved)
-                        <form method="POST"
-                            action="{{ route('camat.bulk_status') }}"
-                            class="{{ $soloMode ? 'w-full' : 'w-1/2' }} sm:w-auto"
-                            x-data>
+                        <form method="POST" action="{{ route('camat.bulk_status') }}"
+                            class="{{ $soloMode ? 'w-full' : 'w-1/2' }} sm:w-auto" x-data>
                             @csrf
 
                             {{-- FIELD WAJIB UNTUK bulkUpdateStatus --}}
@@ -414,11 +406,11 @@
                                         <div class="flex items-center justify-center gap-3">
                                             {{-- Detail data per anak --}}
                                             <a href="{{ route('camat.gizi.detail', [
-                                                    'desa_kelurahan' => $item->desa_kelurahan,
-                                                    'period'         => $periodYm,   // periode aktif
-                                                    'status'         => $status,     // tab aktif: pending/approved/published
-                                                    'from'           => 'camat',     // info asal halaman
-                                                ]) }}"
+                                                'desa_kelurahan' => $item->desa_kelurahan,
+                                                'period' => $periodYm, // periode aktif
+                                                'status' => $status, // tab aktif: pending/approved/published
+                                                'from' => 'camat', // info asal halaman
+                                            ]) }}"
                                                 class="text-xs font-medium text-indigo-600 transition hover:text-indigo-800 hover:underline">
                                                 Detail
                                             </a>
@@ -430,8 +422,10 @@
                                                     @csrf
                                                     <input type="hidden" name="model" value="DataGizi">
                                                     <input type="hidden" name="new_status" value="approved">
-                                                    <input type="hidden" name="desa_kelurahan" value="{{ $item->desa_kelurahan }}">
-                                                    <input type="hidden" name="period" value="{{ $periodYm }}">
+                                                    <input type="hidden" name="desa_kelurahan"
+                                                        value="{{ $item->desa_kelurahan }}">
+                                                    <input type="hidden" name="period"
+                                                        value="{{ $periodYm }}">
                                                     <input type="hidden" name="active_tab" value="gizi">
 
                                                     <button type="button"
@@ -446,38 +440,16 @@
                                                         Approve
                                                     </button>
                                                 </form>
-
-                                                <form method="POST"
-                                                    action="{{ route('camat.destroy') }}"
-                                                    x-data>
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <input type="hidden" name="model" value="DataGizi">
-                                                    <input type="hidden" name="desa_kelurahan" value="{{ $item->desa_kelurahan }}">
-                                                    <input type="hidden" name="period" value="{{ $periodYm }}">
-                                                    <input type="hidden" name="active_tab" value="gizi">
-
-                                                    <button type="button"
-                                                        @click.prevent="$dispatch('open-confirm', {
-                                                            form: $el.closest('form'),
-                                                            title: 'Hapus Data Desa {{ $item->desa_kelurahan }}',
-                                                            message: 'Yakin ingin menghapus seluruh data gizi desa {{ $item->desa_kelurahan }} pada periode ini? Tindakan ini tidak bisa dibatalkan.',
-                                                            okText: 'Ya, Hapus',
-                                                            cancelText: 'Batal'
-                                                        })"
-                                                        class="text-xs font-medium text-red-600 hover:text-red-800 hover:underline">
-                                                        Hapus Semua
-                                                    </button>
-                                                </form>
-
                                             @elseif ($item->status === 'approved')
                                                 {{-- APPROVED -> PENDING (Tarik) --}}
                                                 <form method="POST" action="{{ route('camat.status') }}" x-data>
                                                     @csrf
                                                     <input type="hidden" name="model" value="DataGizi">
                                                     <input type="hidden" name="new_status" value="pending">
-                                                    <input type="hidden" name="desa_kelurahan" value="{{ $item->desa_kelurahan }}">
-                                                    <input type="hidden" name="period" value="{{ $periodYm }}">
+                                                    <input type="hidden" name="desa_kelurahan"
+                                                        value="{{ $item->desa_kelurahan }}">
+                                                    <input type="hidden" name="period"
+                                                        value="{{ $periodYm }}">
                                                     <input type="hidden" name="active_tab" value="gizi">
 
                                                     <button type="button"
@@ -492,61 +464,58 @@
                                                         Tarik
                                                     </button>
                                                 </form>
+                                            @endif
+                                        </div>
 
-                                                <form method="POST"
-                                                    action="{{ route('camat.destroy') }}"
-                                                    x-data>
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <input type="hidden" name="model" value="DataGizi">
-                                                    <input type="hidden" name="desa_kelurahan" value="{{ $item->desa_kelurahan }}">
-                                                    <input type="hidden" name="period" value="{{ $periodYm }}">
-                                                    <input type="hidden" name="active_tab" value="gizi">
+                                        <form method="POST" action="{{ route('camat.destroy') }}" x-data>
+                                            @csrf
+                                            @method('DELETE')
+                                            <input type="hidden" name="model" value="DataGizi">
+                                            <input type="hidden" name="desa_kelurahan"
+                                                value="{{ $item->desa_kelurahan }}">
+                                            <input type="hidden" name="period" value="{{ $periodYm }}">
+                                            <input type="hidden" name="active_tab" value="gizi">
 
-                                                    <button type="button"
-                                                        @click.prevent="$dispatch('open-confirm', {
+                                            <button type="button"
+                                                @click.prevent="$dispatch('open-confirm', {
                                                             form: $el.closest('form'),
                                                             title: 'Hapus Data Desa {{ $item->desa_kelurahan }}',
                                                             message: 'Yakin ingin menghapus seluruh data gizi desa {{ $item->desa_kelurahan }} pada periode ini? Tindakan ini tidak bisa dibatalkan.',
                                                             okText: 'Ya, Hapus',
                                                             cancelText: 'Batal'
                                                         })"
-                                                        class="text-xs font-medium text-red-600 hover:text-red-800 hover:underline">
-                                                        Hapus Semua
-                                                    </button>
-                                                </form>
-                                            @endif
-                                        </div>
-
-                                        {{-- Hapus semua data desa untuk PERIODE ini (pakai confirm modal) --}}
-
+                                                class="text-xs font-medium text-red-600 hover:text-red-800 hover:underline">
+                                                Hapus Semua
+                                            </button>
+                                        </form>
                                     </div>
                                 </td>
                             </tr>
                         @empty
                             <tr>
                                 <td colspan="8" class="px-6 py-12 text-center">
-                                    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none"
-                                        viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            stroke-width="2"
+                                    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24"
+                                        stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
                                     </svg>
 
                                     @if ($status === 'pending')
                                         <p class="mt-4 text-sm text-gray-500">
-                                            Tidak ada data gizi dengan status <span class="font-semibold">Pending</span>
+                                            Tidak ada data gizi dengan status <span
+                                                class="font-semibold">Pending</span>
                                             untuk periode ini.
                                         </p>
                                     @elseif ($status === 'approved')
                                         <p class="mt-4 text-sm text-gray-500">
-                                            Tidak ada data gizi dengan status <span class="font-semibold">Approved</span>
+                                            Tidak ada data gizi dengan status <span
+                                                class="font-semibold">Approved</span>
                                             untuk periode ini.
                                         </p>
                                     @elseif ($status === 'published')
                                         <p class="mt-4 text-sm text-gray-500">
-                                            Tidak ada data gizi dengan status <span class="font-semibold">Published</span>
+                                            Tidak ada data gizi dengan status <span
+                                                class="font-semibold">Published</span>
                                             untuk periode ini.
                                         </p>
                                     @else
