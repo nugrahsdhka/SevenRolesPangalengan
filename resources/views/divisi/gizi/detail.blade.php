@@ -387,6 +387,10 @@
                                             </th>
                                             <th
                                                 class="px-3 md:px-4 py-3 text-left text-[10px] md:text-xs font-semibold tracking-wider uppercase text-gray-600">
+                                                Nama
+                                            </th>
+                                            <th
+                                                class="px-3 md:px-4 py-3 text-left text-[10px] md:text-xs font-semibold tracking-wider uppercase text-gray-600">
                                                 Tanggal Input
                                             </th>
                                             <th
@@ -431,6 +435,10 @@
                                                 <td
                                                     class="whitespace-nowrap px-4 py-3 text-xs md:text-sm text-gray-600 font-medium align-top">
                                                     {{ $dataDetail->firstItem() + $loop->index }}
+                                                </td>
+                                                <td
+                                                    class="whitespace-nowrap px-4 py-3 text-xs md:text-sm text-gray-800 align-top">
+                                                    {{ $row->nama ?? '-' }}
                                                 </td>
                                                 {{-- Tanggal input --}}
                                                 <td

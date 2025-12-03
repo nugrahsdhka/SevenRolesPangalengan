@@ -302,6 +302,10 @@
                                             </th>
                                             <th
                                                 class="px-4 py-3 text-left text-[10px] md:text-xs font-semibold uppercase tracking-wider text-gray-700">
+                                                Nama
+                                            </th>
+                                            <th
+                                                class="px-4 py-3 text-left text-[10px] md:text-xs font-semibold uppercase tracking-wider text-gray-700">
                                                 Tanggal Input
                                             </th>
                                             <th
@@ -346,6 +350,11 @@
                                                 <td
                                                     class="whitespace-nowrap px-4 py-3 text-xs md:text-sm text-gray-600 font-medium align-top">
                                                     {{ $dataGizi->firstItem() + $index }}
+                                                </td>
+
+                                                <td
+                                                    class="whitespace-nowrap px-4 py-3 text-xs md:text-sm text-gray-800 align-top">
+                                                    {{ $row->nama ?? '-' }}
                                                 </td>
 
                                                 {{-- Tanggal Input --}}

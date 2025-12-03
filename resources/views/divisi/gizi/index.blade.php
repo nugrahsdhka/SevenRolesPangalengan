@@ -43,7 +43,7 @@
         @elseif ($section === 'detail')
             Gizi | Detail Data
         @else
-            Divisi Gizi
+            Divisi Gizi - {{ $currentUser->name }}
         @endif
     </x-slot>
 

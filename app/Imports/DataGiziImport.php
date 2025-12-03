@@ -38,10 +38,8 @@ class DataGiziImport implements ToModel, WithHeadingRow, WithValidation
     public function model(array $row)
     {
         // Header tipikal Laravel Excel:
-        // "Desa/Kel" -> desakel | desa_kel | desa_kelurahan (tergantung file)
-        // "BB/U" -> bbu ; "ZS BB/U" -> zs_bbu ; "TB/U" -> tbu ; "ZS TB/U" -> zs_tbu
-        // "BB/TB" -> bbtb ; "ZS BB/TB" -> zs_bbtb
-
+        // "Desa/Kel" -> desa_kel (HeadingRowFormatter ubah jadi snake_case)
+        // Format lama: desakel | desa_kel | desa_kelurahan
         $desa = $row['desakel']
             ?? $row['desa_kel']
             ?? $row['desa_kelurahan']
@@ -51,21 +49,148 @@ class DataGiziImport implements ToModel, WithHeadingRow, WithValidation
             'user_id'        => $this->userId,
             'period'         => $this->period,            // <— DIKUNCI dari form
 
-            // 🔹 kolom baru (ambil langsung dari header "Nama", "NIK", "Posyandu")
-            'nama'           => $row['nama']      ?? null,
-            'nik'            => $row['nik']       ?? null,
-            'posyandu'       => $row['posyandu']  ?? null,
+            // ================================
+            // Identitas posyandu & kunjungan
+            // ================================
+            // Nama Posyandu: "Nama Posyandu" → nama_posyandu
+            'posyandu'       => $row['nama_posyandu']
+                                ?? $row['posyandu']
+                                ?? null,
+
+            // Tanggal Kunjungan: "Tanggal Kunjungan" → tanggal_kunjungan
+            'tgl_kunjungan'  => $row['tanggal_kunjungan']
+                                ?? $row['tgl_kunjungan']
+                                ?? null,
 
             'desa_kelurahan' => $desa,
-            'berat'          => $row['berat']   ?? null,
-            'tinggi'         => $row['tinggi']  ?? null,
-            'status_bb_u'    => $row['bbu']     ?? null,
-            'zs_bb_u'        => $row['zs_bbu']  ?? null,
-            'status_tb_u'    => $row['tbu']     ?? null,
-            'zs_tb_u'        => $row['zs_tbu']  ?? null,
-            'status_bb_tb'   => $row['bbtb']    ?? null,
-            'zs_bb_tb'       => $row['zs_bbtb'] ?? null,
-            // opsional: kalau file punya kolom 'status', pakai; kalau tidak, default 'pending'
+            'alamat'         => $row['alamat']  ?? null,
+            'rt'             => $row['rt']      ?? null,
+            'rw'             => $row['rw']      ?? null,
+
+            // ================================
+            // Data anak
+            // ================================
+            // Nama Anak: "Nama Anak" → nama_anak
+            'nama'           => $row['nama_anak']
+                                ?? $row['nama']
+                                ?? null,
+
+            // Tanggal Lahir: "Tanggal Lahir" → tanggal_lahir
+            'tgl_lahir'      => $row['tanggal_lahir']
+                                ?? $row['tgl_lahir']
+                                ?? null,
+
+            'usia'           => $row['usia']     ?? null,
+            'anak_ke'        => $row['anak_ke']  ?? null,
+            'jenis_kelamin'  => $row['jenis_kelamin'] ?? null,
+
+            // NIK anak
+            'nik'            => $row['nik'] ?? null,
+
+            // NIK EPPGBM, Nomor KK
+            'nik_eppgbm'     => $row['nik_eppgbm'] ?? null,
+            'nomor_kk'       => $row['nomor_kk']   ?? null,
+
+            // BB Lahir (Kg), TB Lahir (Cm)
+            'bb_lahir'       => $row['bb_lahir_kg'] ?? $row['bb_lahir'] ?? null,
+            'tb_lahir'       => $row['tb_lahir_cm'] ?? $row['tb_lahir'] ?? null,
+
+            // ================================
+            // Status KIA, IMD, MBG (sementara disimpan apa adanya,
+            // nanti kalau mau bisa diparse ke boolean di level lain)
+            // ================================
+            'kia'            => $row['kia'] ?? null,
+            'imd'            => $row['imd'] ?? null,
+            'mbg'            => $row['mbg'] ?? null,
+
+            // ================================
+            // ASI Bulan 1–6
+            // ================================
+            'asi_bulan_1'    => $row['asi_bulan_1'] ?? null,
+            'asi_bulan_2'    => $row['asi_bulan_2'] ?? null,
+            'asi_bulan_3'    => $row['asi_bulan_3'] ?? null,
+            'asi_bulan_4'    => $row['asi_bulan_4'] ?? null,
+            'asi_bulan_5'    => $row['asi_bulan_5'] ?? null,
+            'asi_bulan_6'    => $row['asi_bulan_6'] ?? null,
+
+            // ================================
+            // Pengukuran saat kunjungan
+            // ================================
+            // BB (Kg): "BB (Kg)" → bb_kg, tetap support "berat"
+            'berat'          => $row['bb_kg']
+                                ?? $row['berat']
+                                ?? null,
+
+            // TB (Cm): "TB (Cm)" → tb_cm, tetap support "tinggi"
+            'tinggi'         => $row['tb_cm']
+                                ?? $row['tinggi']
+                                ?? null,
+
+            'lila'           => $row['lila']            ?? null,
+            'lingkar_kepala' => $row['lingkar_kepala']  ?? null,
+            'cara_ukur'      => $row['cara_ukur']       ?? null,
+            'edema'          => $row['edema']           ?? null,
+
+            // ================================
+            // Vitamin & Intervensi
+            // ================================
+            'vit_a'          => $row['vit_a']         ?? null,
+            'pmt_biskuit'    => $row['pmt_biskuit']   ?? null,
+            'taburia'        => $row['taburia']       ?? null,
+            'kelas_ibu_balita' => $row['kelas_ibu_balita'] ?? null,
+
+            // ================================
+            // Data orang tua
+            // ================================
+            'nama_ortu'      => $row['nama_orang_tua']
+                                ?? $row['nama_ortu']
+                                ?? null,
+
+            'nik_ortu'       => $row['nik_orang_tua']
+                                ?? $row['nik_ortu']
+                                ?? null,
+
+            'hp_ortu'        => $row['nomor_hp_orang_tua']
+                                ?? $row['no_hp_orang_tua']
+                                ?? $row['hp_ortu']
+                                ?? null,
+
+            // ================================
+            // Kolom BB/U
+            // ================================
+            // "BB/U" → bb_u
+            'bb_u'           => $row['bb_u'] ?? null,
+
+            // "ZS BB/U" → zs_bb_u, tetap support 'zs_bbu'
+            'zs_bb_u'        => $row['zs_bb_u'] ?? $row['zs_bbu'] ?? null,
+
+            // "Kategori BB/U" → kategori_bb_u, tetap support 'status_bb_u' & 'bbu'
+            'status_bb_u'    => $row['kategori_bb_u']
+                                ?? $row['status_bb_u']
+                                ?? $row['bbu']
+                                ?? null,
+
+            // ================================
+            // Kolom TB/U
+            // ================================
+            'tb_u'           => $row['tb_u'] ?? null,
+            'zs_tb_u'        => $row['zs_tb_u'] ?? $row['zs_tbu'] ?? null,
+            'status_tb_u'    => $row['kategori_tb_u']
+                                ?? $row['status_tb_u']
+                                ?? $row['tbu']
+                                ?? null,
+
+            // ================================
+            // Kolom BB/TB
+            // ================================
+            'bb_tb'          => $row['bb_tb'] ?? null,
+            'zs_bb_tb'       => $row['zs_bb_tb'] ?? $row['zs_bbtb'] ?? null,
+            'status_bb_tb'   => $row['kategori_bb_tb']
+                                ?? $row['status_bb_tb']
+                                ?? $row['bbtb']
+                                ?? null,
+
+            // Workflow
             'status'         => $row['status']  ?? 'pending',
         ]);
     }
@@ -76,27 +201,88 @@ class DataGiziImport implements ToModel, WithHeadingRow, WithValidation
     public function rules(): array
     {
         return [
-            // 🔹 rules tambahan untuk kolom baru
-            'nama'     => 'nullable|string|max:100',
-            'nik'      => 'nullable|string|max:20',
-            'posyandu' => 'nullable|string|max:100',
-
+            // 🔹 Desa/Kelurahan: salah satu wajib
             'desakel'         => 'required_without_all:desa_kel,desa_kelurahan|string|max:100',
             'desa_kel'        => 'required_without_all:desakel,desa_kelurahan|string|max:100',
             'desa_kelurahan'  => 'required_without_all:desakel,desa_kel|string|max:100',
 
-            'berat'   => 'required|numeric|min:0|max:999.99',
-            'tinggi'  => 'required|numeric|min:0|max:999.99',
+            // 🔹 Berat & Tinggi:
+            // bisa pakai "BB (Kg)" → bb_kg atau "berat"
+            'bb_kg'  => 'required_without:berat|numeric|min:0|max:999.99',
+            'berat'  => 'required_without:bb_kg|numeric|min:0|max:999.99',
 
-            'bbu'     => 'nullable|string|max:50',
-            'zs_bbu'  => 'nullable|numeric|min:-99.99|max:99.99',
+            'tb_cm'  => 'required_without:tinggi|numeric|min:0|max:999.99',
+            'tinggi' => 'required_without:tb_cm|numeric|min:0|max:999.99',
 
-            'tbu'     => 'nullable|string|max:50',
-            'zs_tbu'  => 'required|numeric|min:-99.99|max:99.99',
+            // 🔹 Z-score (boleh kosong, tapi kalau diisi harus numeric)
+            'zs_bbu'   => 'nullable|numeric|min:-99.99|max:99.99',
+            'zs_bb_u'  => 'nullable|numeric|min:-99.99|max:99.99',
 
-            'bbtb'    => 'nullable|string|max:50',
-            'zs_bbtb' => 'nullable|numeric|min:-99.99|max:99.99',
+            'zs_tbu'   => 'nullable|numeric|min:-99.99|max:99.99',
+            'zs_tb_u'  => 'nullable|numeric|min:-99.99|max:99.99',
 
+            'zs_bbtb'  => 'nullable|numeric|min:-99.99|max:99.99',
+            'zs_bb_tb' => 'nullable|numeric|min:-99.99|max:99.99',
+
+            // 🔹 kolom baru (semua nullable, tipe basic)
+            'nama'           => 'nullable|string|max:100',
+            'nama_anak'      => 'nullable|string|max:100',
+
+            'nama_posyandu'  => 'nullable|string|max:100',
+            'posyandu'       => 'nullable|string|max:100',
+
+            'alamat' => 'nullable|string|max:255',
+            'rt'     => 'nullable|string|max:5',
+            'rw'     => 'nullable|string|max:5',
+
+            'tanggal_kunjungan' => 'nullable',
+            'tgl_kunjungan'     => 'nullable',
+            'tanggal_lahir'     => 'nullable',
+            'tgl_lahir'         => 'nullable',
+
+            'usia'    => 'nullable|integer|min:0|max:200',
+            'anak_ke' => 'nullable|integer|min:1|max:20',
+
+            'nik'        => 'nullable|string|max:20',
+            'nik_eppgbm' => 'nullable|string|max:30',
+            'nomor_kk'   => 'nullable|string|max:30',
+
+            'bb_lahir_kg' => 'nullable|numeric|min:0|max:999.99',
+            'tb_lahir_cm' => 'nullable|numeric|min:0|max:999.99',
+            'bb_lahir'    => 'nullable|numeric|min:0|max:999.99',
+            'tb_lahir'    => 'nullable|numeric|min:0|max:999.99',
+
+            'asi_bulan_1' => 'nullable|string|max:50',
+            'asi_bulan_2' => 'nullable|string|max:50',
+            'asi_bulan_3' => 'nullable|string|max:50',
+            'asi_bulan_4' => 'nullable|string|max:50',
+            'asi_bulan_5' => 'nullable|string|max:50',
+            'asi_bulan_6' => 'nullable|string|max:50',
+
+            'lila'           => 'nullable|numeric|min:0|max:999.99',
+            'lingkar_kepala' => 'nullable|numeric|min:0|max:999.99',
+            'cara_ukur'      => 'nullable|string|max:50',
+
+            // KIA, IMD, MBG, Edema, Vit A, PMT, Taburia, Kelas Ibu Balita → bebas diisi, kita parse di level lain kalau perlu
+            'kia'              => 'nullable',
+            'imd'              => 'nullable',
+            'mbg'              => 'nullable',
+            'edema'            => 'nullable',
+            'vit_a'            => 'nullable',
+            'pmt_biskuit'      => 'nullable',
+            'taburia'          => 'nullable',
+            'kelas_ibu_balita' => 'nullable',
+
+            // Orang tua
+            'nama_orang_tua' => 'nullable|string|max:100',
+            'nama_ortu'      => 'nullable|string|max:100',
+            'nik_orang_tua'  => 'nullable|string|max:30',
+            'nik_ortu'       => 'nullable|string|max:30',
+            'nomor_hp_orang_tua' => 'nullable|string|max:20',
+            'no_hp_orang_tua'    => 'nullable|string|max:20',
+            'hp_ortu'            => 'nullable|string|max:20',
+
+            // Status workflow
             'status'  => 'nullable|in:pending,approved,published',
         ];
     }
@@ -111,12 +297,12 @@ class DataGiziImport implements ToModel, WithHeadingRow, WithValidation
             'desa_kel.required_without_all'       => 'Kolom Desa/Kelurahan tidak boleh kosong.',
             'desa_kelurahan.required_without_all' => 'Kolom Desa/Kelurahan tidak boleh kosong.',
 
-            'berat.required'   => 'Kolom Berat tidak boleh kosong.',
-            'berat.numeric'    => 'Kolom Berat harus berupa angka.',
-            'tinggi.required'  => 'Kolom Tinggi tidak boleh kosong.',
-            'tinggi.numeric'   => 'Kolom Tinggi harus berupa angka.',
+            'bb_kg.required_without'   => 'Kolom BB (Kg) atau Berat tidak boleh kosong.',
+            'berat.required_without'   => 'Kolom BB (Kg) atau Berat tidak boleh kosong.',
 
-            'zs_tbu.required'  => 'Kolom ZS TB/U tidak boleh kosong.',
+            'tb_cm.required_without'   => 'Kolom TB (Cm) atau Tinggi tidak boleh kosong.',
+            'tinggi.required_without'  => 'Kolom TB (Cm) atau Tinggi tidak boleh kosong.',
+
             'status.in'        => 'Status data harus salah satu dari: pending, approved, atau published.',
         ];
     }

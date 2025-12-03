@@ -170,6 +170,7 @@ class DivisiGiziController extends Controller
         }
 
         return view('divisi.gizi.index', compact(
+            'currentUser',
             'aggregatedData',
             'currentPeriod',
             'availablePeriods',

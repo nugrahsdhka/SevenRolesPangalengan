@@ -25,56 +25,79 @@ class RoleAndUserSeeder extends Seeder
 
         // ====== BUAT / UPDATE USER UNTUK SETIAP ROLE ======
 
-        // Divisi Gizi
+        // Divisi Gizi Puskesmas Pangalengan
         $userGizi = User::updateOrCreate(
-            ['email' => 'gizi@test.com'],
+            ['email' => 'puskesmaspangalengan@rumahstuntingpangalengan.id'],
             [
-                'name'              => 'User Gizi',
-                'password'          => Hash::make('gizi123456'),
+                'name'              => 'Puskesmas Pangalengan',
+                'password'          => Hash::make('puskesmaspangalengan123'),
                 'email_verified_at' => now(),
             ]
         );
         $userGizi->syncRoles([$roleGizi->name]);
 
-        // Divisi Pencegahan
-        $userPencegahan = User::updateOrCreate(
-            ['email' => 'pencegahan@test.com'],
+        // Divisi Gizi Puskesmas Warnasari
+        $userGizi = User::updateOrCreate(
+            ['email' => 'puskesmaswarnasari@rumahstuntingpangalengan.id'],
             [
-                'name'              => 'User Pencegahan',
-                'password'          => Hash::make('pencegahan123456'),
+                'name'              => 'Puskesmas Warnasari',
+                'password'          => Hash::make('puskesmaswarnasari123'),
                 'email_verified_at' => now(),
             ]
         );
-        $userPencegahan->syncRoles([$rolePencegahan->name]);
+        $userGizi->syncRoles([$roleGizi->name]);
 
-        // Divisi Penanggulangan
-        $userPenanggulangan = User::updateOrCreate(
-            ['email' => 'penanggulangan@test.com'],
+        // Divisi Gizi Puskesmas Sukamanah
+        $userGizi = User::updateOrCreate(
+            ['email' => 'puskesmassukamanah@rumahstuntingpangalengan.id'],
             [
-                'name'              => 'User Penanggulangan',
-                'password'          => Hash::make('penanggulangan123456'),
+                'name'              => 'Puskesmas Sukamanah',
+                'password'          => Hash::make('puskesmassukamanah123'),
                 'email_verified_at' => now(),
             ]
         );
-        $userPenanggulangan->syncRoles([$rolePenanggulangan->name]);
+        $userGizi->syncRoles([$roleGizi->name]);
 
-        // Divisi Desa
-        $userDesa = User::updateOrCreate(
-            ['email' => 'desa@test.com'],
-            [
-                'name'              => 'User Desa',
-                'password'          => Hash::make('desa123456'),
-                'email_verified_at' => now(),
-            ]
-        );
-        $userDesa->syncRoles([$roleDesa->name]);
+
+        // // Divisi Pencegahan
+        // $userPencegahan = User::updateOrCreate(
+        //     ['email' => 'pencegahan@test.com'],
+        //     [
+        //         'name'              => 'User Pencegahan',
+        //         'password'          => Hash::make('pencegahan123456'),
+        //         'email_verified_at' => now(),
+        //     ]
+        // );
+        // $userPencegahan->syncRoles([$rolePencegahan->name]);
+
+        // // Divisi Penanggulangan
+        // $userPenanggulangan = User::updateOrCreate(
+        //     ['email' => 'penanggulangan@test.com'],
+        //     [
+        //         'name'              => 'User Penanggulangan',
+        //         'password'          => Hash::make('penanggulangan123456'),
+        //         'email_verified_at' => now(),
+        //     ]
+        // );
+        // $userPenanggulangan->syncRoles([$rolePenanggulangan->name]);
+
+        // // Divisi Desa
+        // $userDesa = User::updateOrCreate(
+        //     ['email' => 'desa@test.com'],
+        //     [
+        //         'name'              => 'User Desa',
+        //         'password'          => Hash::make('desa123456'),
+        //         'email_verified_at' => now(),
+        //     ]
+        // );
+        // $userDesa->syncRoles([$roleDesa->name]);
 
         // Camat
         $userCamat = User::updateOrCreate(
-            ['email' => 'camat@test.com'],
+            ['email' => 'camat@rumahstuntingpangalengan.id'],
             [
-                'name'              => 'User Camat',
-                'password'          => Hash::make('camat123456'),
+                'name'              => 'Camat Pangalengan',
+                'password'          => Hash::make('camatpangalengan123'),
                 'email_verified_at' => now(),
             ]
         );
@@ -82,10 +105,10 @@ class RoleAndUserSeeder extends Seeder
 
         // IT Admin
         $userAdmin = User::updateOrCreate(
-            ['email' => 'admin@test.com'],
+            ['email' => 'admin@rumahstuntingpangalengan.id'],
             [
-                'name'              => 'User IT Admin',
-                'password'          => Hash::make('admin123456'),
+                'name'              => 'Admin RSP',
+                'password'          => Hash::make('adminrsp123'),
                 'email_verified_at' => now(),
             ]
         );

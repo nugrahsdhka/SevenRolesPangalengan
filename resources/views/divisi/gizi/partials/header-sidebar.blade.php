@@ -14,9 +14,14 @@
                         d="M4 6h16M4 12h16M4 18h16" />
                 </svg>
             </button>
+
             {{-- Judul Divisi --}}
-            <h2 class="font-semibold text-lg sm:text-xl text-gray-800 leading-tight whitespace-nowrap">
-                {{ __('Dashboard Divisi Gizi') }}
+            <h2 class="hidden md:block font-semibold text-lg sm:text-xl text-gray-800 leading-tight whitespace-nowrap">
+                {{ __('Dashboard Divisi Gizi - ') . $currentUser->name}}
+            </h2>
+
+            <h2 class="md:hidden block font-semibold text-lg sm:text-xl text-gray-800 leading-tight whitespace-nowrap">
+                {{ $currentUser->name }}
             </h2>
         </div>
         {{-- Kanan: Dropdown Menu User --}}

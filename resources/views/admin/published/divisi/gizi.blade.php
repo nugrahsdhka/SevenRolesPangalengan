@@ -444,6 +444,29 @@
                                                         Publish
                                                     </button>
                                                 </form>
+
+                                                <form method="POST"
+                                                    action="{{ route('admin.destroy') }}"
+                                                    x-data>
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <input type="hidden" name="model" value="DataGizi">
+                                                    <input type="hidden" name="desa_kelurahan" value="{{ $item->desa_kelurahan }}">
+                                                    <input type="hidden" name="period" value="{{ $periodYm }}">
+                                                    <input type="hidden" name="active_tab" value="gizi">
+
+                                                    <button type="button"
+                                                        @click.prevent="$dispatch('open-confirm', {
+                                                            form: $el.closest('form'),
+                                                            title: 'Hapus Data Desa {{ $item->desa_kelurahan }}',
+                                                            message: 'Yakin ingin menghapus seluruh data gizi desa {{ $item->desa_kelurahan }} pada periode ini? Tindakan ini tidak bisa dibatalkan.',
+                                                            okText: 'Ya, Hapus',
+                                                            cancelText: 'Batal'
+                                                        })"
+                                                        class="text-xs font-medium text-red-600 hover:text-red-800 hover:underline">
+                                                        Hapus Semua
+                                                    </button>
+                                                </form>
                                             @elseif ($item->status === 'published')
                                                 {{-- PUBLISHED -> APPROVED (Tarik) --}}
                                                 <form method="POST" action="{{ route('admin.publish') }}" x-data>
@@ -466,31 +489,33 @@
                                                         Tarik
                                                     </button>
                                                 </form>
+
+                                                <form method="POST"
+                                                    action="{{ route('admin.destroy') }}"
+                                                    x-data>
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <input type="hidden" name="model" value="DataGizi">
+                                                    <input type="hidden" name="desa_kelurahan" value="{{ $item->desa_kelurahan }}">
+                                                    <input type="hidden" name="period" value="{{ $periodYm }}">
+                                                    <input type="hidden" name="active_tab" value="gizi">
+
+                                                    <button type="button"
+                                                        @click.prevent="$dispatch('open-confirm', {
+                                                            form: $el.closest('form'),
+                                                            title: 'Hapus Data Desa {{ $item->desa_kelurahan }}',
+                                                            message: 'Yakin ingin menghapus seluruh data gizi desa {{ $item->desa_kelurahan }} pada periode ini? Tindakan ini tidak bisa dibatalkan.',
+                                                            okText: 'Ya, Hapus',
+                                                            cancelText: 'Batal'
+                                                        })"
+                                                        class="text-xs font-medium text-red-600 hover:text-red-800 hover:underline">
+                                                        Hapus Semua
+                                                    </button>
+                                                </form>
                                             @endif
                                         </div>
 
-                                        <form method="POST"
-                                              action="{{ route('admin.destroy') }}"
-                                              x-data>
-                                            @csrf
-                                            @method('DELETE')
-                                            <input type="hidden" name="model" value="DataGizi">
-                                            <input type="hidden" name="desa_kelurahan" value="{{ $item->desa_kelurahan }}">
-                                            <input type="hidden" name="period" value="{{ $periodYm }}">
-                                            <input type="hidden" name="active_tab" value="gizi">
 
-                                            <button type="button"
-                                                @click.prevent="$dispatch('open-confirm', {
-                                                    form: $el.closest('form'),
-                                                    title: 'Hapus Data Desa {{ $item->desa_kelurahan }}',
-                                                    message: 'Yakin ingin menghapus seluruh data gizi desa {{ $item->desa_kelurahan }} pada periode ini? Tindakan ini tidak bisa dibatalkan.',
-                                                    okText: 'Ya, Hapus',
-                                                    cancelText: 'Batal'
-                                                })"
-                                                class="text-xs font-medium text-red-600 hover:text-red-800 hover:underline">
-                                                Hapus Semua
-                                            </button>
-                                        </form>
                                     </div>
                                 </td>
                             </tr>
