@@ -45,6 +45,22 @@ class DataGiziImport implements ToModel, WithHeadingRow, WithValidation
             ?? $row['desa_kelurahan']
             ?? null;
 
+        // ================================
+        // Normalisasi BB (Kg) & TB (Cm)
+        // ================================
+        // Ambil dari bb_kg atau berat
+        $bb = $row['bb_kg'] ?? $row['berat'] ?? null;
+        if ($bb !== null && $bb !== '') {
+            // ubah koma jadi titik, mis: "7,5" -> "7.5"
+            $bb = str_replace(',', '.', $bb);
+        }
+
+        // Ambil dari tb_cm atau tinggi
+        $tb = $row['tb_cm'] ?? $row['tinggi'] ?? null;
+        if ($tb !== null && $tb !== '') {
+            $tb = str_replace(',', '.', $tb);
+        }
+
         return new DataGizi([
             'user_id'        => $this->userId,
             'period'         => $this->period,            // <— DIKUNCI dari form
@@ -80,7 +96,7 @@ class DataGiziImport implements ToModel, WithHeadingRow, WithValidation
                                 ?? $row['tgl_lahir']
                                 ?? null,
 
-            'usia'           => $row['usia']     ?? null,
+            'usia'           => $row['usia'] ?? $row['usia_bulan'] ?? null,
             'anak_ke'        => $row['anak_ke']  ?? null,
             'jenis_kelamin'  => $row['jenis_kelamin'] ?? null,
 
@@ -96,8 +112,7 @@ class DataGiziImport implements ToModel, WithHeadingRow, WithValidation
             'tb_lahir'       => $row['tb_lahir_cm'] ?? $row['tb_lahir'] ?? null,
 
             // ================================
-            // Status KIA, IMD, MBG (sementara disimpan apa adanya,
-            // nanti kalau mau bisa diparse ke boolean di level lain)
+            // Status KIA, IMD, MBG
             // ================================
             'kia'            => $row['kia'] ?? null,
             'imd'            => $row['imd'] ?? null,
@@ -116,15 +131,8 @@ class DataGiziImport implements ToModel, WithHeadingRow, WithValidation
             // ================================
             // Pengukuran saat kunjungan
             // ================================
-            // BB (Kg): "BB (Kg)" → bb_kg, tetap support "berat"
-            'berat'          => $row['bb_kg']
-                                ?? $row['berat']
-                                ?? null,
-
-            // TB (Cm): "TB (Cm)" → tb_cm, tetap support "tinggi"
-            'tinggi'         => $row['tb_cm']
-                                ?? $row['tinggi']
-                                ?? null,
+            'berat'          => $bb,
+            'tinggi'         => $tb,
 
             'lila'           => $row['lila']            ?? null,
             'lingkar_kepala' => $row['lingkar_kepala']  ?? null,
@@ -158,13 +166,8 @@ class DataGiziImport implements ToModel, WithHeadingRow, WithValidation
             // ================================
             // Kolom BB/U
             // ================================
-            // "BB/U" → bb_u
             'bb_u'           => $row['bb_u'] ?? null,
-
-            // "ZS BB/U" → zs_bb_u, tetap support 'zs_bbu'
             'zs_bb_u'        => $row['zs_bb_u'] ?? $row['zs_bbu'] ?? null,
-
-            // "Kategori BB/U" → kategori_bb_u, tetap support 'status_bb_u' & 'bbu'
             'status_bb_u'    => $row['kategori_bb_u']
                                 ?? $row['status_bb_u']
                                 ?? $row['bbu']
@@ -207,12 +210,12 @@ class DataGiziImport implements ToModel, WithHeadingRow, WithValidation
             'desa_kelurahan'  => 'required_without_all:desakel,desa_kel|string|max:100',
 
             // 🔹 Berat & Tinggi:
-            // bisa pakai "BB (Kg)" → bb_kg atau "berat"
-            'bb_kg'  => 'required_without:berat|numeric|min:0|max:999.99',
-            'berat'  => 'required_without:bb_kg|numeric|min:0|max:999.99',
+            // bb_kg & berat boleh pakai titik atau koma
+            'bb_kg'  => 'required_without:berat|regex:/^\d+([.,]\d+)?$/',
+            'berat'  => 'required_without:bb_kg|regex:/^\d+([.,]\d+)?$/',
 
-            'tb_cm'  => 'required_without:tinggi|numeric|min:0|max:999.99',
-            'tinggi' => 'required_without:tb_cm|numeric|min:0|max:999.99',
+            'tb_cm'  => 'required_without:tinggi|regex:/^\d+([.,]\d+)?$/',
+            'tinggi' => 'required_without:tb_cm|regex:/^\d+([.,]\d+)?$/',
 
             // 🔹 Z-score (boleh kosong, tapi kalau diisi harus numeric)
             'zs_bbu'   => 'nullable|numeric|min:-99.99|max:99.99',
@@ -240,8 +243,9 @@ class DataGiziImport implements ToModel, WithHeadingRow, WithValidation
             'tanggal_lahir'     => 'nullable',
             'tgl_lahir'         => 'nullable',
 
-            'usia'    => 'nullable|integer|min:0|max:200',
-            'anak_ke' => 'nullable|integer|min:1|max:20',
+            'usia'       => 'nullable|integer|min:0|max:200',
+            'usia_bulan' => 'nullable|integer|min:0|max:200',
+            'anak_ke'    => 'nullable|integer|min:1|max:20',
 
             'nik'        => 'nullable|string|max:20',
             'nik_eppgbm' => 'nullable|string|max:30',
@@ -263,7 +267,7 @@ class DataGiziImport implements ToModel, WithHeadingRow, WithValidation
             'lingkar_kepala' => 'nullable|numeric|min:0|max:999.99',
             'cara_ukur'      => 'nullable|string|max:50',
 
-            // KIA, IMD, MBG, Edema, Vit A, PMT, Taburia, Kelas Ibu Balita → bebas diisi, kita parse di level lain kalau perlu
+            // KIA, IMD, MBG, Edema, Vit A, PMT, Taburia, Kelas Ibu Balita
             'kia'              => 'nullable',
             'imd'              => 'nullable',
             'mbg'              => 'nullable',
@@ -274,13 +278,13 @@ class DataGiziImport implements ToModel, WithHeadingRow, WithValidation
             'kelas_ibu_balita' => 'nullable',
 
             // Orang tua
-            'nama_orang_tua' => 'nullable|string|max:100',
-            'nama_ortu'      => 'nullable|string|max:100',
-            'nik_orang_tua'  => 'nullable|string|max:30',
-            'nik_ortu'       => 'nullable|string|max:30',
-            'nomor_hp_orang_tua' => 'nullable|string|max:20',
-            'no_hp_orang_tua'    => 'nullable|string|max:20',
-            'hp_ortu'            => 'nullable|string|max:20',
+            'nama_orang_tua'      => 'nullable|string|max:100',
+            'nama_ortu'           => 'nullable|string|max:100',
+            'nik_orang_tua'       => 'nullable|string|max:30',
+            'nik_ortu'            => 'nullable|string|max:30',
+            'nomor_hp_orang_tua'  => 'nullable|string|max:20',
+            'no_hp_orang_tua'     => 'nullable|string|max:20',
+            'hp_ortu'             => 'nullable|string|max:20',
 
             // Status workflow
             'status'  => 'nullable|in:pending,approved,published',
