@@ -87,10 +87,41 @@ class DataGiziImport implements ToModel, WithHeadingRow
         return date('Y-m-d', $ts);
     }
 
+    /**
+     * Konversi ke integer aman untuk kolom usia / anak_ke.
+     * - Kalau numeric -> (int)
+     * - Kalau string mulai "=" (formula) -> null
+     * - Kalau ada angka di dalam teks -> ambil angka pertama
+     * - Kalau nggak nemu angka -> null
+     */
+    private function toIntOrNull($value): ?int
+    {
+        if ($value === null || $value === '') {
+            return null;
+        }
+
+        if (is_numeric($value)) {
+            return (int) $value;
+        }
+
+        $s = trim((string) $value);
+
+        // kalau ini formula Excel, kita anggap saja null
+        if (isset($s[0]) && $s[0] === '=') {
+            return null;
+        }
+
+        // cari angka di dalam string
+        if (preg_match('/-?\d+/', $s, $m)) {
+            return (int) $m[0];
+        }
+
+        return null;
+    }
+
     public function model(array $row)
     {
         // =============== 1. Ambil & normalisasi desa ===============
-        // Dari header "Desa/Kel" -> "desa_kel"
         $desa = $row['desa_kel']
             ?? $row['desakel']
             ?? $row['desa_kelurahan']
@@ -104,30 +135,28 @@ class DataGiziImport implements ToModel, WithHeadingRow
         }
 
         // =============== 2. Angka pengukuran ===============
-        // BB/TB kunjungan
         $bb = $this->toDecimal($row['bb_kg'] ?? $row['berat'] ?? null);
         $tb = $this->toDecimal($row['tb_cm'] ?? $row['tinggi'] ?? null);
 
-        // BB/TB lahir
         $bb_lahir = $this->toDecimal($row['bb_lahir_kg'] ?? $row['bb_lahir'] ?? null);
         $tb_lahir = $this->toDecimal($row['tb_lahir_cm'] ?? $row['tb_lahir'] ?? null);
 
-        // LILA & lingkar kepala (rekap & posyandu)
         $lila = $this->toDecimal($row['lila'] ?? $row['lila_cm'] ?? null);
         $lingkarKepala = $this->toDecimal($row['lingkar_kepala'] ?? $row['lingkar_kepala_cm'] ?? null);
 
-        // Z-score: INI YANG PASTI NUMERIC (sesuai permintaanmu)
+        // Z-score (numeric)
         $zs_bb_u  = $this->toDecimal($row['zs_bb_u']  ?? $row['zs_bbu']  ?? null);
         $zs_tb_u  = $this->toDecimal($row['zs_tb_u']  ?? $row['zs_tbu']  ?? null);
         $zs_bb_tb = $this->toDecimal($row['zs_bb_tb'] ?? $row['zs_bbtb'] ?? null);
 
-        // BB/U, TB/U, BB/TB nilai mentah (boleh numeric, aman)
         $bb_u  = $this->toDecimal($row['bb_u'] ?? null);
         $tb_u  = $this->toDecimal($row['tb_u'] ?? null);
         $bb_tb = $this->toDecimal($row['bb_tb'] ?? null);
 
-        // Usia (rekap: "Usia", posyandu: "Usia (Bulan)")
-        $usiaRaw = $row['usia'] ?? $row['usia_bulan'] ?? null;
+        // Usia & Anak ke -> integer
+        $usiaRaw  = $row['usia'] ?? $row['usia_bulan'] ?? null;
+        $usiaInt  = $this->toIntOrNull($usiaRaw);
+        $anakKeInt = $this->toIntOrNull($row['anak_ke'] ?? null);
 
         // Tanggal-tanggal
         $tglKunjungan = $this->toDateYmd($row['tanggal_kunjungan'] ?? $row['tgl_kunjungan'] ?? null);
@@ -149,8 +178,8 @@ class DataGiziImport implements ToModel, WithHeadingRow
             // Data anak
             'nama'           => $this->safeString($row['nama_anak'] ?? $row['nama'] ?? null, 100),
             'tgl_lahir'      => $tglLahir,
-            'usia'           => $this->safeString($usiaRaw, 20),
-            'anak_ke'        => $this->safeString($row['anak_ke'] ?? null, 5),
+            'usia'           => $usiaInt,           // ← INT / NULL
+            'anak_ke'        => $anakKeInt,        // ← INT / NULL
             'jenis_kelamin'  => $this->safeString($row['jenis_kelamin'] ?? null, 20),
             'nik'            => $this->safeString($row['nik'] ?? null, 20),
             'nik_eppgbm'     => $this->safeString($row['nik_eppgbm'] ?? null, 30),
