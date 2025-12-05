@@ -77,7 +77,7 @@ return new class extends Migration {
             $table->string('vit_a', 20)->nullable();
             $table->string('pmt_biskuit', 20)->nullable();
             $table->string('taburia', 20)->nullable();
-            $table->string('kelas_ibu_balita', 50)->nullable();
+            $table->string('kelas_ibu_balita')->nullable();
 
             // ================================
             // DATA ORANG TUA
