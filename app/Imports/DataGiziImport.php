@@ -89,7 +89,7 @@ class DataGiziImport implements ToModel, WithHeadingRow, WithValidation
                                 ?? $row['tgl_kunjungan']
                                 ?? null,
             'desa_kelurahan' => $desa,
-            'alamat'         => $row['alamat'] ?? null,
+            'alamat'         => $row['alamat'] ?? $row['alamat_anak'] ?? null,
             'rt'             => $row['rt'] ?? null,
             'rw'             => $row['rw'] ?? null,
 
