@@ -222,8 +222,8 @@ class DataGiziImport implements ToModel, WithHeadingRow, WithValidation
             'posyandu'        => 'nullable|string|max:100',
             'alamat'          => 'nullable|string|max:255',
             'alamat_anak'     => 'nullable|string|max:255',
-            'rt'              => 'nullable|string|max:5',
-            'rw'              => 'nullable|string|max:5',
+            'rt'              => 'nullable|string|max:200',
+            'rw'              => 'nullable|string|max:200',
 
             // Tanggal & usia
             'tanggal_kunjungan' => 'nullable',
