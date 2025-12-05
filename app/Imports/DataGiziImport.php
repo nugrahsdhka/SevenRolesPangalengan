@@ -16,6 +16,7 @@ class DataGiziImport implements ToModel, WithHeadingRow
     {
         $p = trim($period);
 
+        // support "2025-11" -> "2025-11-01"
         if (preg_match('/^\d{4}-\d{2}$/', $p)) {
             $p .= '-01';
         }
@@ -24,35 +25,79 @@ class DataGiziImport implements ToModel, WithHeadingRow
         $this->userId = $userId;
     }
 
-    /* ============================================================
-       CLEANER UTAMA — MEMBUANG FORMULA EXCEL SEPERTI:
-       =IFERROR(__xludf.DUMMYFUNCTION("COMPUTED_VALUE"),"MELATI 1")
-       ============================================================ */
-    private function cleanExcelFormula($value): ?string
+    /*
+    |--------------------------------------------------------------------------
+    | HELPERS: BERSIHKAN FORMULA EXCEL
+    |--------------------------------------------------------------------------
+    | Kita pisah: satu khusus STRING, satu khusus NUMERIC
+    | Contoh formula di file kamu:
+    |   =IFERROR(__xludf.DUMMYFUNCTION("COMPUTED_VALUE"),"MELATI 1")
+    |   =IFERROR(__xludf.DUMMYFUNCTION("COMPUTED_VALUE"),3,6)
+    */
+
+    /**
+     * Untuk kolom STRING:
+     * - Kalau bukan formula → trim biasa
+     * - Kalau formula dengan "..." → ambil teks di kutip terakhir
+     * - Kalau formula tanpa "..." → anggap NULL
+     */
+    private function cleanFormulaForString($value): ?string
     {
         if ($value === null || $value === '') return null;
 
         $s = trim((string) $value);
 
-        // Jika ada "=" maka itu formula
-        if (strlen($s) > 0 && $s[0] === '=') {
-
-            // Ambil string di dalam tanda kutip terakhir
-            if (preg_match_all('/"([^"]*)"/', $s, $matches)) {
-                $last = trim(end($matches[1]));
-                return $last !== '' ? $last : null;
-            }
-
-            return null;
+        // Bukan formula
+        if ($s === '' || $s[0] !== '=') {
+            return $s;
         }
 
-        return $s;
+        // Formula: ambil teks di dalam tanda kutip
+        if (preg_match_all('/"([^"]*)"/', $s, $matches)) {
+            $last = trim(end($matches[1]));
+            return $last !== '' ? $last : null;
+        }
+
+        // Formula tapi tidak ada string fallback → dianggap kosong
+        return null;
     }
 
-    /* Bersihkan string + batasi panjang */
+    /**
+     * Untuk kolom NUMERIC:
+     * - Kalau numeric biasa → pakai langsung
+     * - Kalau bukan formula → pakai string-nya
+     * - Kalau formula → ambil ANGKA TERAKHIR di dalam formula
+     *   Contoh: =IFERROR(__xludf.DUMMYFUNCTION("X"),3,6) → 3,6
+     */
+    private function cleanFormulaForNumeric($value)
+    {
+        if ($value === null || $value === '') return null;
+
+        if (is_numeric($value)) return $value;
+
+        $s = trim((string) $value);
+        if ($s === '') return null;
+
+        // Bukan formula → kembalikan apa adanya (nanti diproses lagi oleh toDecimal / toInt)
+        if ($s[0] !== '=') {
+            return $s;
+        }
+
+        // Formula: cari angka terakhir (boleh pakai koma/titik)
+        if (preg_match_all('/-?\d+(?:[.,]\d+)?/', $s, $matches)) {
+            $lastNumber = end($matches[0]); // string angka terakhir
+            return $lastNumber;
+        }
+
+        return null;
+    }
+
+    /**
+     * Potong string dan trim, setelah dibersihkan dari formula.
+     */
     private function safeString($value, ?int $maxLen = null): ?string
     {
-        $value = $this->cleanExcelFormula($value);
+        $value = $this->cleanFormulaForString($value);
         if ($value === null || $value === '') return null;
 
         $s = trim($value);
@@ -62,68 +107,80 @@ class DataGiziImport implements ToModel, WithHeadingRow
         return $s;
     }
 
-    /* Ubah string menjadi float */
+    /**
+     * Ubah ke float aman (support koma/titik), dengan dukungan formula.
+     */
     private function toDecimal($value): ?float
     {
-        $value = $this->cleanExcelFormula($value);
+        $value = $this->cleanFormulaForNumeric($value);
         if ($value === null || $value === '') return null;
 
-        if (is_numeric($value)) return (float)$value;
+        if (is_numeric($value)) return (float) $value;
 
         $v = trim((string) $value);
         $v = preg_replace('/[^\d,\.\-]/', '', $v);
         $v = str_replace(',', '.', $v);
 
-        return is_numeric($v) ? (float)$v : null;
+        if ($v === '' || !is_numeric($v)) {
+            return null;
+        }
+
+        return (float) $v;
     }
 
-    /* Ubah string menjadi integer */
+    /**
+     * Integer aman (usia, anak_ke), dengan dukungan formula numeric.
+     */
     private function toIntOrNull($value): ?int
     {
-        $value = $this->cleanExcelFormula($value);
-
+        $value = $this->cleanFormulaForNumeric($value);
         if ($value === null || $value === '') return null;
 
-        if (is_numeric($value)) return (int)$value;
+        if (is_numeric($value)) return (int) $value;
 
-        $s = trim((string)$value);
-
-        if ($s[0] === '=') return null;
+        $s = trim((string) $value);
 
         if (preg_match('/-?\d+/', $s, $m)) {
-            return (int)$m[0];
+            return (int) $m[0];
         }
 
         return null;
     }
 
-    /* Konversi tanggal ke Y-m-d */
+    /**
+     * Normalisasi tanggal ke Y-m-d.
+     * Support:
+     * - Excel serial (juga jika muncul sebagai angka terakhir di formula)
+     * - String "31/01/2025", "2025-01-31", dll.
+     */
     private function toDateYmd($value): ?string
     {
-        $value = $this->cleanExcelFormula($value);
-
+        $value = $this->cleanFormulaForNumeric($value);
         if ($value === null || $value === '') return null;
 
+        // Excel serial
         if (is_numeric($value)) {
             try {
                 return ExcelDate::excelToDateTimeObject($value)->format('Y-m-d');
             } catch (\Throwable $e) {
-                return null;
+                // kalau gagal dianggap bukan serial, lanjut ke parsing string
             }
         }
 
-        $s = str_replace('/', '-', trim((string)$value));
+        $s = str_replace('/', '-', trim((string) $value));
         $ts = strtotime($s);
-
-        return $ts ? date('Y-m-d', $ts) : null;
+        if ($ts === false) {
+            return null;
+        }
+        return date('Y-m-d', $ts);
     }
 
-    /* ============================================================
-       BAGIAN UTAMA PEMETAAN ROW EXCEL → MODEL
-       ============================================================ */
+    /**
+     * Mapping 1 row Excel → 1 DataGizi
+     */
     public function model(array $row)
     {
-        // Ambil nama desa
+        // Desa/Kel
         $desa = $this->safeString(
             $row['desa_kel'] ??
             $row['desakel'] ??
@@ -132,35 +189,48 @@ class DataGiziImport implements ToModel, WithHeadingRow
             100
         );
 
-        if ($desa === null || $desa === '') return null;
+        // Skip baris yang tidak punya desa
+        if ($desa === null || $desa === '') {
+            return null;
+        }
 
-        // Angka
-        $bb         = $this->toDecimal($row['bb_kg'] ?? $row['berat'] ?? null);
-        $tb         = $this->toDecimal($row['tb_cm'] ?? $row['tinggi'] ?? null);
-        $bb_lahir   = $this->toDecimal($row['bb_lahir'] ?? null);
-        $tb_lahir   = $this->toDecimal($row['tb_lahir'] ?? null);
-        $lila       = $this->toDecimal($row['lila'] ?? null);
-        $kepala     = $this->toDecimal($row['lingkar_kepala'] ?? null);
+        // ==================== ANGKA PENGUKURAN ====================
+        // Header di file: "BB (Kg)" -> bb_kg, "TB (Cm)" -> tb_cm
+        $bb = $this->toDecimal($row['bb_kg'] ?? $row['berat'] ?? null);
+        $tb = $this->toDecimal($row['tb_cm'] ?? $row['tinggi'] ?? null);
 
-        $zs_bb_u    = $this->toDecimal($row['zs_bb_u'] ?? null);
-        $zs_tb_u    = $this->toDecimal($row['zs_tb_u'] ?? null);
-        $zs_bb_tb   = $this->toDecimal($row['zs_bb_tb'] ?? null);
+        $bb_lahir = $this->toDecimal($row['bb_lahir'] ?? $row['bb_lahir_kg'] ?? null);
+        $tb_lahir = $this->toDecimal($row['tb_lahir'] ?? $row['tb_lahir_cm'] ?? null);
 
-        // Integer
-        $usia   = $this->toIntOrNull($row['usia'] ?? null);
-        $anakKe = $this->toIntOrNull($row['anak_ke'] ?? null);
+        $lila          = $this->toDecimal($row['lila'] ?? null);
+        $lingkarKepala = $this->toDecimal($row['lingkar_kepala'] ?? null);
+
+        // Z-score (numeric)
+        $zs_bb_u  = $this->toDecimal($row['zs_bb_u'] ?? $row['zs_bbu'] ?? null);
+        $zs_tb_u  = $this->toDecimal($row['zs_tb_u'] ?? $row['zs_tbu'] ?? null);
+        $zs_bb_tb = $this->toDecimal($row['zs_bb_tb'] ?? $row['zs_bbtb'] ?? null);
+
+        // BB/U, TB/U, BB/TB (boleh numeric, di DB kamu TEXT)
+        $bb_u  = $this->toDecimal($row['bb_u'] ?? null);
+        $tb_u  = $this->toDecimal($row['tb_u'] ?? null);
+        $bb_tb = $this->toDecimal($row['bb_tb'] ?? null);
+
+        // Usia & Anak ke
+        $usiaRaw   = $row['usia'] ?? $row['usia_bulan'] ?? null;
+        $usiaInt   = $this->toIntOrNull($usiaRaw);
+        $anakKeInt = $this->toIntOrNull($row['anak_ke'] ?? null);
 
         // Tanggal
-        $tglKunjungan = $this->toDateYmd($row['tanggal_kunjungan'] ?? null);
-        $tglLahir     = $this->toDateYmd($row['tanggal_lahir'] ?? null);
+        $tglKunjungan = $this->toDateYmd($row['tanggal_kunjungan'] ?? $row['tgl_kunjungan'] ?? null);
+        $tglLahir     = $this->toDateYmd($row['tanggal_lahir'] ?? $row['tgl_lahir'] ?? null);
 
+        // ==================== BUILD MODEL ====================
         return new DataGizi([
-
             'user_id'        => $this->userId,
             'period'         => $this->period,
 
-            // Identitas posyandu
-            'posyandu'       => $this->safeString($row['nama_posyandu'] ?? null, 150),
+            // Identitas posyandu & kunjungan
+            'posyandu'       => $this->safeString($row['nama_posyandu'] ?? $row['posyandu'] ?? null, 150),
             'tgl_kunjungan'  => $tglKunjungan,
             'desa_kelurahan' => $desa,
             'alamat'         => $this->safeString($row['alamat_anak'] ?? $row['alamat'] ?? null, 255),
@@ -168,25 +238,25 @@ class DataGiziImport implements ToModel, WithHeadingRow
             'rw'             => $this->safeString($row['rw'] ?? null, 50),
 
             // Data anak
-            'nama'           => $this->safeString($row['nama_anak'] ?? null, 150),
+            'nama'           => $this->safeString($row['nama_anak'] ?? $row['nama'] ?? null, 150),
             'tgl_lahir'      => $tglLahir,
-            'usia'           => $usia,
-            'anak_ke'        => $anakKe,
+            'usia'           => $usiaInt,
+            'anak_ke'        => $anakKeInt,
             'jenis_kelamin'  => $this->safeString($row['jenis_kelamin'] ?? null, 10),
             'nik'            => $this->safeString($row['nik'] ?? null, 50),
             'nik_eppgbm'     => $this->safeString($row['nik_eppgbm'] ?? null, 50),
             'nomor_kk'       => $this->safeString($row['nomor_kk'] ?? null, 50),
 
-            // Lahir
+            // BB/TB lahir
             'bb_lahir'       => $bb_lahir,
             'tb_lahir'       => $tb_lahir,
 
-            // KIA / IMD / MBG
+            // KIA, IMD, MBG
             'kia'            => $this->safeString($row['kia'] ?? null, 50),
             'imd'            => $this->safeString($row['imd'] ?? null, 50),
             'mbg'            => $this->safeString($row['mbg'] ?? null, 50),
 
-            // ASI
+            // ASI Bulan 1–6
             'asi_bulan_1'    => $this->safeString($row['asi_bulan_1'] ?? null, 50),
             'asi_bulan_2'    => $this->safeString($row['asi_bulan_2'] ?? null, 50),
             'asi_bulan_3'    => $this->safeString($row['asi_bulan_3'] ?? null, 50),
@@ -194,37 +264,65 @@ class DataGiziImport implements ToModel, WithHeadingRow
             'asi_bulan_5'    => $this->safeString($row['asi_bulan_5'] ?? null, 50),
             'asi_bulan_6'    => $this->safeString($row['asi_bulan_6'] ?? null, 50),
 
-            // Pengukuran
+            // Pengukuran kunjungan
             'berat'          => $bb,
             'tinggi'         => $tb,
             'lila'           => $lila,
-            'lingkar_kepala' => $kepala,
+            'lingkar_kepala' => $lingkarKepala,
             'cara_ukur'      => $this->safeString($row['cara_ukur'] ?? null, 50),
             'edema'          => $this->safeString($row['edema'] ?? null, 20),
 
-            // Intervensi
+            // Vitamin & intervensi
             'vit_a'          => $this->safeString($row['vit_a'] ?? null, 50),
             'pmt_biskuit'    => $this->safeString($row['pmt_biskuit'] ?? null, 50),
             'taburia'        => $this->safeString($row['taburia'] ?? null, 50),
             'kelas_ibu_balita' => $this->safeString($row['kelas_ibu_balita'] ?? null, 200),
 
-            // Orang tua
-            'nama_ortu'      => $this->safeString($row['nama_orang_tua'] ?? null, 150),
-            'nik_ortu'       => $this->safeString($row['nik_orang_tua'] ?? null, 50),
-            'hp_ortu'        => $this->safeString($row['nomor_hp_orang_tua'] ?? null, 50),
+            // Data orang tua
+            'nama_ortu'      => $this->safeString($row['nama_orang_tua'] ?? $row['nama_ortu'] ?? null, 150),
+            'nik_ortu'       => $this->safeString($row['nik_orang_tua'] ?? $row['nik_ortu'] ?? null, 50),
+            'hp_ortu'        => $this->safeString(
+                $row['nomor_hp_orang_tua'] ??
+                $row['no_hp_orang_tua'] ??
+                $row['hp_ortu'] ??
+                null,
+                50
+            ),
 
-            // Z-score
-            'bb_u'           => $this->toDecimal($row['bb_u'] ?? null),
+            // BB/U
+            'bb_u'           => $bb_u,          // numeric → disimpan di kolom TEXT, aman
             'zs_bb_u'        => $zs_bb_u,
-            'status_bb_u'    => $this->safeString($row['kategori_bb_u'] ?? null, 100),
-            'tb_u'           => $this->toDecimal($row['tb_u'] ?? null),
-            'zs_tb_u'        => $zs_tb_u,
-            'status_tb_u'    => $this->safeString($row['kategori_tb_u'] ?? null, 100),
-            'bb_tb'          => $this->toDecimal($row['bb_tb'] ?? null),
-            'zs_bb_tb'       => $zs_bb_tb,
-            'status_bb_tb'   => $this->safeString($row['kategori_bb_tb'] ?? null, 100),
+            'status_bb_u'    => $this->safeString(
+                $row['kategori_bb_u'] ??
+                $row['status_bb_u'] ??
+                $row['bbu'] ??
+                null,
+                100
+            ),
 
-            // workflow
+            // TB/U
+            'tb_u'           => $tb_u,
+            'zs_tb_u'        => $zs_tb_u,
+            'status_tb_u'    => $this->safeString(
+                $row['kategori_tb_u'] ??
+                $row['status_tb_u'] ??
+                $row['tbu'] ??
+                null,
+                100
+            ),
+
+            // BB/TB
+            'bb_tb'          => $bb_tb,
+            'zs_bb_tb'       => $zs_bb_tb,
+            'status_bb_tb'   => $this->safeString(
+                $row['kategori_bb_tb'] ??
+                $row['status_bb_tb'] ??
+                $row['bbtb'] ??
+                null,
+                100
+            ),
+
+            // Workflow
             'status'         => 'pending',
         ]);
     }
