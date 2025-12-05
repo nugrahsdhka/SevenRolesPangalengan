@@ -16,7 +16,7 @@ class DataGiziImport implements ToModel, WithHeadingRow, WithValidation
     {
         $p = trim($period);
 
-        // support "2025-11" -> "2025-11-01"
+        // support format "2025-11" -> "2025-11-01"
         if (preg_match('/^\d{4}-\d{2}$/', $p)) {
             $p .= '-01';
         }
@@ -35,16 +35,14 @@ class DataGiziImport implements ToModel, WithHeadingRow, WithValidation
             return null;
         }
 
-        // kalau sudah numeric (misal dari Excel sebagai number)
         if (is_numeric($value)) {
             return (float) $value;
         }
 
-        // Buang karakter aneh, sisakan digit, koma, titik, minus
         $v = trim((string) $value);
+        // sisakan digit, koma, titik, minus
         $v = preg_replace('/[^\d,\.\-]/', '', $v);
-
-        // Ganti koma jadi titik: "3,6" -> "3.6"
+        // koma -> titik
         $v = str_replace(',', '.', $v);
 
         if ($v === '' || !is_numeric($v)) {
@@ -56,6 +54,10 @@ class DataGiziImport implements ToModel, WithHeadingRow, WithValidation
 
     public function model(array $row)
     {
+        // ==============================
+        // Normalisasi beberapa field
+        // ==============================
+
         // Desa / Kelurahan
         $desa = $row['desakel']
             ?? $row['desa_kel']
@@ -80,7 +82,7 @@ class DataGiziImport implements ToModel, WithHeadingRow, WithValidation
         $lila           = $this->toDecimal($row['lila']           ?? null);
         $lingkarKepala  = $this->toDecimal($row['lingkar_kepala'] ?? null);
 
-        // Z-score (ini yang pasti numeric di DB)
+        // Z-score (ini yang pasti numeric)
         $zs_bb_u  = $this->toDecimal($row['zs_bb_u']  ?? $row['zs_bbu']  ?? null);
         $zs_tb_u  = $this->toDecimal($row['zs_tb_u']  ?? $row['zs_tbu']  ?? null);
         $zs_bb_tb = $this->toDecimal($row['zs_bb_tb'] ?? $row['zs_bbtb'] ?? null);
@@ -190,97 +192,17 @@ class DataGiziImport implements ToModel, WithHeadingRow, WithValidation
     public function rules(): array
     {
         return [
-            // Desa/Kel: salah satu wajib
-            'desakel'         => 'required_without_all:desa_kel,desa_kelurahan|string|max:100',
-            'desa_kel'        => 'required_without_all:desakel,desa_kelurahan|string|max:100',
-            'desa_kelurahan'  => 'required_without_all:desakel,desa_kel|string|max:100',
+            // Desa/Kel: salah satu wajib diisi
+            'desakel'         => 'required_without_all:desa_kel,desa_kelurahan',
+            'desa_kel'        => 'required_without_all:desakel,desa_kelurahan',
+            'desa_kelurahan'  => 'required_without_all:desakel,desa_kel',
 
-            // Semua kolom lain longgar (string / bebas), supaya gak gampang error
+            // Status workflow: optional tapi dibatasi nilainya
+            'status'          => 'nullable|in:pending,approved,published',
 
-            // Posyandu & alamat
-            'nama_posyandu'   => 'nullable|string|max:255',
-            'posyandu'        => 'nullable|string|max:255',
-            'alamat'          => 'nullable|string|max:255',
-            'alamat_anak'     => 'nullable|string|max:255',
-            'rt'              => 'nullable|string|max:50',
-            'rw'              => 'nullable|string|max:50',
-
-            // Tanggal & usia
-            'tanggal_kunjungan' => 'nullable|string|max:50',
-            'tgl_kunjungan'     => 'nullable|string|max:50',
-            'tanggal_lahir'     => 'nullable|string|max:50',
-            'tgl_lahir'         => 'nullable|string|max:50',
-            'usia'              => 'nullable|string|max:20',
-            'usia_bulan'        => 'nullable|string|max:20',
-            'anak_ke'           => 'nullable|string|max:20',
-
-            // Identitas anak & orang tua
-            'nama'              => 'nullable|string|max:255',
-            'nama_anak'         => 'nullable|string|max:255',
-            'jenis_kelamin'     => 'nullable|string|max:20',
-            'nik'               => 'nullable|string|max:50',
-            'nik_eppgbm'        => 'nullable|string|max:50',
-            'nomor_kk'          => 'nullable|string|max:50',
-            'nama_orang_tua'    => 'nullable|string|max:255',
-            'nama_ortu'         => 'nullable|string|max:255',
-            'nik_orang_tua'     => 'nullable|string|max:50',
-            'nik_ortu'          => 'nullable|string|max:50',
-            'nomor_hp_orang_tua'=> 'nullable|string|max:50',
-            'no_hp_orang_tua'   => 'nullable|string|max:50',
-            'hp_ortu'           => 'nullable|string|max:50',
-
-            // BB/TB lahir & kunjungan (dibersihkan di toDecimal)
-            'bb_lahir_kg'       => 'nullable|string|max:50',
-            'tb_lahir_cm'       => 'nullable|string|max:50',
-            'bb_lahir'          => 'nullable|string|max:50',
-            'tb_lahir'          => 'nullable|string|max:50',
-            'bb_kg'             => 'nullable|string|max:50',
-            'berat'             => 'nullable|string|max:50',
-            'tb_cm'             => 'nullable|string|max:50',
-            'tinggi'            => 'nullable|string|max:50',
-            'lila'              => 'nullable|string|max:50',
-            'lingkar_kepala'    => 'nullable|string|max:50',
-
-            // ASI 1–6
-            'asi_bulan_1'       => 'nullable|string|max:50',
-            'asi_bulan_2'       => 'nullable|string|max:50',
-            'asi_bulan_3'       => 'nullable|string|max:50',
-            'asi_bulan_4'       => 'nullable|string|max:50',
-            'asi_bulan_5'       => 'nullable|string|max:50',
-            'asi_bulan_6'       => 'nullable|string|max:50',
-
-            // Lain-lain (string semua)
-            'kia'               => 'nullable|string|max:50',
-            'imd'               => 'nullable|string|max:50',
-            'mbg'               => 'nullable|string|max:50',
-            'cara_ukur'         => 'nullable|string|max:50',
-            'edema'             => 'nullable|string|max:50',
-            'vit_a'             => 'nullable|string|max:50',
-            'pmt_biskuit'       => 'nullable|string|max:50',
-            'taburia'           => 'nullable|string|max:50',
-            'kelas_ibu_balita'  => 'nullable|string|max:100',
-
-            // Z-score dibiarkan bebas di validasi (boleh "3,6"), nanti toDecimal yang nyulap
-            'zs_bbu'            => 'nullable|string|max:50',
-            'zs_bb_u'           => 'nullable|string|max:50',
-            'zs_tbu'            => 'nullable|string|max:50',
-            'zs_tb_u'           => 'nullable|string|max:50',
-            'zs_bbtb'           => 'nullable|string|max:50',
-            'zs_bb_tb'          => 'nullable|string|max:50',
-
-            // Kategori status antropometri (string biasa)
-            'kategori_bb_u'     => 'nullable|string|max:100',
-            'status_bb_u'       => 'nullable|string|max:100',
-            'bbu'               => 'nullable|string|max:100',
-            'kategori_tb_u'     => 'nullable|string|max:100',
-            'status_tb_u'       => 'nullable|string|max:100',
-            'tbu'               => 'nullable|string|max:100',
-            'kategori_bb_tb'    => 'nullable|string|max:100',
-            'status_bb_tb'      => 'nullable|string|max:100',
-            'bbtb'              => 'nullable|string|max:100',
-
-            // Workflow
-            'status'            => 'nullable|in:pending,approved,published',
+            // TIDAK ADA RULE LAIN.
+            // RT, RW, BB, TB, Z-score, dll tidak divalidasi tipe/length di sini,
+            // supaya tidak muncul error seperti "rt must not be greater than ..."
         ];
     }
 
