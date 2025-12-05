@@ -195,12 +195,12 @@ class DataGiziImport implements ToModel, WithHeadingRow, WithValidation
             'tinggi'  => 'nullable',
 
             // Z-score: tetap numeric kalau diisi
-            'zs_bbu'   => 'nullable|numeric|min:-99.99|max:99.99',
-            'zs_bb_u'  => 'nullable|numeric|min:-99.99|max:99.99',
-            'zs_tbu'   => 'nullable|numeric|min:-99.99|max:99.99',
-            'zs_tb_u'  => 'nullable|numeric|min:-99.99|max:99.99',
-            'zs_bbtb'  => 'nullable|numeric|min:-99.99|max:99.99',
-            'zs_bb_tb' => 'nullable|numeric|min:-99.99|max:99.99',
+            'zs_bbu'   => 'nullable',
+            'zs_bb_u'  => 'nullable',
+            'zs_tbu'   => 'nullable',
+            'zs_tb_u'  => 'nullable',
+            'zs_bbtb'  => 'nullable',
+            'zs_bb_tb' => 'nullable',
 
             // kolom lain tetap seperti sebelumnya
             'nama'           => 'nullable|string|max:100',
