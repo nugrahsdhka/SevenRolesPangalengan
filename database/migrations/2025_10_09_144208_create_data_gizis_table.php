@@ -21,7 +21,7 @@ return new class extends Migration {
             // =============================
             $table->text('posyandu')->nullable();            // EXCEL bisa panjang & ada formula
             $table->date('tgl_kunjungan')->nullable();
-            $table->text('desa_kelurahan')->nullable();      // WAJIB TEXT karena bisa ada formula
+            $table->text('desa_kelurahan', 150)->nullable();      // WAJIB TEXT karena bisa ada formula
             $table->text('alamat')->nullable();              // bisa panjang & ada dummyfunction
 
             $table->string('rt', 50)->nullable();            // antisipasi format aneh
