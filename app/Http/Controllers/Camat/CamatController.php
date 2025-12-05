@@ -143,10 +143,15 @@ class CamatController extends Controller
         //  LOAD USER UNTUK GIZI
         // =========================
         foreach ($allData['gizi'] as $item) {
-            if ($item->user_id) {
-                $item->load(['user' => function ($query) use ($item) {
-                    $query->where('id', $item->user_id);
-                }]);
+            // Cek apakah user_id ada isinya (tidak null/0)
+            if (!empty($item->user_id)) {
+                // Cari manual, jangan pakai ->load()
+                $user = \App\Models\User::find($item->user_id);
+                
+                // Jika user ketemu, tempelkan manual
+                if ($user) {
+                    $item->setRelation('user', $user);
+                }
             }
         }
 
