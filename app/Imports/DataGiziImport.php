@@ -5,6 +5,7 @@ namespace App\Imports;
 use App\Models\DataGizi;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
+use PhpOffice\PhpSpreadsheet\Shared\Date as ExcelDate;
 
 class DataGiziImport implements ToModel, WithHeadingRow
 {
@@ -15,7 +16,7 @@ class DataGiziImport implements ToModel, WithHeadingRow
     {
         $p = trim($period);
 
-        // support format "2025-11" -> "2025-11-01"
+        // support "2025-11" -> "2025-11-01"
         if (preg_match('/^\d{4}-\d{2}$/', $p)) {
             $p .= '-01';
         }
@@ -26,22 +27,15 @@ class DataGiziImport implements ToModel, WithHeadingRow
 
     /**
      * Ubah string/apa pun jadi float aman (dukung koma/titik).
-     * Kalau gagal dibaca -> null (tidak bikin import error).
+     * Kalau gagal dibaca -> null.
      */
     private function toDecimal($value): ?float
     {
-        if ($value === null || $value === '') {
-            return null;
-        }
-
-        if (is_numeric($value)) {
-            return (float) $value;
-        }
+        if ($value === null || $value === '') return null;
+        if (is_numeric($value)) return (float) $value;
 
         $v = trim((string) $value);
-        // sisakan digit, koma, titik, minus
         $v = preg_replace('/[^\d,\.\-]/', '', $v);
-        // koma -> titik
         $v = str_replace(',', '.', $v);
 
         if ($v === '' || !is_numeric($v)) {
@@ -52,98 +46,110 @@ class DataGiziImport implements ToModel, WithHeadingRow
     }
 
     /**
-     * Potong string supaya tidak melebihi max length kolom DB.
+     * Potong string biar tidak lebih dari maxLen, dan trim.
      */
     private function safeString($value, ?int $maxLen = null): ?string
     {
-        if ($value === null || $value === '') {
-            return null;
-        }
+        if ($value === null || $value === '') return null;
 
         $s = trim((string) $value);
-
         if ($maxLen !== null && mb_strlen($s) > $maxLen) {
             $s = mb_substr($s, 0, $maxLen);
         }
-
         return $s;
+    }
+
+    /**
+     * Normalisasi tanggal ke format Y-m-d.
+     * Support:
+     * - Excel serial number
+     * - "31/01/2025", "31-01-2025", "2025-01-31", dll.
+     */
+    private function toDateYmd($value): ?string
+    {
+        if ($value === null || $value === '') return null;
+
+        // Excel serial
+        if (is_numeric($value)) {
+            try {
+                return ExcelDate::excelToDateTimeObject($value)->format('Y-m-d');
+            } catch (\Throwable $e) {
+                return null;
+            }
+        }
+
+        // String: ganti "/" jadi "-" biar strtotime lebih nurut
+        $s = str_replace('/', '-', trim((string) $value));
+        $ts = strtotime($s);
+        if ($ts === false) {
+            return null;
+        }
+        return date('Y-m-d', $ts);
     }
 
     public function model(array $row)
     {
-        // -----------------------------------
-        // 1. Normalisasi beberapa field kunci
-        // -----------------------------------
-
-        // Heading dari file:
-        // "Desa/Kel" -> desa_kel
+        // =============== 1. Ambil & normalisasi desa ===============
+        // Dari header "Desa/Kel" -> "desa_kel"
         $desa = $row['desa_kel']
             ?? $row['desakel']
             ?? $row['desa_kelurahan']
             ?? null;
 
-        // BB / TB kunjungan
-        // "BB (Kg)" -> bb_kg, "TB (Cm)" -> tb_cm
-        $bb = $row['bb_kg'] ?? $row['berat'] ?? null;
-        $tb = $row['tb_cm'] ?? $row['tinggi'] ?? null;
+        $desa = $this->safeString($desa, 100);
 
-        $bb = $this->toDecimal($bb);
-        $tb = $this->toDecimal($tb);
+        // Kalau desa kosong total → SKIP baris ini
+        if ($desa === null || $desa === '') {
+            return null;
+        }
 
-        // BB / TB lahir
-        // "BB Lahir (Kg)" -> bb_lahir_kg, "TB Lahir (Cm)" -> tb_lahir_cm
-        $bb_lahir = $row['bb_lahir_kg'] ?? $row['bb_lahir'] ?? null;
-        $tb_lahir = $row['tb_lahir_cm'] ?? $row['tb_lahir'] ?? null;
+        // =============== 2. Angka pengukuran ===============
+        // BB/TB kunjungan
+        $bb = $this->toDecimal($row['bb_kg'] ?? $row['berat'] ?? null);
+        $tb = $this->toDecimal($row['tb_cm'] ?? $row['tinggi'] ?? null);
 
-        $bb_lahir = $this->toDecimal($bb_lahir);
-        $tb_lahir = $this->toDecimal($tb_lahir);
+        // BB/TB lahir
+        $bb_lahir = $this->toDecimal($row['bb_lahir_kg'] ?? $row['bb_lahir'] ?? null);
+        $tb_lahir = $this->toDecimal($row['tb_lahir_cm'] ?? $row['tb_lahir'] ?? null);
 
-        // LILA & lingkar kepala
-        // Sheet rekap: "LILA" -> lila, "Lingkar Kepala" -> lingkar_kepala
-        // Sheet per-posyandu: "LILA (Cm)" -> lila_cm, "Lingkar Kepala (Cm)" -> lingkar_kepala_cm
+        // LILA & lingkar kepala (rekap & posyandu)
         $lila = $this->toDecimal($row['lila'] ?? $row['lila_cm'] ?? null);
         $lingkarKepala = $this->toDecimal($row['lingkar_kepala'] ?? $row['lingkar_kepala_cm'] ?? null);
 
-        // Z-score (yang pasti numeric)
-        // "ZS BB/U" -> zs_bb_u, "ZS TB/U" -> zs_tb_u, "ZS BB/TB" -> zs_bb_tb
+        // Z-score: INI YANG PASTI NUMERIC (sesuai permintaanmu)
         $zs_bb_u  = $this->toDecimal($row['zs_bb_u']  ?? $row['zs_bbu']  ?? null);
         $zs_tb_u  = $this->toDecimal($row['zs_tb_u']  ?? $row['zs_tbu']  ?? null);
         $zs_bb_tb = $this->toDecimal($row['zs_bb_tb'] ?? $row['zs_bbtb'] ?? null);
 
-        // BB/U, TB/U, BB/TB nilai mentah (boleh kosong)
+        // BB/U, TB/U, BB/TB nilai mentah (boleh numeric, aman)
         $bb_u  = $this->toDecimal($row['bb_u'] ?? null);
         $tb_u  = $this->toDecimal($row['tb_u'] ?? null);
         $bb_tb = $this->toDecimal($row['bb_tb'] ?? null);
 
-        // Usia: di sheet rekap "Usia" -> usia, di sheet posyandu "Usia (Bulan)" -> usia_bulan
-        $usia = $row['usia'] ?? $row['usia_bulan'] ?? null;
+        // Usia (rekap: "Usia", posyandu: "Usia (Bulan)")
+        $usiaRaw = $row['usia'] ?? $row['usia_bulan'] ?? null;
 
-        // -----------------------------------
-        // 2. Build model DataGizi
-        // -----------------------------------
+        // Tanggal-tanggal
+        $tglKunjungan = $this->toDateYmd($row['tanggal_kunjungan'] ?? $row['tgl_kunjungan'] ?? null);
+        $tglLahir     = $this->toDateYmd($row['tanggal_lahir'] ?? $row['tgl_lahir'] ?? null);
 
+        // =============== 3. Build model ===============
         return new DataGizi([
             'user_id'        => $this->userId,
             'period'         => $this->period,
 
             // Identitas posyandu & kunjungan
-            // "Nama Posyandu" -> nama_posyandu
-            'posyandu'       => $this->safeString(
-                $row['nama_posyandu'] ?? $row['posyandu'] ?? null,
-                100
-            ),
-            // "Tanggal Kunjungan" -> tanggal_kunjungan
-            'tgl_kunjungan'  => $row['tanggal_kunjungan'] ?? $row['tgl_kunjungan'] ?? null,
-
-            'desa_kelurahan' => $this->safeString($desa, 100),
+            'posyandu'       => $this->safeString($row['nama_posyandu'] ?? $row['posyandu'] ?? null, 100),
+            'tgl_kunjungan'  => $tglKunjungan,
+            'desa_kelurahan' => $desa,
             'alamat'         => $this->safeString($row['alamat_anak'] ?? $row['alamat'] ?? null, 255),
             'rt'             => $this->safeString($row['rt'] ?? null, 5),
             'rw'             => $this->safeString($row['rw'] ?? null, 5),
 
             // Data anak
             'nama'           => $this->safeString($row['nama_anak'] ?? $row['nama'] ?? null, 100),
-            'tgl_lahir'      => $row['tanggal_lahir'] ?? $row['tgl_lahir'] ?? null,
-            'usia'           => $this->safeString($usia, 20),
+            'tgl_lahir'      => $tglLahir,
+            'usia'           => $this->safeString($usiaRaw, 20),
             'anak_ke'        => $this->safeString($row['anak_ke'] ?? null, 5),
             'jenis_kelamin'  => $this->safeString($row['jenis_kelamin'] ?? null, 20),
             'nik'            => $this->safeString($row['nik'] ?? null, 20),
@@ -182,14 +188,8 @@ class DataGiziImport implements ToModel, WithHeadingRow
             'kelas_ibu_balita' => $this->safeString($row['kelas_ibu_balita'] ?? null, 100),
 
             // Data orang tua
-            'nama_ortu'      => $this->safeString(
-                $row['nama_orang_tua'] ?? $row['nama_ortu'] ?? null,
-                100
-            ),
-            'nik_ortu'       => $this->safeString(
-                $row['nik_orang_tua'] ?? $row['nik_ortu'] ?? null,
-                30
-            ),
+            'nama_ortu'      => $this->safeString($row['nama_orang_tua'] ?? $row['nama_ortu'] ?? null, 100),
+            'nik_ortu'       => $this->safeString($row['nik_orang_tua'] ?? $row['nik_ortu'] ?? null, 30),
             'hp_ortu'        => $this->safeString(
                 $row['nomor_hp_orang_tua'] ?? $row['no_hp_orang_tua'] ?? $row['hp_ortu'] ?? null,
                 20
@@ -220,7 +220,7 @@ class DataGiziImport implements ToModel, WithHeadingRow
             ),
 
             // Workflow
-            'status'         => $this->safeString($row['status'] ?? 'pending', 20),
+            'status'         => 'pending',
         ]);
     }
 }

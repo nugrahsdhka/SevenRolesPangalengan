@@ -426,10 +426,11 @@ class DivisiGiziController extends Controller
                 ->with('error', $errorMessage);
 
         } catch (\Exception $e) {
-            Log::error('Error importing Excel: ' . $e->getMessage());
+            dd($e->getMessage());
+        //     Log::error('Error importing Excel: ' . $e->getMessage());
 
-            return redirect()->route('gizi.index', ['period' => $periodYm])
-                ->with('error', 'Terjadi kesalahan saat import data. Pastikan format file benar dan coba lagi.');
+        //     return redirect()->route('gizi.index', ['period' => $periodYm])
+        //         ->with('error', 'Terjadi kesalahan saat import data. Pastikan format file benar dan coba lagi.');
         }
     }
 
