@@ -9,20 +9,25 @@ use Maatwebsite\Excel\Concerns\WithValidation;
 
 class DataGiziImport implements ToModel, WithHeadingRow, WithValidation
 {
-    public function __construct(
-        private string $period,
-        private int $userId
-    ) {
-        $p = trim($this->period);
+    protected string $period;
+    protected int $userId;
+
+    public function __construct(string $period, int $userId)
+    {
+        $p = trim($period);
+
+        // support "2025-11" -> "2025-11-01"
         if (preg_match('/^\d{4}-\d{2}$/', $p)) {
             $p .= '-01';
         }
+
         $this->period = date('Y-m-01', strtotime($p));
+        $this->userId = $userId;
     }
 
     /**
-     * Helper: ubah string jadi angka desimal aman (support koma/titik).
-     * Kalau gagal dibaca → return null (tidak bikin import error).
+     * Ubah string/apa pun jadi float aman (dukung koma/titik).
+     * Kalau gagal dibaca -> null (tidak bikin import error).
      */
     private function toDecimal($value): ?float
     {
@@ -30,6 +35,7 @@ class DataGiziImport implements ToModel, WithHeadingRow, WithValidation
             return null;
         }
 
+        // kalau sudah numeric (misal dari Excel sebagai number)
         if (is_numeric($value)) {
             return (float) $value;
         }
@@ -38,7 +44,7 @@ class DataGiziImport implements ToModel, WithHeadingRow, WithValidation
         $v = trim((string) $value);
         $v = preg_replace('/[^\d,\.\-]/', '', $v);
 
-        // ganti koma jadi titik: "7,5" -> "7.5"
+        // Ganti koma jadi titik: "3,6" -> "3.6"
         $v = str_replace(',', '.', $v);
 
         if ($v === '' || !is_numeric($v)) {
@@ -50,29 +56,31 @@ class DataGiziImport implements ToModel, WithHeadingRow, WithValidation
 
     public function model(array $row)
     {
+        // Desa / Kelurahan
         $desa = $row['desakel']
             ?? $row['desa_kel']
             ?? $row['desa_kelurahan']
             ?? null;
 
-        // ================================
-        // Normalisasi angka pengukuran
-        // ================================
+        // Pengukuran kunjungan
         $bb = $row['bb_kg'] ?? $row['berat'] ?? null;
         $tb = $row['tb_cm'] ?? $row['tinggi'] ?? null;
 
         $bb = $this->toDecimal($bb);
         $tb = $this->toDecimal($tb);
 
+        // BB / TB lahir
         $bb_lahir = $row['bb_lahir_kg'] ?? $row['bb_lahir'] ?? null;
         $tb_lahir = $row['tb_lahir_cm'] ?? $row['tb_lahir'] ?? null;
 
         $bb_lahir = $this->toDecimal($bb_lahir);
         $tb_lahir = $this->toDecimal($tb_lahir);
 
+        // LILA & lingkar kepala
         $lila           = $this->toDecimal($row['lila']           ?? null);
         $lingkarKepala  = $this->toDecimal($row['lingkar_kepala'] ?? null);
 
+        // Z-score
         $zs_bb_u  = $this->toDecimal($row['zs_bb_u']  ?? $row['zs_bbu']  ?? null);
         $zs_tb_u  = $this->toDecimal($row['zs_tb_u']  ?? $row['zs_tbu']  ?? null);
         $zs_bb_tb = $this->toDecimal($row['zs_bb_tb'] ?? $row['zs_bbtb'] ?? null);
@@ -187,29 +195,37 @@ class DataGiziImport implements ToModel, WithHeadingRow, WithValidation
             'desa_kel'        => 'required_without_all:desakel,desa_kelurahan|string|max:100',
             'desa_kelurahan'  => 'required_without_all:desakel,desa_kel|string|max:100',
 
-            // BB/TB & pengukuran: TIDAK divalidasi numeric lagi
-            // (kita bersihin sendiri di toDecimal agar tidak bikin import gagal)
-            'bb_kg'   => 'nullable',
-            'berat'   => 'nullable',
-            'tb_cm'   => 'nullable',
-            'tinggi'  => 'nullable',
+            // BB/TB & pengukuran utama -> tidak numeric, dibersihkan di toDecimal()
+            'bb_kg'           => 'nullable',
+            'berat'           => 'nullable',
+            'tb_cm'           => 'nullable',
+            'tinggi'          => 'nullable',
 
-            // Z-score: tetap numeric kalau diisi
-            'zs_bbu'   => 'nullable',
-            'zs_bb_u'  => 'nullable',
-            'zs_tbu'   => 'nullable',
-            'zs_tb_u'  => 'nullable',
-            'zs_bbtb'  => 'nullable',
-            'zs_bb_tb' => 'nullable',
+            // BB/TB lahir -> boleh koma, dibersihkan di toDecimal()
+            'bb_lahir_kg'     => 'nullable',
+            'tb_lahir_cm'     => 'nullable',
+            'bb_lahir'        => 'nullable',
+            'tb_lahir'        => 'nullable',
 
-            // kolom lain tetap seperti sebelumnya
-            'nama'           => 'nullable|string|max:100',
-            'nama_anak'      => 'nullable|string|max:100',
-            'nama_posyandu'  => 'nullable|string|max:100',
-            'posyandu'       => 'nullable|string|max:100',
-            'alamat'         => 'nullable|string|max:255',
-            'rt'             => 'nullable|string|max:5',
-            'rw'             => 'nullable|string|max:5',
+            // Z-score -> juga dibersihkan manual, jangan pakai numeric supaya "3,6" aman
+            'zs_bbu'          => 'nullable',
+            'zs_bb_u'         => 'nullable',
+            'zs_tbu'          => 'nullable',
+            'zs_tb_u'         => 'nullable',
+            'zs_bbtb'         => 'nullable',
+            'zs_bb_tb'        => 'nullable',
+
+            // Kolom teks / identitas
+            'nama'            => 'nullable|string|max:100',
+            'nama_anak'       => 'nullable|string|max:100',
+            'nama_posyandu'   => 'nullable|string|max:100',
+            'posyandu'        => 'nullable|string|max:100',
+            'alamat'          => 'nullable|string|max:255',
+            'alamat_anak'     => 'nullable|string|max:255',
+            'rt'              => 'nullable|string|max:5',
+            'rw'              => 'nullable|string|max:5',
+
+            // Tanggal & usia
             'tanggal_kunjungan' => 'nullable',
             'tgl_kunjungan'     => 'nullable',
             'tanggal_lahir'     => 'nullable',
@@ -217,21 +233,30 @@ class DataGiziImport implements ToModel, WithHeadingRow, WithValidation
             'usia'              => 'nullable|integer|min:0|max:200',
             'usia_bulan'        => 'nullable|integer|min:0|max:200',
             'anak_ke'           => 'nullable|integer|min:1|max:20',
-            'nik'               => 'nullable|string|max:20',
+
+            // NIK / KK / HP (boleh numeric panjang atau string)
+            'nik'               => 'nullable|string|max:30',
             'nik_eppgbm'        => 'nullable|string|max:30',
             'nomor_kk'          => 'nullable|string|max:30',
-            'bb_lahir_kg'       => 'nullable|numeric|min:0|max:999.99',
-            'tb_lahir_cm'       => 'nullable|numeric|min:0|max:999.99',
-            'bb_lahir'          => 'nullable|numeric|min:0|max:999.99',
-            'tb_lahir'          => 'nullable|numeric|min:0|max:999.99',
+            'nik_orang_tua'     => 'nullable|string|max:30',
+            'nik_ortu'          => 'nullable|string|max:30',
+            'nomor_hp_orang_tua'=> 'nullable|string|max:20',
+            'no_hp_orang_tua'   => 'nullable|string|max:20',
+            'hp_ortu'           => 'nullable|string|max:20',
+
+            // ASI 1–6
             'asi_bulan_1'       => 'nullable|string|max:50',
             'asi_bulan_2'       => 'nullable|string|max:50',
             'asi_bulan_3'       => 'nullable|string|max:50',
             'asi_bulan_4'       => 'nullable|string|max:50',
             'asi_bulan_5'       => 'nullable|string|max:50',
             'asi_bulan_6'       => 'nullable|string|max:50',
-            'lila'              => 'nullable|numeric|min:0|max:999.99',
-            'lingkar_kepala'    => 'nullable|numeric|min:0|max:999.99',
+
+            // LILA & lingkar kepala: ada toDecimal, jadi tidak numeric di sini
+            'lila'              => 'nullable',
+            'lingkar_kepala'    => 'nullable',
+
+            // Lain-lain
             'cara_ukur'         => 'nullable|string|max:50',
             'kia'               => 'nullable',
             'imd'               => 'nullable',
@@ -243,16 +268,13 @@ class DataGiziImport implements ToModel, WithHeadingRow, WithValidation
             'kelas_ibu_balita'  => 'nullable',
             'nama_orang_tua'    => 'nullable|string|max:100',
             'nama_ortu'         => 'nullable|string|max:100',
-            'nik_orang_tua'     => 'nullable|string|max:30',
-            'nik_ortu'          => 'nullable|string|max:30',
-            'nomor_hp_orang_tua'=> 'nullable|string|max:20',
-            'no_hp_orang_tua'   => 'nullable|string|max:20',
-            'hp_ortu'           => 'nullable|string|max:20',
+
+            // Status workflow
             'status'            => 'nullable|in:pending,approved,published',
         ];
     }
 
-    public function customValidationMessages()
+    public function customValidationMessages(): array
     {
         return [
             'desakel.required_without_all'        => 'Kolom Desa/Kelurahan tidak boleh kosong.',
