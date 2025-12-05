@@ -230,9 +230,9 @@ class DataGiziImport implements ToModel, WithHeadingRow, WithValidation
             'tgl_kunjungan'     => 'nullable',
             'tanggal_lahir'     => 'nullable',
             'tgl_lahir'         => 'nullable',
-            'usia'              => 'nullable|integer|min:0|max:200',
-            'usia_bulan'        => 'nullable|integer|min:0|max:200',
-            'anak_ke'           => 'nullable|integer|min:1|max:20',
+            'usia'              => 'nullable|string|max:30',
+            'usia_bulan'        => 'nullable|string|max:30',
+            'anak_ke'           => 'nullable|string|max:30',
 
             // NIK / KK / HP (boleh numeric panjang atau string)
             'nik'               => 'nullable|string|max:30',
