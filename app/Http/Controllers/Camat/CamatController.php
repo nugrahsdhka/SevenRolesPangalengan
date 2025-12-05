@@ -17,52 +17,37 @@ class CamatController extends Controller
     public function index(Request $request)
     {
         $perPage = 15;
+        $allData = []; // Inisialisasi array agar tidak error undefined
 
         // =========================
-        //  1. Ambil semua periode tersedia dulu
-        //     (dibulatkan ke tanggal 1 tiap bulan)
+        //  1. Ambil semua periode tersedia
         // =========================
         $availablePeriods = DataGizi::select(DB::raw('DATE_FORMAT(period, "%Y-%m-01") as period_date'))
             ->distinct()
             ->orderBy('period_date', 'desc')
-            ->pluck('period_date');   // contoh isi: ['2025-11-01', '2025-10-01', ...]
+            ->pluck('period_date');
 
         // =========================
-        //  2. Tentukan periodYm (Y-m) prioritas:
-        //     a. ?period di URL (kalau ada)
-        //     b. session('camat_gizi_period') (kalau ada)
-        //     c. periode terbaru dari DB (kalau ada data)
-        //     d. now()->format('Y-m') (kalau DB kosong)
+        //  2. Tentukan periodYm (Y-m)
         // =========================
-        $requestedPeriod = $request->input('period');               // dari query string
-        $sessionPeriod   = session('camat_gizi_period');            // terakhir dipakai
+        $requestedPeriod = $request->input('period');
+        $sessionPeriod   = session('camat_gizi_period');
 
         if ($availablePeriods->isNotEmpty()) {
-            // periode terbaru di DB → jadikan Y-m
             $latestPeriodYm = Carbon::parse($availablePeriods->first())->format('Y-m');
         } else {
             $latestPeriodYm = now()->format('Y-m');
         }
 
         if ($requestedPeriod) {
-            // user pilih manual via dropdown / URL
             $periodYm = $requestedPeriod;
         } elseif ($sessionPeriod) {
-            // pakai periode yang terakhir dipakai di halaman camat
             $periodYm = $sessionPeriod;
         } else {
-            // pertama kali buka:
-            // kalau ada data → pakai periode terbaru
-            // kalau tidak ada data sama sekali → pakai now()
-            $periodYm = $availablePeriods->isNotEmpty()
-                ? $latestPeriodYm
-                : now()->format('Y-m');
+            $periodYm = $availablePeriods->isNotEmpty() ? $latestPeriodYm : now()->format('Y-m');
         }
 
-        // Simpan periode aktif ke session
         session(['camat_gizi_period' => $periodYm]);
-
-        // Pecah jadi year + month
         [$year, $month] = explode('-', $periodYm);
 
         // =========================
@@ -71,7 +56,7 @@ class CamatController extends Controller
         $status = $request->input('status', 'pending');
 
         // =========================
-        //  QUERY DATA GIZI (AGREGASI PER DESA)
+        //  QUERY DATA GIZI
         // =========================
         $giziQuery = DataGizi::query()
             ->select(
@@ -95,7 +80,7 @@ class CamatController extends Controller
             )
             ->whereYear('period', $year)
             ->whereMonth('period', $month)
-            ->where('status', $status) // sesuai tab aktif
+            ->where('status', $status)
             ->groupBy('desa_kelurahan', 'status')
             ->orderByRaw("FIELD(status, 'pending', 'approved', 'published')")
             ->orderBy('tanggal_input_terbaru', 'desc');
@@ -103,7 +88,20 @@ class CamatController extends Controller
         $allData['gizi'] = $giziQuery->paginate($perPage, ['*'], 'gizi_page');
 
         // =========================
-        //  STATUS COUNTS PER PERIODE (BADGE TAB)
+        //  LOAD USER UNTUK GIZI (VERSI AMAN)
+        // =========================
+        // Ini perbaikan yang tadi saya berikan
+        foreach ($allData['gizi'] as $item) {
+            if (!empty($item->user_id)) {
+                $user = \App\Models\User::find($item->user_id);
+                if ($user) {
+                    $item->setRelation('user', $user);
+                }
+            }
+        }
+
+        // =========================
+        //  STATUS COUNTS
         // =========================
         $statusCountsRaw = DataGizi::select(
                 'status',
@@ -122,7 +120,7 @@ class CamatController extends Controller
         ];
 
         // =========================
-        //  TAB LAIN (Pencegahan, Penanggulangan, Desa)
+        //  TAB LAIN
         // =========================
         $allData['pencegahan'] = DataPencegahan::with('user')
             ->orderByRaw("FIELD(status, 'pending', 'approved', 'published')")
@@ -140,23 +138,7 @@ class CamatController extends Controller
             ->paginate($perPage, ['*'], 'desa_page');
 
         // =========================
-        //  LOAD USER UNTUK GIZI
-        // =========================
-        foreach ($allData['gizi'] as $item) {
-            // Cek apakah user_id ada isinya (tidak null/0)
-            if (!empty($item->user_id)) {
-                // Cari manual, jangan pakai ->load()
-                $user = \App\Models\User::find($item->user_id);
-                
-                // Jika user ketemu, tempelkan manual
-                if ($user) {
-                    $item->setRelation('user', $user);
-                }
-            }
-        }
-
-        // =========================
-        //  BULK ACTION FLAGS (Gizi by periode)
+        //  BULK ACTION FLAGS
         // =========================
         $giziBase = DataGizi::whereYear('period', $year)->whereMonth('period', $month);
 
@@ -179,14 +161,14 @@ class CamatController extends Controller
             ],
         ];
 
-        // =========================
-        //  ACTIVE TAB
-        // =========================
         $activeTab = $request->input('active_tab', session('active_tab', 'gizi'));
         session(['active_tab' => $activeTab]);
 
+        // =========================
+        //  RETURN VIEW (PASTIKAN INI ADA)
+        // =========================
         return view('camat.index', compact(
-            'allData',
+            'allData',          // <--- Variabel yang tadi hilang (Undefined)
             'bulkActionData',
             'activeTab',
             'periodYm',
