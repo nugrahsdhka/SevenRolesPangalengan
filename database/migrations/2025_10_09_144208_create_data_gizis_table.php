@@ -10,31 +10,35 @@ return new class extends Migration {
         Schema::create('data_gizis', function (Blueprint $table) {
             $table->id();
 
+            // USER PENGINPUT
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
 
+            // PERIODE (SELALU TGL 1)
             $table->date('period')->index();
 
             // =============================
             // IDENTITAS POSYANDU
             // =============================
-            $table->text('posyandu')->nullable();
+            $table->text('posyandu')->nullable();            // EXCEL bisa panjang & ada formula
             $table->date('tgl_kunjungan')->nullable();
-            $table->text('desa_kelurahan')->nullable();
+            $table->text('desa_kelurahan')->nullable();      // WAJIB TEXT karena bisa ada formula
+            $table->text('alamat')->nullable();              // bisa panjang & ada dummyfunction
 
-            $table->text('alamat')->nullable();
-            $table->string('rt', 50)->nullable();
+            $table->string('rt', 50)->nullable();            // antisipasi format aneh
             $table->string('rw', 50)->nullable();
 
             // =============================
             // DATA ANAK
             // =============================
-            $table->text('nama')->nullable();
+            $table->text('nama')->nullable();                // formula → TEXT
             $table->date('tgl_lahir')->nullable();
+
             $table->unsignedSmallInteger('usia')->nullable();
             $table->unsignedTinyInteger('anak_ke')->nullable();
+
             $table->string('jenis_kelamin', 10)->nullable();
 
-            $table->text('nik')->nullable();
+            $table->text('nik')->nullable();                 // Excel memunculkan formula → TEXT wajib
             $table->text('nik_eppgbm')->nullable();
             $table->text('nomor_kk')->nullable();
 
@@ -42,13 +46,16 @@ return new class extends Migration {
             $table->decimal('tb_lahir', 8, 2)->nullable();
 
             // =============================
-            // KIA IMD MBG
+            // KIA / IMD / MBG
             // =============================
+            // Excel mengisi teks "Ya", "Tidak", atau formula IFERROR
             $table->text('kia')->nullable();
             $table->text('imd')->nullable();
             $table->text('mbg')->nullable();
 
-            // ASI 1–6
+            // =============================
+            // ASI BULAN 1–6
+            // =============================
             $table->text('asi_bulan_1')->nullable();
             $table->text('asi_bulan_2')->nullable();
             $table->text('asi_bulan_3')->nullable();
@@ -59,6 +66,7 @@ return new class extends Migration {
             // =============================
             // PENGUKURAN
             // =============================
+            // Kolom ini harus NULLABLE karena Excel sering kosong
             $table->decimal('berat', 8, 2)->nullable();
             $table->decimal('tinggi', 8, 2)->nullable();
 
@@ -74,25 +82,25 @@ return new class extends Migration {
             $table->text('vit_a')->nullable();
             $table->text('pmt_biskuit')->nullable();
             $table->text('taburia')->nullable();
-            $table->text('kelas_ibu_balita')->nullable();
+            $table->text('kelas_ibu_balita')->nullable();    // WAJIB TEXT (file kamu error disini!)
 
             // =============================
-            // BB/U - TB/U - BB/TB
+            // BB/U, TB/U, BB/TB
             // =============================
             $table->text('bb_u')->nullable();
-            $table->decimal('zs_bb_u', 6, 2)->nullable();
+            $table->decimal('zs_bb_u', 8, 2)->nullable();
             $table->text('status_bb_u')->nullable();
 
             $table->text('tb_u')->nullable();
-            $table->decimal('zs_tb_u', 6, 2)->nullable();
+            $table->decimal('zs_tb_u', 8, 2)->nullable();
             $table->text('status_tb_u')->nullable();
 
             $table->text('bb_tb')->nullable();
-            $table->decimal('zs_bb_tb', 6, 2)->nullable();
+            $table->decimal('zs_bb_tb', 8, 2)->nullable();
             $table->text('status_bb_tb')->nullable();
 
             // =============================
-            // WORKFLOW
+            // WORKFLOW STATUS
             // =============================
             $table->string('status', 20)->default('pending');
             $table->boolean('is_published')->default(false);
