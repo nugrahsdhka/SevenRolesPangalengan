@@ -9,71 +9,49 @@ return new class extends Migration {
         Schema::create('data_gizis', function (Blueprint $table) {
             $table->id();
 
-            // Relasi ke user penginput
+            // Relasi ke user
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
 
-            // Periode (tanggal 1 setiap bulan), penting untuk filter & grafik
+            // Periode (tanggal 1 bulan tersebut)
             $table->date('period')->index();
 
             // ================================
-            // Kolom identitas posyandu & kunjungan
+            // IDENTITAS POSYANDU & KUNJUNGAN
             // ================================
-            // Nama Posyandu
             $table->string('posyandu', 100)->nullable();
-
-            // Tgl Kunjungan
             $table->date('tgl_kunjungan')->nullable();
+            $table->string('desa_kelurahan', 100)->nullable();
 
-            // Desa/Kel
-            $table->string('desa_kelurahan', 100);
-
-            // Alamat, RT, RW
+            // Alamat / RT / RW
             $table->string('alamat', 255)->nullable();
-            $table->string('rt', 5)->nullable();
-            $table->string('rw', 5)->nullable();
+            $table->string('rt', 50)->nullable();   // aman dari berbagai format Excel
+            $table->string('rw', 50)->nullable();
 
             // ================================
-            // Data anak
+            // DATA ANAK
             // ================================
-            // Nama Anak
-            $table->string('nama', 100);
-
-            // Tgl Lahir
+            $table->string('nama', 100)->nullable();
             $table->date('tgl_lahir')->nullable();
-
-            // Usia (mis: dalam bulan)
             $table->unsignedSmallInteger('usia')->nullable();
-
-            // Anak Ke-
             $table->unsignedTinyInteger('anak_ke')->nullable();
+            $table->string('jenis_kelamin', 5)->nullable();
 
-            // Jenis Kelamin (L/P)
-            $table->enum('jenis_kelamin', ['L', 'P'])->nullable();
-
-            // NIK
-            $table->string('nik', 20)->nullable();
-
-            // NIK EPPGBM
-            $table->string('nik_eppgbm', 30)->nullable();
-
-            // Nomor KK
+            $table->string('nik', 30)->nullable();
+            $table->string('nik_eppgbm', 50)->nullable();
             $table->string('nomor_kk', 30)->nullable();
 
-            // BB Lahir (kg), TB Lahir (cm)
-            $table->decimal('bb_lahir', 5, 2)->nullable();
-            $table->decimal('tb_lahir', 5, 2)->nullable();
+            $table->decimal('bb_lahir', 6, 2)->nullable();
+            $table->decimal('tb_lahir', 6, 2)->nullable();
 
             // ================================
-            // Status KIA, IMD, MBG
-            // (nullable boolean: null = belum diisi)
+            // KIA / IMD / MBG (banyak variasi, jadi string supaya aman)
             // ================================
-            $table->boolean('kia')->nullable();   // punya buku KIA atau tidak
-            $table->boolean('imd')->nullable();   // Inisiasi Menyusu Dini
-            $table->boolean('mbg')->nullable();   // Menyusu Bayi/Gizi (sesuai definisi internal)
+            $table->string('kia', 20)->nullable();
+            $table->string('imd', 20)->nullable();
+            $table->string('mbg', 20)->nullable();
 
             // ================================
-            // ASI Bulan 1 - 6
-            // (biasanya berupa kode/status: eksklusif, parsial, dsb → pakai string)
+            // ASI Bulan 1–6
             // ================================
             $table->string('asi_bulan_1', 50)->nullable();
             $table->string('asi_bulan_2', 50)->nullable();
@@ -83,67 +61,53 @@ return new class extends Migration {
             $table->string('asi_bulan_6', 50)->nullable();
 
             // ================================
-            // Pengukuran saat kunjungan
+            // PENGUKURAN KUNJUNGAN
             // ================================
-            // BB (kg) & TB (cm)
-            $table->decimal('berat', 5, 2);     // BB (kg)
-            $table->decimal('tinggi', 5, 2);    // TB (cm)
+            $table->decimal('berat', 6, 2)->nullable();    // HARUS NULLABLE
+            $table->decimal('tinggi', 6, 2)->nullable();   // HARUS NULLABLE
 
-            // LILA & Lingkar Kepala
-            $table->decimal('lila', 5, 2)->nullable();
-            $table->decimal('lingkar_kepala', 5, 2)->nullable();
-
-            // Cara Ukur
+            $table->decimal('lila', 6, 2)->nullable();
+            $table->decimal('lingkar_kepala', 6, 2)->nullable();
             $table->string('cara_ukur', 50)->nullable();
-
-            // Edema (0/1)
-            $table->boolean('edema')->nullable();
+            $table->string('edema', 20)->nullable();
 
             // ================================
-            // Vitamin & Intervensi
+            // VITAMIN & INTERVENSI
             // ================================
-            $table->boolean('vit_a')->nullable();
-            $table->boolean('pmt_biskuit')->nullable();
-            $table->boolean('taburia')->nullable();
-            $table->boolean('kelas_ibu_balita')->nullable();
+            $table->string('vit_a', 20)->nullable();
+            $table->string('pmt_biskuit', 20)->nullable();
+            $table->string('taburia', 20)->nullable();
+            $table->string('kelas_ibu_balita', 50)->nullable();
 
             // ================================
-            // Data orang tua
+            // DATA ORANG TUA
             // ================================
             $table->string('nama_ortu', 100)->nullable();
-            $table->string('nik_ortu', 30)->nullable();
-            $table->string('hp_ortu', 20)->nullable();
+            $table->string('nik_ortu', 50)->nullable();
+            $table->string('hp_ortu', 30)->nullable();
 
             // ================================
-            // Kolom BB/U
+            // BB / TB / BB-TB
             // ================================
-            // BB/U (bisa berupa kategori/kelas singkat atau simbol, jadi string)
+            // Semua kolom status STRING
+            // Semua Z-score DECIMAL
+            // Semua angka mentah STRING (bukan decimal)
             $table->string('bb_u', 20)->nullable();
-
-            // ZS BB/U
-            $table->decimal('zs_bb_u', 4, 2)->nullable();
-
-            // Kategori BB/U → pakai status_bb_u (mapping ke header "Kategori BB/U")
+            $table->decimal('zs_bb_u', 5, 2)->nullable();
             $table->string('status_bb_u', 50)->nullable();
 
-            // ================================
-            // Kolom TB/U
-            // ================================
             $table->string('tb_u', 20)->nullable();
-            $table->decimal('zs_tb_u', 4, 2)->nullable();
+            $table->decimal('zs_tb_u', 5, 2)->nullable();
             $table->string('status_tb_u', 50)->nullable();
 
-            // ================================
-            // Kolom BB/TB
-            // ================================
             $table->string('bb_tb', 20)->nullable();
-            $table->decimal('zs_bb_tb', 4, 2)->nullable();
+            $table->decimal('zs_bb_tb', 5, 2)->nullable();
             $table->string('status_bb_tb', 50)->nullable();
 
             // ================================
-            // Workflow status
+            // WORKFLOW STATUS
             // ================================
-            $table->string('status')->default('pending');   // pending, approved, published
+            $table->string('status', 20)->default('pending');
             $table->boolean('is_published')->default(false);
 
             $table->timestamps();
