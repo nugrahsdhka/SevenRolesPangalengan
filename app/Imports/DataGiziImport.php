@@ -3,39 +3,32 @@
 namespace App\Imports;
 
 use App\Models\DataGizi;
-use App\Models\ImportJob;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\WithChunkReading;
 use Maatwebsite\Excel\Concerns\WithBatchInserts;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use PhpOffice\PhpSpreadsheet\Shared\Date as ExcelDate;
 
-class DataGiziImport implements ToModel, WithHeadingRow, WithChunkReading, WithBatchInserts, ShouldQueue
+class DataGiziImport implements ToModel, WithHeadingRow, WithChunkReading, WithBatchInserts
 {
-
     protected string $period;
     protected int $userId;
-    protected int $importJobId;
-    protected int $localCounter = 0;
 
-    public function __construct(string $period, int $userId, ImportJob $importJob)
+    public function __construct(string $period, int $userId)
     {
         $p = trim($period);
 
-        // support "2025-11" -> "2025-11-01"
         if (preg_match('/^\d{4}-\d{2}$/', $p)) {
             $p .= '-01';
         }
 
-        $this->period    = date('Y-m-01', strtotime($p));
-        $this->userId    = $userId;
-        $this->importJobId = $importJob->id;
+        $this->period = date('Y-m-01', strtotime($p));
+        $this->userId = $userId;
     }
 
     public function chunkSize(): int
     {
-        return 500; // boleh kamu ubah
+        return 500;
     }
 
     public function batchSize(): int
@@ -43,29 +36,7 @@ class DataGiziImport implements ToModel, WithHeadingRow, WithChunkReading, WithB
         return 500;
     }
 
-    // ================== PROGRESS HELPER ==================
-
-    private function incrementProgress(): void
-    {
-        $this->localCounter++;
-
-        if ($this->localCounter >= 20) {
-            ImportJob::whereKey($this->importJobId)
-                ->increment('processed_rows', $this->localCounter);
-
-            $this->localCounter = 0;
-        }
-    }
-
-    public function __destruct()
-    {
-        if ($this->localCounter > 0) {
-            ImportJob::whereKey($this->importJobId)
-                ->increment('processed_rows', $this->localCounter);
-        }
-    }
-
-    // ================== HELPER BERSIHKAN FORMULA ==================
+    // ============== helpers bersihkan formula ==============
 
     private function cleanFormulaForString($value): ?string
     {
@@ -73,18 +44,15 @@ class DataGiziImport implements ToModel, WithHeadingRow, WithChunkReading, WithB
 
         $s = trim((string) $value);
 
-        // Bukan formula
         if ($s === '' || $s[0] !== '=') {
             return $s;
         }
 
-        // Formula: ambil teks di dalam tanda kutip
         if (preg_match_all('/"([^"]*)"/', $s, $matches)) {
             $last = trim(end($matches[1]));
             return $last !== '' ? $last : null;
         }
 
-        // Formula tapi tidak ada string fallback → dianggap kosong
         return null;
     }
 
@@ -97,14 +65,12 @@ class DataGiziImport implements ToModel, WithHeadingRow, WithChunkReading, WithB
         $s = trim((string) $value);
         if ($s === '') return null;
 
-        // Bukan formula → kembalikan apa adanya (nanti diproses lagi oleh toDecimal / toInt)
         if ($s[0] !== '=') {
             return $s;
         }
 
-        // Formula: cari angka terakhir (boleh pakai koma/titik)
         if (preg_match_all('/-?\d+(?:[.,]\d+)?/', $s, $matches)) {
-            $lastNumber = end($matches[0]); // string angka terakhir
+            $lastNumber = end($matches[0]);
             return $lastNumber;
         }
 
@@ -163,12 +129,11 @@ class DataGiziImport implements ToModel, WithHeadingRow, WithChunkReading, WithB
         $value = $this->cleanFormulaForNumeric($value);
         if ($value === null || $value === '') return null;
 
-        // Excel serial
         if (is_numeric($value)) {
             try {
                 return ExcelDate::excelToDateTimeObject($value)->format('Y-m-d');
             } catch (\Throwable $e) {
-                // kalau gagal dianggap bukan serial, lanjut ke parsing string
+                // ignore
             }
         }
 
@@ -181,11 +146,10 @@ class DataGiziImport implements ToModel, WithHeadingRow, WithChunkReading, WithB
         return date('Y-m-d', $ts);
     }
 
-    // ================== INTI: 1 ROW EXCEL → 1 MODEL ==================
+    // ============== inti: mapping row → DataGizi ==============
 
     public function model(array $row)
     {
-        // Desa/Kel
         $desa = $this->safeString(
             $row['desa_kel'] ??
             $row['desakel'] ??
@@ -194,12 +158,10 @@ class DataGiziImport implements ToModel, WithHeadingRow, WithChunkReading, WithB
             100
         );
 
-        // Skip baris yang tidak punya desa
         if ($desa === null || $desa === '') {
             return null;
         }
 
-        // ==================== ANGKA PENGUKURAN ====================
         $bb = $this->toDecimal($row['bb_kg'] ?? $row['berat'] ?? null);
         $tb = $this->toDecimal($row['tb_cm'] ?? $row['tinggi'] ?? null);
 
@@ -209,29 +171,20 @@ class DataGiziImport implements ToModel, WithHeadingRow, WithChunkReading, WithB
         $lila          = $this->toDecimal($row['lila'] ?? null);
         $lingkarKepala = $this->toDecimal($row['lingkar_kepala'] ?? null);
 
-        // Z-score (numeric)
         $zs_bb_u  = $this->toDecimal($row['zs_bb_u'] ?? $row['zs_bbu'] ?? null);
         $zs_tb_u  = $this->toDecimal($row['zs_tb_u'] ?? $row['zs_tbu'] ?? null);
         $zs_bb_tb = $this->toDecimal($row['zs_bb_tb'] ?? $row['zs_bbtb'] ?? null);
 
-        // BB/U, TB/U, BB/TB
         $bb_u  = $this->toDecimal($row['bb_u'] ?? null);
         $tb_u  = $this->toDecimal($row['tb_u'] ?? null);
         $bb_tb = $this->toDecimal($row['bb_tb'] ?? null);
 
-        // Usia & Anak ke
         $usiaRaw   = $row['usia'] ?? $row['usia_bulan'] ?? null;
         $usiaInt   = $this->toIntOrNull($usiaRaw);
         $anakKeInt = $this->toIntOrNull($row['anak_ke'] ?? null);
 
-        // Tanggal
         $tglKunjungan = $this->toDateYmd($row['tanggal_kunjungan'] ?? $row['tgl_kunjungan'] ?? null);
         $tglLahir     = $this->toDateYmd($row['tanggal_lahir'] ?? $row['tgl_lahir'] ?? null);
-
-        // ==================== BUILD MODEL ====================
-
-        // progress naik (hitung row yang bener-bener diinsert)
-        $this->incrementProgress();
 
         return new DataGizi([
             'user_id'        => $this->userId,
