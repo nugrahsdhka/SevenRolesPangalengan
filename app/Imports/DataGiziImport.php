@@ -14,6 +14,8 @@ use PhpOffice\PhpSpreadsheet\Shared\Date as ExcelDate;
 
 class DataGiziImport implements ToModel, WithHeadingRow, WithChunkReading, WithBatchInserts, ShouldQueue
 {
+    use Importable;
+
     protected string $period;
     protected int $userId;
     protected ImportJob $importJob;
