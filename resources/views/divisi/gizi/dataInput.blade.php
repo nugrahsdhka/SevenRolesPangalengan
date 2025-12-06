@@ -289,7 +289,7 @@
                                             Detail
                                         </a>
                                         <span class="text-gray-300">|</span>
-                                        <form action="{{ route('gizi.destroyAggregated') }}" method="POST" x-data>
+                                        {{-- <form action="{{ route('gizi.destroyAggregated') }}" method="POST" x-data>
                                             @csrf
                                             <input type="hidden" name="desa_kelurahan"
                                                 value="{{ $item->desa_kelurahan }}">
@@ -307,7 +307,17 @@
                                                 class="text-sm font-medium text-red-600 transition hover:text-red-800 hover:underline">
                                                 Hapus
                                             </button>
-                                        </form>
+                                        </form> --}}
+<form method="POST" action="{{ route('gizi.destroyAggregat') }}" onsubmit="return confirm('Hapus semua data desa ini untuk periode ini?')">
+    @csrf
+    @method('DELETE')
+    <input type="hidden" name="period" value="{{ $periodYm }}">
+    <input type="hidden" name="desa" value="{{ $row->desa_kelurahan }}">
+    <button type="submit" class="text-red-600 hover:underline text-sm">
+        Hapus
+    </button>
+</form>
+
                                     </div>
                                 </td>
                             </tr>
