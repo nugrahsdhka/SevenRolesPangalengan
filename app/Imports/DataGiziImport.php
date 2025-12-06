@@ -49,9 +49,10 @@ class DataGiziImport implements ToModel, WithHeadingRow, WithChunkReading, WithB
     {
         $this->localCounter++;
 
-        // update DB tiap 20 baris biar ga kebanyakan query
         if ($this->localCounter >= 20) {
-            $this->importJob->increment('processed_rows', $this->localCounter);
+            ImportJob::whereKey($this->importJobId)
+                ->increment('processed_rows', $this->localCounter);
+
             $this->localCounter = 0;
         }
     }
@@ -59,7 +60,8 @@ class DataGiziImport implements ToModel, WithHeadingRow, WithChunkReading, WithB
     public function __destruct()
     {
         if ($this->localCounter > 0) {
-            $this->importJob->increment('processed_rows', $this->localCounter);
+            ImportJob::whereKey($this->importJobId)
+                ->increment('processed_rows', $this->localCounter);
         }
     }
 
