@@ -256,4 +256,57 @@ class DivisiGiziController extends Controller
             return back()->with('error', "Terjadi kesalahan import: " . $e->getMessage());
         }
     }
+
+    public function destroyAggregat(Request $request)
+    {
+        $request->validate([
+            'period' => ['required', 'regex:/^\d{4}-\d{2}(-\d{2})?$/'],
+            'desa'   => 'required|string|max:150',
+        ]);
+
+        $currentUser   = Auth::user();
+        $userRoleName  = $currentUser->roles->first()->name;
+
+        // Standarkan period -> Y-m-01
+        $period = preg_match('/^\d{4}-\d{2}$/', $request->period)
+            ? ($request->period . '-01')
+            : $request->period;
+
+        $periodDate  = date('Y-m-01', strtotime($period));
+        $periodParam = date('Y-m', strtotime($periodDate));
+
+        // Samakan format desa seperti di store()
+        $desa = strtoupper(trim($request->desa));
+
+        // Cek dulu: kalau sudah approved/published, jangan boleh dihapus
+        $isLocked = DataGizi::where('desa_kelurahan', $desa)
+            ->whereDate('period', $periodDate)
+            ->whereIn('status', ['approved', 'published'])
+            ->whereHas('user.roles', fn($q) => $q->where('name', $userRoleName))
+            ->exists();
+
+        if ($isLocked) {
+            return back()->with(
+                'error',
+                'Data desa ini sudah di-Approve/Published, tidak bisa dihapus secara agregat.'
+            );
+        }
+
+        // Hapus SEMUA data untuk desa + periode + role ini
+        $deleted = DataGizi::where('desa_kelurahan', $desa)
+            ->whereDate('period', $periodDate)
+            ->whereHas('user.roles', fn($q) => $q->where('name', $userRoleName))
+            ->delete();
+
+        if ($deleted === 0) {
+            return back()->with(
+                'error',
+                'Tidak ada data yang dihapus untuk desa dan periode tersebut.'
+            );
+        }
+
+        return redirect()
+            ->route('gizi.index', ['period' => $periodParam])
+            ->with('success', "Semua data untuk desa {$desa} pada periode tersebut berhasil dihapus ({$deleted} baris).");
+    }
 }
