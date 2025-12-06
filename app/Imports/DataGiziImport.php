@@ -5,12 +5,24 @@ namespace App\Imports;
 use App\Models\DataGizi;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
+use Maatwebsite\Excel\Concerns\WithChunkReading;
+use Maatwebsite\Excel\Concerns\WithBatchInserts;
 use PhpOffice\PhpSpreadsheet\Shared\Date as ExcelDate;
 
-class DataGiziImport implements ToModel, WithHeadingRow
+class DataGiziImport implements ToModel, WithHeadingRow, WithChunkReading, WithBatchInserts
 {
     protected string $period;
     protected int $userId;
+
+    public function chunkSize(): int
+    {
+        return 500; // atau 200–1000
+    }
+
+    public function batchSize(): int
+    {
+        return 500;
+    }
 
     public function __construct(string $period, int $userId)
     {
@@ -25,22 +37,6 @@ class DataGiziImport implements ToModel, WithHeadingRow
         $this->userId = $userId;
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | HELPERS: BERSIHKAN FORMULA EXCEL
-    |--------------------------------------------------------------------------
-    | Kita pisah: satu khusus STRING, satu khusus NUMERIC
-    | Contoh formula di file kamu:
-    |   =IFERROR(__xludf.DUMMYFUNCTION("COMPUTED_VALUE"),"MELATI 1")
-    |   =IFERROR(__xludf.DUMMYFUNCTION("COMPUTED_VALUE"),3,6)
-    */
-
-    /**
-     * Untuk kolom STRING:
-     * - Kalau bukan formula → trim biasa
-     * - Kalau formula dengan "..." → ambil teks di kutip terakhir
-     * - Kalau formula tanpa "..." → anggap NULL
-     */
     private function cleanFormulaForString($value): ?string
     {
         if ($value === null || $value === '') return null;
@@ -62,13 +58,6 @@ class DataGiziImport implements ToModel, WithHeadingRow
         return null;
     }
 
-    /**
-     * Untuk kolom NUMERIC:
-     * - Kalau numeric biasa → pakai langsung
-     * - Kalau bukan formula → pakai string-nya
-     * - Kalau formula → ambil ANGKA TERAKHIR di dalam formula
-     *   Contoh: =IFERROR(__xludf.DUMMYFUNCTION("X"),3,6) → 3,6
-     */
     private function cleanFormulaForNumeric($value)
     {
         if ($value === null || $value === '') return null;
@@ -92,9 +81,6 @@ class DataGiziImport implements ToModel, WithHeadingRow
         return null;
     }
 
-    /**
-     * Potong string dan trim, setelah dibersihkan dari formula.
-     */
     private function safeString($value, ?int $maxLen = null): ?string
     {
         $value = $this->cleanFormulaForString($value);
@@ -108,9 +94,6 @@ class DataGiziImport implements ToModel, WithHeadingRow
         return $s;
     }
 
-    /**
-     * Ubah ke float aman (support koma/titik), dengan dukungan formula.
-     */
     private function toDecimal($value): ?float
     {
         $value = $this->cleanFormulaForNumeric($value);
@@ -129,9 +112,6 @@ class DataGiziImport implements ToModel, WithHeadingRow
         return (float) $v;
     }
 
-    /**
-     * Integer aman (usia, anak_ke), dengan dukungan formula numeric.
-     */
     private function toIntOrNull($value): ?int
     {
         $value = $this->cleanFormulaForNumeric($value);
@@ -148,12 +128,6 @@ class DataGiziImport implements ToModel, WithHeadingRow
         return null;
     }
 
-    /**
-     * Normalisasi tanggal ke Y-m-d.
-     * Support:
-     * - Excel serial (juga jika muncul sebagai angka terakhir di formula)
-     * - String "31/01/2025", "2025-01-31", dll.
-     */
     private function toDateYmd($value): ?string
     {
         $value = $this->cleanFormulaForNumeric($value);
@@ -177,9 +151,6 @@ class DataGiziImport implements ToModel, WithHeadingRow
         return date('Y-m-d', $ts);
     }
 
-    /**
-     * Mapping 1 row Excel → 1 DataGizi
-     */
     public function model(array $row)
     {
         // Desa/Kel
