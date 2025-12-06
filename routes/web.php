@@ -92,6 +92,12 @@ Route::middleware('auth', 'verified')->group(function () {
 
         Route::get('/gizi/desa/{desa}', [DivisiGiziController::class, 'detail'])->name('detail');
         Route::post('/import', [DivisiGiziController::class, 'import'])->name('import');
+
+        Route::get('/gizi/import/{job}/progress', [DivisiGiziController::class, 'importProgress'])
+            ->name('gizi.import.progress');
+
+        Route::get('/gizi/import-status/{job}', [DivisiGiziController::class, 'importStatus'])
+            ->name('gizi.import.status');
     });
 
     // Divisi Pencegahan

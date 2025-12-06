@@ -3,6 +3,7 @@
 namespace App\Imports;
 
 use App\Models\DataGizi;
+use App\Models\ImportJob;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\WithChunkReading;
@@ -13,18 +14,12 @@ class DataGiziImport implements ToModel, WithHeadingRow, WithChunkReading, WithB
 {
     protected string $period;
     protected int $userId;
+    protected ImportJob $importJob;
 
-    public function chunkSize(): int
-    {
-        return 1000;
-    }
+    // counter lokal supaya gak spam update DB
+    protected int $localCounter = 0;
 
-    public function batchSize(): int
-    {
-        return 1000;
-    }
-
-    public function __construct(string $period, int $userId)
+    public function __construct(string $period, int $userId, ImportJob $importJob)
     {
         $p = trim($period);
 
@@ -33,9 +28,42 @@ class DataGiziImport implements ToModel, WithHeadingRow, WithChunkReading, WithB
             $p .= '-01';
         }
 
-        $this->period = date('Y-m-01', strtotime($p));
-        $this->userId = $userId;
+        $this->period    = date('Y-m-01', strtotime($p));
+        $this->userId    = $userId;
+        $this->importJob = $importJob;
     }
+
+    public function chunkSize(): int
+    {
+        return 500; // boleh kamu ubah
+    }
+
+    public function batchSize(): int
+    {
+        return 500;
+    }
+
+    // ================== PROGRESS HELPER ==================
+
+    private function incrementProgress(): void
+    {
+        $this->localCounter++;
+
+        // update DB tiap 20 baris biar ga kebanyakan query
+        if ($this->localCounter >= 20) {
+            $this->importJob->increment('processed_rows', $this->localCounter);
+            $this->localCounter = 0;
+        }
+    }
+
+    public function __destruct()
+    {
+        if ($this->localCounter > 0) {
+            $this->importJob->increment('processed_rows', $this->localCounter);
+        }
+    }
+
+    // ================== HELPER BERSIHKAN FORMULA ==================
 
     private function cleanFormulaForString($value): ?string
     {
@@ -151,6 +179,8 @@ class DataGiziImport implements ToModel, WithHeadingRow, WithChunkReading, WithB
         return date('Y-m-d', $ts);
     }
 
+    // ================== INTI: 1 ROW EXCEL → 1 MODEL ==================
+
     public function model(array $row)
     {
         // Desa/Kel
@@ -168,7 +198,6 @@ class DataGiziImport implements ToModel, WithHeadingRow, WithChunkReading, WithB
         }
 
         // ==================== ANGKA PENGUKURAN ====================
-        // Header di file: "BB (Kg)" -> bb_kg, "TB (Cm)" -> tb_cm
         $bb = $this->toDecimal($row['bb_kg'] ?? $row['berat'] ?? null);
         $tb = $this->toDecimal($row['tb_cm'] ?? $row['tinggi'] ?? null);
 
@@ -183,7 +212,7 @@ class DataGiziImport implements ToModel, WithHeadingRow, WithChunkReading, WithB
         $zs_tb_u  = $this->toDecimal($row['zs_tb_u'] ?? $row['zs_tbu'] ?? null);
         $zs_bb_tb = $this->toDecimal($row['zs_bb_tb'] ?? $row['zs_bbtb'] ?? null);
 
-        // BB/U, TB/U, BB/TB (boleh numeric, di DB kamu TEXT)
+        // BB/U, TB/U, BB/TB
         $bb_u  = $this->toDecimal($row['bb_u'] ?? null);
         $tb_u  = $this->toDecimal($row['tb_u'] ?? null);
         $bb_tb = $this->toDecimal($row['bb_tb'] ?? null);
@@ -198,11 +227,14 @@ class DataGiziImport implements ToModel, WithHeadingRow, WithChunkReading, WithB
         $tglLahir     = $this->toDateYmd($row['tanggal_lahir'] ?? $row['tgl_lahir'] ?? null);
 
         // ==================== BUILD MODEL ====================
+
+        // progress naik (hitung row yang bener-bener diinsert)
+        $this->incrementProgress();
+
         return new DataGizi([
             'user_id'        => $this->userId,
             'period'         => $this->period,
 
-            // Identitas posyandu & kunjungan
             'posyandu'       => $this->safeString($row['nama_posyandu'] ?? $row['posyandu'] ?? null, 150),
             'tgl_kunjungan'  => $tglKunjungan,
             'desa_kelurahan' => $desa,
@@ -210,7 +242,6 @@ class DataGiziImport implements ToModel, WithHeadingRow, WithChunkReading, WithB
             'rt'             => $this->safeString($row['rt'] ?? null, 50),
             'rw'             => $this->safeString($row['rw'] ?? null, 50),
 
-            // Data anak
             'nama'           => $this->safeString($row['nama_anak'] ?? $row['nama'] ?? null, 150),
             'tgl_lahir'      => $tglLahir,
             'usia'           => $usiaInt,
@@ -220,16 +251,13 @@ class DataGiziImport implements ToModel, WithHeadingRow, WithChunkReading, WithB
             'nik_eppgbm'     => $this->safeString($row['nik_eppgbm'] ?? null, 50),
             'nomor_kk'       => $this->safeString($row['nomor_kk'] ?? null, 50),
 
-            // BB/TB lahir
             'bb_lahir'       => $bb_lahir,
             'tb_lahir'       => $tb_lahir,
 
-            // KIA, IMD, MBG
             'kia'            => $this->safeString($row['kia'] ?? null, 50),
             'imd'            => $this->safeString($row['imd'] ?? null, 50),
             'mbg'            => $this->safeString($row['mbg'] ?? null, 50),
 
-            // ASI Bulan 1–6
             'asi_bulan_1'    => $this->safeString($row['asi_bulan_1'] ?? null, 50),
             'asi_bulan_2'    => $this->safeString($row['asi_bulan_2'] ?? null, 50),
             'asi_bulan_3'    => $this->safeString($row['asi_bulan_3'] ?? null, 50),
@@ -237,7 +265,6 @@ class DataGiziImport implements ToModel, WithHeadingRow, WithChunkReading, WithB
             'asi_bulan_5'    => $this->safeString($row['asi_bulan_5'] ?? null, 50),
             'asi_bulan_6'    => $this->safeString($row['asi_bulan_6'] ?? null, 50),
 
-            // Pengukuran kunjungan
             'berat'          => $bb,
             'tinggi'         => $tb,
             'lila'           => $lila,
@@ -245,57 +272,47 @@ class DataGiziImport implements ToModel, WithHeadingRow, WithChunkReading, WithB
             'cara_ukur'      => $this->safeString($row['cara_ukur'] ?? null, 50),
             'edema'          => $this->safeString($row['edema'] ?? null, 20),
 
-            // Vitamin & intervensi
             'vit_a'          => $this->safeString($row['vit_a'] ?? null, 50),
             'pmt_biskuit'    => $this->safeString($row['pmt_biskuit'] ?? null, 50),
             'taburia'        => $this->safeString($row['taburia'] ?? null, 50),
             'kelas_ibu_balita' => $this->safeString($row['kelas_ibu_balita'] ?? null, 200),
 
-            // Data orang tua
             'nama_ortu'      => $this->safeString($row['nama_orang_tua'] ?? $row['nama_ortu'] ?? null, 150),
             'nik_ortu'       => $this->safeString($row['nik_orang_tua'] ?? $row['nik_ortu'] ?? null, 50),
             'hp_ortu'        => $this->safeString(
                 $row['nomor_hp_orang_tua'] ??
                 $row['no_hp_orang_tua'] ??
-                $row['hp_ortu'] ??
-                null,
+                $row['hp_ortu'] ?? null,
                 50
             ),
 
-            // BB/U
-            'bb_u'           => $bb_u,          // numeric → disimpan di kolom TEXT, aman
+            'bb_u'           => $bb_u,
             'zs_bb_u'        => $zs_bb_u,
             'status_bb_u'    => $this->safeString(
                 $row['kategori_bb_u'] ??
                 $row['status_bb_u'] ??
-                $row['bbu'] ??
-                null,
+                $row['bbu'] ?? null,
                 100
             ),
 
-            // TB/U
             'tb_u'           => $tb_u,
             'zs_tb_u'        => $zs_tb_u,
             'status_tb_u'    => $this->safeString(
                 $row['kategori_tb_u'] ??
                 $row['status_tb_u'] ??
-                $row['tbu'] ??
-                null,
+                $row['tbu'] ?? null,
                 100
             ),
 
-            // BB/TB
             'bb_tb'          => $bb_tb,
             'zs_bb_tb'       => $zs_bb_tb,
             'status_bb_tb'   => $this->safeString(
                 $row['kategori_bb_tb'] ??
                 $row['status_bb_tb'] ??
-                $row['bbtb'] ??
-                null,
+                $row['bbtb'] ?? null,
                 100
             ),
 
-            // Workflow
             'status'         => 'pending',
         ]);
     }

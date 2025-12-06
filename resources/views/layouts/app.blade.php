@@ -23,8 +23,11 @@
 <body class="font-sans antialiased">
     <x-confirm-modal />
 
-    <x-loading img="{{ asset('img/logo-kab-bandung.png') }}" ring="true" mode="dual" size="120" logo="70"
-        ringThickness="7" ringColor="#8B0000" ringTrail="#E5E7EB" speed="0.65s" />
+    @if (!Route::is('gizi.import'))
+        <x-loading img="{{ asset('img/logo-kab-bandung.png') }}" 
+                ring="true" mode="dual" size="120" logo="70"
+                ringThickness="7" ringColor="#8B0000" ringTrail="#E5E7EB" speed="0.65s" />
+    @endif
 
     <div class="min-h-screen bg-slate-50">
         {{-- @include('layouts.navigation') --}}

@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Divisi;
 
 use App\Models\DataGizi;
+use App\Models\ImportJob;
 use Illuminate\Http\Request;
+use App\Imports\DataGiziImport;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
 use App\Imports\DataGiziFileImport;
@@ -11,6 +13,9 @@ use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Storage;
+use Maatwebsite\Excel\Concerns\ToCollection;
+use Maatwebsite\Excel\Concerns\WithHeadingRow;
 
 class DivisiGiziController extends Controller
 {
@@ -228,25 +233,82 @@ class DivisiGiziController extends Controller
             : $request->period;
 
         $periodYm = date('Y-m', strtotime($period));
+        $userId   = Auth::id();
+
+        // untuk sekarang: pakai file pertama saja
+        $file = $request->file('files')[0];
+
+        // 1) simpan file ke storage
+        $storedPath = $file->store('imports/data_gizi');
+
+        // 2) hitung total baris data (tanpa header)
+        $collection = Excel::toCollection(
+            new class implements ToCollection, WithHeadingRow {
+                public function collection(\Illuminate\Support\Collection $rows) {}
+            },
+            $file
+        );
+
+        $firstSheet = $collection->first();
+        $totalRows  = $firstSheet ? $firstSheet->count() : 0; // sudah tanpa header karena WithHeadingRow
+
+        // 3) buat ImportJob
+        $importJob = ImportJob::create([
+            'user_id'        => $userId,
+            'type'           => 'data_gizi',
+            'period'         => $periodYm,
+            'file_path'      => $storedPath,
+            'total_rows'     => $totalRows,
+            'processed_rows' => 0,
+            'status'         => 'queued',
+        ]);
 
         try {
-            foreach ($request->file('files') as $file) {
-                Excel::import(new DataGiziFileImport($period, Auth::id()), $file);
-            }
+            // 4) queue import
+            Excel::queueImport(
+                new DataGiziImport($period, $userId, $importJob),
+                Storage::path($storedPath)
+            )->chain([
+                function () use ($importJob) {
+                    $importJob->update(['status' => 'success']);
+                }
+            ]);
 
-            return redirect()->route('gizi.index', ['period' => $periodYm])
-                ->with('success', 'Import berhasil.');
-        } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
-            $f = $e->failures()[0];
+            $importJob->update(['status' => 'running']);
+        } catch (\Throwable $e) {
+            Log::error('IMPORT QUEUE ERROR: ' . $e->getMessage());
 
-            return back()->with(
-                'error',
-                "Kesalahan validasi: {$f->errors()[0]} (baris {$f->row()}, kolom {$f->attribute()})"
-            );
-        } catch (\Exception $e) {
-            Log::error("IMPORT ERROR: " . $e->getMessage());
+            $importJob->update([
+                'status'        => 'failed',
+                'error_message' => $e->getMessage(),
+            ]);
 
-            return back()->with('error', "Terjadi kesalahan import: " . $e->getMessage());
+            return back()->with('error', 'Gagal mengantrikan import: ' . $e->getMessage());
         }
+
+        // 5) redirect ke halaman progress
+        return redirect()
+            ->route('gizi.import.progress', $importJob->id);
+    }
+
+    public function importProgress(ImportJob $job)
+    {
+        // bisa tambahin authorize kalau perlu
+        return view('divisi.gizi.import-progress', compact('job'));
+    }
+
+    public function importStatus(ImportJob $job)
+    {
+        $total     = max(1, $job->total_rows); // hindari divide by zero
+        $processed = min($job->processed_rows, $total);
+        $percent   = round($processed / $total * 100);
+
+        return response()->json([
+            'status'         => $job->status,
+            'total_rows'     => $total,
+            'processed_rows' => $processed,
+            'percent'        => $percent,
+            'error_message'  => $job->error_message,
+        ]);
     }
 }
