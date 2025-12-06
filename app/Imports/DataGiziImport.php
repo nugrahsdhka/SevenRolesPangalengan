@@ -16,7 +16,7 @@ class DataGiziImport implements ToModel, WithHeadingRow, WithChunkReading, WithB
 
     protected string $period;
     protected int $userId;
-    protected ImportJob $importJobId;
+    protected int $importJobId;
     protected int $localCounter = 0;
 
     public function __construct(string $period, int $userId, ImportJob $importJob)
