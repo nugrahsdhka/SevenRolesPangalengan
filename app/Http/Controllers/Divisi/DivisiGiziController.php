@@ -257,15 +257,16 @@ class DivisiGiziController extends Controller
         }
     }
 
-    public function destroyAggregat(Request $request)
+    public function destroyAggregated(Request $request)
     {
         $request->validate([
-            'period' => ['required', 'regex:/^\d{4}-\d{2}(-\d{2})?$/'],
-            'desa'   => 'required|string|max:150',
+            'period'         => ['required', 'regex:/^\d{4}-\d{2}(-\d{2})?$/'],
+            'desa_kelurahan' => 'required|string|max:150',
+            'status'         => ['required', Rule::in(['pending', 'approved', 'published'])],
         ]);
 
-        $currentUser   = Auth::user();
-        $userRoleName  = $currentUser->roles->first()->name;
+        $currentUser  = Auth::user();
+        $userRoleName = $currentUser->roles->first()->name;
 
         // Standarkan period -> Y-m-01
         $period = preg_match('/^\d{4}-\d{2}$/', $request->period)
@@ -276,9 +277,18 @@ class DivisiGiziController extends Controller
         $periodParam = date('Y-m', strtotime($periodDate));
 
         // Samakan format desa seperti di store()
-        $desa = strtoupper(trim($request->desa));
+        $desa   = strtoupper(trim($request->desa_kelurahan));
+        $status = $request->status;
 
-        // Cek dulu: kalau sudah approved/published, jangan boleh dihapus
+        // Kalau status yang mau dihapus SUDAH approved/published -> tolak
+        if (in_array($status, ['approved', 'published'])) {
+            return back()->with(
+                'error',
+                'Data dengan status Approved/Published tidak boleh dihapus secara agregat.'
+            );
+        }
+
+        // Cek: apakah sudah pernah di-approve/published oleh role ini?
         $isLocked = DataGizi::where('desa_kelurahan', $desa)
             ->whereDate('period', $periodDate)
             ->whereIn('status', ['approved', 'published'])
@@ -292,21 +302,25 @@ class DivisiGiziController extends Controller
             );
         }
 
-        // Hapus SEMUA data untuk desa + periode + role ini
+        // Hapus semua data UNTUK desa + period + status ini + role user
         $deleted = DataGizi::where('desa_kelurahan', $desa)
             ->whereDate('period', $periodDate)
+            ->where('status', $status)
             ->whereHas('user.roles', fn($q) => $q->where('name', $userRoleName))
             ->delete();
 
         if ($deleted === 0) {
             return back()->with(
                 'error',
-                'Tidak ada data yang dihapus untuk desa dan periode tersebut.'
+                'Tidak ada data yang dihapus untuk desa, periode, dan status tersebut.'
             );
         }
 
         return redirect()
             ->route('gizi.index', ['period' => $periodParam])
-            ->with('success', "Semua data untuk desa {$desa} pada periode tersebut berhasil dihapus ({$deleted} baris).");
+            ->with(
+                'success',
+                "Semua data ({$deleted} baris) untuk desa {$desa} dengan status {$status} pada periode ini berhasil dihapus."
+            );
     }
 }
