@@ -9,18 +9,14 @@ use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\WithChunkReading;
 use Maatwebsite\Excel\Concerns\WithBatchInserts;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Maatwebsite\Excel\Concerns\Importable;
 use PhpOffice\PhpSpreadsheet\Shared\Date as ExcelDate;
 
 class DataGiziImport implements ToModel, WithHeadingRow, WithChunkReading, WithBatchInserts, ShouldQueue
 {
-    use Importable;
 
     protected string $period;
     protected int $userId;
-    protected ImportJob $importJob;
-
-    // counter lokal supaya gak spam update DB
+    protected ImportJob $importJobId;
     protected int $localCounter = 0;
 
     public function __construct(string $period, int $userId, ImportJob $importJob)
@@ -34,7 +30,7 @@ class DataGiziImport implements ToModel, WithHeadingRow, WithChunkReading, WithB
 
         $this->period    = date('Y-m-01', strtotime($p));
         $this->userId    = $userId;
-        $this->importJob = $importJob;
+        $this->importJobId = $importJob->id;
     }
 
     public function chunkSize(): int
