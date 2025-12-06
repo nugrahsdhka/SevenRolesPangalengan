@@ -56,20 +56,6 @@ class DataGiziImport implements ToModel, WithHeadingRow, WithChunkReading, WithB
         return null;
     }
 
-    private function toZScore($value): ?float
-    {
-        $num = $this->toDecimal($value);
-        if ($num === null) return null;
-
-        // Z-score manusiawi biasanya di range -6 s/d +6
-        if ($num < -10 || $num > 10) {
-            // anggap ini error input (misal 45690), jangan disimpan
-            return null;
-        }
-
-        return $num;
-    }
-
     private function cleanFormulaForNumeric($value)
     {
         if ($value === null || $value === '') return null;
@@ -185,9 +171,9 @@ class DataGiziImport implements ToModel, WithHeadingRow, WithChunkReading, WithB
         $lila          = $this->toDecimal($row['lila'] ?? null);
         $lingkarKepala = $this->toDecimal($row['lingkar_kepala'] ?? null);
 
-        $zs_bb_u  = $this->toZScore($row['zs_bb_u'] ?? $row['zs_bbu'] ?? null);
-        $zs_tb_u  = $this->toZScore($row['zs_tb_u'] ?? $row['zs_tbu'] ?? null);
-        $zs_bb_tb = $this->toZScore($row['zs_bb_tb'] ?? $row['zs_bbtb'] ?? null);
+        $zs_bb_u  = $this->toDecimal($row['zs_bb_u'] ?? $row['zs_bbu'] ?? null);
+        $zs_tb_u  = $this->toDecimal($row['zs_tb_u'] ?? $row['zs_tbu'] ?? null);
+        $zs_bb_tb = $this->toDecimal($row['zs_bb_tb'] ?? $row['zs_bbtb'] ?? null);
 
         $bb_u  = $this->toDecimal($row['bb_u'] ?? null);
         $tb_u  = $this->toDecimal($row['tb_u'] ?? null);

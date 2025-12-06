@@ -98,9 +98,9 @@ Route::middleware('auth', 'verified')->group(function () {
 
         Route::get('/gizi/import-status/{job}', [DivisiGiziController::class, 'importStatus'])
             ->name('gizi.import.status');
-            
+
         Route::delete('/divisi/gizi/aggregat', [DivisiGiziController::class, 'destroyAggregat'])
-            ->name('gizi.destroyAggregat');
+            ->name('gizi.destroyAggregated');
     });
 
     // Divisi Pencegahan
