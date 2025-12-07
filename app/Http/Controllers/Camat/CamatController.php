@@ -211,34 +211,16 @@ class CamatController extends Controller
                 $query->whereYear('period', $year)->whereMonth('period', $month);
             }
 
-            // Cek apakah ada data published di scope tersebut
-            $hasPublished = (clone $query)->where('status', 'published')->exists();
+            // ⬇️ TIDAK ADA LAGI BLOK UNTUK STATUS "published"
+            // Semua status (pending, approved, published) boleh diubah
 
-            // Tetap blok langsung Published -> Pending
-            if ($hasPublished && $request->new_status === 'pending') {
-                return back()
-                    ->with('error', 'Tidak bisa mengubah status Published menjadi Pending. Tarik dulu ke Approved.')
-                    ->with('active_tab', $request->active_tab);
-            }
-
-            // ========== LOGIKA BARU DI SINI ==========
-
-            if ($request->new_status === 'approved') {
-                // Tarik SEMUA (pending + approved + published) menjadi approved
-                $affectedRows = $query
-                    ->whereIn('status', ['pending', 'approved', 'published'])
-                    ->update(['status' => 'approved']);
-            } else {
-                // new_status = 'pending'
-                // Turunkan hanya pending + approved menjadi pending (published sudah diblok di atas)
-                $affectedRows = $query
-                    ->whereIn('status', ['pending', 'approved'])
-                    ->update(['status' => 'pending']);
-            }
+            $affectedRows = $query->update([
+                'status' => $request->new_status,
+            ]);
 
             $message = $request->new_status === 'approved'
-                ? "Data desa {$desaKelurahan} berhasil di-approve / ditarik ke Approved ({$affectedRows} data)."
-                : "Data desa {$desaKelurahan} berhasil ditarik kembali ke Pending ({$affectedRows} data).";
+                ? "Semua data desa {$desaKelurahan} pada periode ini berhasil di-set ke Approved ({$affectedRows} data)."
+                : "Semua data desa {$desaKelurahan} pada periode ini berhasil di-set ke Pending ({$affectedRows} data).";
 
             return back()
                 ->with('success', $message)
@@ -252,18 +234,13 @@ class CamatController extends Controller
 
         $data = $modelName::findOrFail($request->id);
 
-        if ($data->status === 'published' && $request->new_status === 'pending') {
-            return back()
-                ->with('error', 'Tidak bisa mengubah status Published menjadi Pending. Tarik dulu ke Approved.')
-                ->with('active_tab', $request->active_tab);
-        }
-
+        // ⬇️ Di sini juga TIDAK ADA LAGI larangan mengubah "published"
         $data->status = $request->new_status;
         $data->save();
 
         $message = $request->new_status === 'approved'
             ? 'Data berhasil di-approve.'
-            : 'Data berhasil ditarik kembali (un-approved).';
+            : 'Data berhasil ditarik kembali ke Pending.';
 
         return back()
             ->with('success', $message)
