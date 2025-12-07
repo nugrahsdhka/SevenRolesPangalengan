@@ -39,11 +39,11 @@
     {{-- TITLE DINAMIS --}}
     <x-slot name="title">
         @if ($section === 'tambah')
-            Gizi | Tambah Data
+            {{ $currentUser->name }} - Tambah Data
         @elseif ($section === 'detail')
-            Gizi | Detail Data
+            {{ $currentUser->name }} - Detail Data
         @else
-            Divisi Gizi - {{ $currentUser->name }}
+            {{ $currentUser->name }} - Divisi Gizi
         @endif
     </x-slot>
 
