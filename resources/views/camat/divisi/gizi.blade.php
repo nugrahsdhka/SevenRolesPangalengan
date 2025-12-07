@@ -478,12 +478,12 @@
 
                                             <button type="button"
                                                 @click.prevent="$dispatch('open-confirm', {
-                                                            form: $el.closest('form'),
-                                                            title: 'Hapus Data Desa {{ $item->desa_kelurahan }}',
-                                                            message: 'Yakin ingin menghapus seluruh data gizi desa {{ $item->desa_kelurahan }} pada periode ini? Tindakan ini tidak bisa dibatalkan.',
-                                                            okText: 'Ya, Hapus',
-                                                            cancelText: 'Batal'
-                                                        })"
+                                                    form: $el.closest('form'),
+                                                    title: 'Hapus Data Desa {{ $row->desa_kelurahan }}',
+                                                    message: 'Yakin ingin menghapus seluruh data gizi desa {{ $row->desa_kelurahan }} dengan status {{ strtoupper($row->status) }} pada periode ini? Tindakan ini tidak bisa dibatalkan.',
+                                                    okText: 'Ya, Hapus',
+                                                    cancelText: 'Batal'
+                                                })"
                                                 class="text-xs font-medium text-red-600 hover:text-red-800 hover:underline">
                                                 Hapus Semua
                                             </button>
