@@ -440,7 +440,7 @@
                                                         Approve
                                                     </button>
                                                 </form>
-                                            @elseif ($item->status === 'approved')
+                                            @elseif ($item->status === 'approved' || $item->status === 'published')
                                                 {{-- APPROVED -> PENDING (Tarik) --}}
                                                 <form method="POST" action="{{ route('camat.status') }}" x-data>
                                                     @csrf
