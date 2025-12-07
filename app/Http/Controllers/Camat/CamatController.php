@@ -281,7 +281,7 @@ class CamatController extends Controller
 
             // ❗ HANYA hapus data pending
             $deletedCount = $query
-                ->where('status', 'pending')
+                ->where('status', 'pending', 'approved', 'published')
                 ->delete();
 
             if ($deletedCount === 0) {
