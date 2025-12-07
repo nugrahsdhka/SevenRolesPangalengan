@@ -274,7 +274,7 @@ class CamatController extends Controller
                 ->withInput();
         }
 
-        // ===== DataGizi: hapus berdasarkan desa + periode =====
+        // ===== DataGizi: hapus berdasarkan desa + periode, HANYA status pending =====
         if ($request->model === 'DataGizi') {
             $request->validate([
                 'desa_kelurahan' => 'required|string',
@@ -291,10 +291,19 @@ class CamatController extends Controller
                 $query->whereYear('period', $year)->whereMonth('period', $month);
             }
 
-            $deletedCount = $query->delete();
+            // ❗ HANYA hapus data pending
+            $deletedCount = $query
+                ->where('status', 'pending')
+                ->delete();
+
+            if ($deletedCount === 0) {
+                return back()
+                    ->with('error', "Tidak ada data pending desa {$desaKelurahan} pada periode tersebut yang dihapus.")
+                    ->with('active_tab', $request->active_tab);
+            }
 
             return back()
-                ->with('success', "Semua data desa {$desaKelurahan} pada periode terkait berhasil dihapus ({$deletedCount} data).")
+                ->with('success', "Semua data PENDING desa {$desaKelurahan} pada periode terkait berhasil dihapus ({$deletedCount} data).")
                 ->with('active_tab', $request->active_tab);
         }
 
@@ -404,7 +413,6 @@ class CamatController extends Controller
             ->with('success', $message)
             ->with('active_tab', $request->active_tab);
     }
-
 
     public function showGiziDetail(Request $request, $desaKelurahan)
     {
