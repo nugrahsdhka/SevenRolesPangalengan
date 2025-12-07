@@ -262,25 +262,26 @@ class DivisiGiziController extends Controller
         $request->validate([
             'period'         => ['required', 'regex:/^\d{4}-\d{2}(-\d{2})?$/'],
             'desa_kelurahan' => 'required|string|max:150',
+            // status dikirim dari form, tapi kita batasi hanya 3 pilihan
             'status'         => ['required', Rule::in(['pending', 'approved', 'published'])],
         ]);
 
         $currentUser  = Auth::user();
         $userRoleName = $currentUser->roles->first()->name;
 
-        // Standarkan period -> Y-m-01
+        // 2. Normalisasi period -> selalu YYYY-MM-01
         $period = preg_match('/^\d{4}-\d{2}$/', $request->period)
             ? ($request->period . '-01')
             : $request->period;
 
-        $periodDate  = date('Y-m-01', strtotime($period));
-        $periodParam = date('Y-m', strtotime($periodDate));
+        $periodDate  = date('Y-m-01', strtotime($period)); // untuk whereDate
+        $periodParam = date('Y-m', strtotime($periodDate)); // untuk redirect
 
-        // Samakan format desa seperti di store()
+        // 3. Standarisasi desa & status
         $desa   = strtoupper(trim($request->desa_kelurahan));
-        $status = $request->status;
+        $status = $request->status; // dari form -> kita pastikan pending saja di Blade
 
-        // Kalau status yang mau dihapus SUDAH approved/published -> tolak
+        // 4. Proteksi: tidak boleh menghapus yang statusnya approved/published
         if (in_array($status, ['approved', 'published'])) {
             return back()->with(
                 'error',
@@ -288,7 +289,7 @@ class DivisiGiziController extends Controller
             );
         }
 
-        // Cek: apakah sudah pernah di-approve/published oleh role ini?
+        // 5. Cek apakah desa + periode ini sudah pernah di-approve/published oleh role ini
         $isLocked = DataGizi::where('desa_kelurahan', $desa)
             ->whereDate('period', $periodDate)
             ->whereIn('status', ['approved', 'published'])
@@ -302,10 +303,10 @@ class DivisiGiziController extends Controller
             );
         }
 
-        // Hapus semua data UNTUK desa + period + status ini + role user
+        // 6. Hapus SEMUA data desa+periode+status (pending) milik role ini
         $deleted = DataGizi::where('desa_kelurahan', $desa)
             ->whereDate('period', $periodDate)
-            ->where('status', $status)
+            ->where('status', $status) // 'pending' dari form
             ->whereHas('user.roles', fn($q) => $q->where('name', $userRoleName))
             ->delete();
 
@@ -316,6 +317,7 @@ class DivisiGiziController extends Controller
             );
         }
 
+        // 7. Berhasil -> balik ke index dengan periode yg sama
         return redirect()
             ->route('gizi.index', ['period' => $periodParam])
             ->with(

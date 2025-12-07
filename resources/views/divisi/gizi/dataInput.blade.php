@@ -280,34 +280,53 @@
                                 </td>
                                 <td class="whitespace-nowrap px-4 py-3">
                                     <div class="flex items-center justify-center gap-3">
+
+                                        {{-- Tombol DETAIL selalu muncul --}}
                                         <a href="{{ route('gizi.index', [
-                                            'view' => 'detail',
-                                            'desa' => $item->desa_kelurahan,
+                                            'view'   => 'detail',
+                                            'desa'   => $item->desa_kelurahan,
                                             'period' => $periodYm ?? now()->format('Y-m'),
                                         ]) }}"
                                             class="text-sm font-medium text-indigo-600 transition hover:text-indigo-800 hover:underline">
                                             Detail
                                         </a>
-                                        <span class="text-gray-300">|</span>
-                                        <form action="{{ route('gizi.destroyAggregated') }}" method="POST" x-data>
-                                            @csrf
-                                            <input type="hidden" name="desa_kelurahan" value="{{ $item->desa_kelurahan }}">
-                                            <input type="hidden" name="status" value="{{ $item->status }}">
-                                            <input type="hidden" name="period" value="{{ $periodYm ?? now()->format('Y-m') }}">
-                                            <button type="button"
-                                                @click.prevent="$dispatch('open-confirm', {
-                                                    form: $el.closest('form'),
-                                                    title: 'Hapus Data Desa {{ $item->desa_kelurahan }}',
-                                                    message: 'Yakin ingin menghapus seluruh data gizi desa {{ $item->desa_kelurahan }} pada periode ini? Tindakan ini tidak bisa dibatalkan.',
-                                                    okText: 'Ya, Hapus',
-                                                    cancelText: 'Batal'
-                                                })"
-                                                class="text-sm font-medium text-red-600 transition hover:text-red-800 hover:underline">
-                                                Hapus
-                                            </button>
-                                        </form>
+
+                                        {{-- Hanya tampilkan tombol HAPUS kalau status = pending --}}
+                                        @if ($item->status === 'pending')
+                                            <span class="text-gray-300">|</span>
+
+                                            {{-- FORM DELETE AGGREGATED --}}
+                                            <form action="{{ route('gizi.destroyAggregated') }}" method="POST" x-data>
+                                                @csrf
+
+                                                {{-- Desa yang akan dihapus --}}
+                                                <input type="hidden" name="desa_kelurahan" value="{{ $item->desa_kelurahan }}">
+
+                                                {{-- Hanya boleh hapus pending --}}
+                                                <input type="hidden" name="status" value="pending">
+
+                                                {{-- Periode dalam format YYYY-MM --}}
+                                                <input type="hidden" name="period" value="{{ $periodYm }}">
+
+                                                <button type="button"
+                                                    @click.prevent="
+                                                        $dispatch('open-confirm', {
+                                                            form: $el.closest('form'),
+                                                            title: 'Hapus Data Desa {{ $item->desa_kelurahan }}',
+                                                            message: 'Yakin ingin menghapus seluruh data desa {{ $item->desa_kelurahan }} pada periode {{ \Carbon\Carbon::createFromFormat('Y-m', $periodYm)->isoFormat('MMMM Y') }}? Tindakan ini tidak dapat dibatalkan.',
+                                                            okText: 'Ya, Hapus',
+                                                            cancelText: 'Batal'
+                                                        })
+                                                    "
+                                                    class="text-sm font-medium text-red-600 transition hover:text-red-800 hover:underline">
+                                                    Hapus
+                                                </button>
+                                            </form>
+                                        @endif
+
                                     </div>
                                 </td>
+
                             </tr>
                         @empty
                             <tr>
