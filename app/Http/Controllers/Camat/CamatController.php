@@ -11,6 +11,7 @@ use App\Models\DataPenanggulangan;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx\Rels;
+use Illuminate\Validation\Rule;
 
 class CamatController extends Controller
 {
@@ -262,34 +263,42 @@ class CamatController extends Controller
                 ->withInput();
         }
 
-        // ===== DataGizi: hapus berdasarkan desa + periode, SEMUA STATUS =====
+        // ===== DataGizi: hapus berdasarkan desa + periode + status =====
         if ($request->model === 'DataGizi') {
             $request->validate([
                 'desa_kelurahan' => 'required|string',
                 'period'         => 'nullable|string', // Y-m
+                'status'         => ['required', Rule::in(['pending', 'approved', 'published'])],
             ]);
 
             $desaKelurahan = $request->desa_kelurahan;
             $periodYm      = $request->input('period');
+            $status        = $request->input('status');
 
-            $query = $modelName::where('desa_kelurahan', $desaKelurahan);
+            $query = $modelName::where('desa_kelurahan', $desaKelurahan)
+                ->where('status', $status);   // ⬅️ FILTER STATUS WAJIB
 
             if ($periodYm) {
                 [$year, $month] = explode('-', $periodYm);
                 $query->whereYear('period', $year)->whereMonth('period', $month);
             }
 
-            // ⬇️ HAPUS SEMUA STATUS (pending, approved, published)
             $deletedCount = $query->delete();
 
             if ($deletedCount === 0) {
                 return back()
-                    ->with('error', "Tidak ada data desa {$desaKelurahan} pada periode tersebut yang dihapus.")
+                    ->with(
+                        'error',
+                        "Tidak ada data dengan status {$status} untuk desa {$desaKelurahan} pada periode tersebut yang dihapus."
+                    )
                     ->with('active_tab', $request->active_tab);
             }
 
             return back()
-                ->with('success', "Semua data desa {$desaKelurahan} pada periode terkait berhasil dihapus ({$deletedCount} data).")
+                ->with(
+                    'success',
+                    "Semua data dengan status {$status} untuk desa {$desaKelurahan} pada periode terkait berhasil dihapus ({$deletedCount} data)."
+                )
                 ->with('active_tab', $request->active_tab);
         }
 
