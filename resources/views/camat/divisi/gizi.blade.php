@@ -472,15 +472,15 @@
                                             @method('DELETE')
                                             <input type="hidden" name="model" value="DataGizi">
                                             <input type="hidden" name="active_tab" value="gizi">
-                                            <input type="hidden" name="desa_kelurahan" value="{{ $row->desa_kelurahan }}">
+                                            <input type="hidden" name="desa_kelurahan" value="{{ $item->desa_kelurahan }}">
                                             <input type="hidden" name="period" value="{{ $periodYm }}">
-                                            <input type="hidden" name="status" value="{{ $row->status }}">
+                                            <input type="hidden" name="status" value="{{ $item->status }}">
 
                                             <button type="button"
                                                 @click.prevent="$dispatch('open-confirm', {
                                                     form: $el.closest('form'),
-                                                    title: 'Hapus Data Desa {{ $row->desa_kelurahan }}',
-                                                    message: 'Yakin ingin menghapus seluruh data gizi desa {{ $row->desa_kelurahan }} dengan status {{ strtoupper($row->status) }} pada periode ini? Tindakan ini tidak bisa dibatalkan.',
+                                                    title: 'Hapus Data Desa {{ $item->desa_kelurahan }}',
+                                                    message: 'Yakin ingin menghapus seluruh data gizi desa {{ $item->desa_kelurahan }} dengan status {{ strtoupper($item->status) }} pada periode ini? Tindakan ini tidak bisa dibatalkan.',
                                                     okText: 'Ya, Hapus',
                                                     cancelText: 'Batal'
                                                 })"
