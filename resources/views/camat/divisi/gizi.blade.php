@@ -471,10 +471,10 @@
                                             @csrf
                                             @method('DELETE')
                                             <input type="hidden" name="model" value="DataGizi">
-                                            <input type="hidden" name="desa_kelurahan"
-                                                value="{{ $item->desa_kelurahan }}">
-                                            <input type="hidden" name="period" value="{{ $periodYm }}">
                                             <input type="hidden" name="active_tab" value="gizi">
+                                            <input type="hidden" name="desa_kelurahan" value="{{ $row->desa_kelurahan }}">
+                                            <input type="hidden" name="period" value="{{ $periodYm }}">
+                                            <input type="hidden" name="status" value="{{ $row->status }}">
 
                                             <button type="button"
                                                 @click.prevent="$dispatch('open-confirm', {
