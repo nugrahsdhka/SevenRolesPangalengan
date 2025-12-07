@@ -214,20 +214,31 @@ class CamatController extends Controller
             // Cek apakah ada data published di scope tersebut
             $hasPublished = (clone $query)->where('status', 'published')->exists();
 
+            // Tetap blok langsung Published -> Pending
             if ($hasPublished && $request->new_status === 'pending') {
                 return back()
                     ->with('error', 'Tidak bisa mengubah status Published menjadi Pending. Tarik dulu ke Approved.')
                     ->with('active_tab', $request->active_tab);
             }
 
-            // Update semua data (kecuali published)
-            $affectedRows = $query
-                ->where('status', '!=', 'published')
-                ->update(['status' => $request->new_status]);
+            // ========== LOGIKA BARU DI SINI ==========
+
+            if ($request->new_status === 'approved') {
+                // Tarik SEMUA (pending + approved + published) menjadi approved
+                $affectedRows = $query
+                    ->whereIn('status', ['pending', 'approved', 'published'])
+                    ->update(['status' => 'approved']);
+            } else {
+                // new_status = 'pending'
+                // Turunkan hanya pending + approved menjadi pending (published sudah diblok di atas)
+                $affectedRows = $query
+                    ->whereIn('status', ['pending', 'approved'])
+                    ->update(['status' => 'pending']);
+            }
 
             $message = $request->new_status === 'approved'
-                ? "Data desa {$desaKelurahan} berhasil di-approve ({$affectedRows} data)."
-                : "Data desa {$desaKelurahan} berhasil ditarik kembali ({$affectedRows} data).";
+                ? "Data desa {$desaKelurahan} berhasil di-approve / ditarik ke Approved ({$affectedRows} data)."
+                : "Data desa {$desaKelurahan} berhasil ditarik kembali ke Pending ({$affectedRows} data).";
 
             return back()
                 ->with('success', $message)
