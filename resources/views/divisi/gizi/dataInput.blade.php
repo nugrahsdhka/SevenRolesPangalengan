@@ -291,11 +291,9 @@
                                         <span class="text-gray-300">|</span>
                                         <form action="{{ route('gizi.destroyAggregated') }}" method="POST" x-data>
                                             @csrf
-                                            <input type="hidden" name="desa_kelurahan"
-                                                value="{{ $item->desa_kelurahan }}">
+                                            <input type="hidden" name="desa_kelurahan" value="{{ $item->desa_kelurahan }}">
                                             <input type="hidden" name="status" value="{{ $item->status }}">
-                                            <input type="hidden" name="period"
-                                                value="{{ $periodYm ?? now()->format('Y-m') }}">
+                                            <input type="hidden" name="period" value="{{ $periodYm ?? now()->format('Y-m') }}">
                                             <button type="button"
                                                 @click.prevent="$dispatch('open-confirm', {
                                                     form: $el.closest('form'),
