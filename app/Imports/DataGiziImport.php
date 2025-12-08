@@ -26,28 +26,25 @@ class DataGiziImport implements ToModel, WithHeadingRow, WithChunkReading, WithB
         $this->userId = $userId;
     }
 
-    public function chunkSize(): int
-    {
-        return 500;
-    }
+    public function chunkSize(): int { return 500; }
+    public function batchSize(): int { return 500; }
 
-    public function batchSize(): int
-    {
-        return 500;
-    }
-
-    // ============== helpers bersihkan formula ==============
+    /* ============================================================
+       =============== FORMULA & STRING CLEANSER ===================
+       ============================================================ */
 
     private function cleanFormulaForString($value): ?string
     {
         if ($value === null || $value === '') return null;
 
-        $s = trim((string) $value);
+        $s = trim((string)$value);
 
+        // jika bukan formula, return langsung
         if ($s === '' || $s[0] !== '=') {
             return $s;
         }
 
+        // jika ada string di dalam tanda kutip
         if (preg_match_all('/"([^"]*)"/', $s, $matches)) {
             $last = trim(end($matches[1]));
             return $last !== '' ? $last : null;
@@ -59,32 +56,33 @@ class DataGiziImport implements ToModel, WithHeadingRow, WithChunkReading, WithB
     private function cleanFormulaForNumeric($value)
     {
         if ($value === null || $value === '') return null;
-
         if (is_numeric($value)) return $value;
 
-        $s = trim((string) $value);
+        $s = trim((string)$value);
         if ($s === '') return null;
 
-        if ($s[0] !== '=') {
-            return $s;
-        }
+        if ($s[0] !== '=') return $s;
 
         if (preg_match_all('/-?\d+(?:[.,]\d+)?/', $s, $matches)) {
-            $lastNumber = end($matches[0]);
-            return $lastNumber;
+            return end($matches[0]);
         }
 
         return null;
     }
 
+    /* ============================================================
+       ========================= HELPERS ============================
+       ============================================================ */
+
     private function safeString($value, ?int $maxLen = null): ?string
     {
-        // Jika numeric sangat besar (scientific notation), ubah ke string biasa
+        // FIX: Jika notasi ilmiah E+14 → ubah ke string angka penuh
         if (is_numeric($value) && stripos((string)$value, 'e+') !== false) {
-            $value = number_format($value, 0, '', ''); // ubah 1.23E+14 → 123000000000000
+            $value = number_format($value, 0, '', '');
         }
 
         $value = $this->cleanFormulaForString($value);
+
         if ($value === null || $value === '') return null;
 
         $s = trim((string)$value);
@@ -99,19 +97,16 @@ class DataGiziImport implements ToModel, WithHeadingRow, WithChunkReading, WithB
     private function toDecimal($value): ?float
     {
         $value = $this->cleanFormulaForNumeric($value);
+
         if ($value === null || $value === '') return null;
 
-        if (is_numeric($value)) return (float) $value;
-
-        $v = trim((string) $value);
-        $v = preg_replace('/[^\d,\.\-]/', '', $v);
-        $v = str_replace(',', '.', $v);
-
-        if ($v === '' || !is_numeric($v)) {
-            return null;
+        // FIX: ambil angka PERTAMA dari gabungan, ex: "2.5 Normal"
+        if (preg_match('/-?\d+(?:[.,]\d+)?/', (string)$value, $m)) {
+            $num = str_replace(',', '.', $m[0]);
+            return is_numeric($num) ? (float)$num : null;
         }
 
-        return (float) $v;
+        return null;
     }
 
     private function toIntOrNull($value): ?int
@@ -119,12 +114,10 @@ class DataGiziImport implements ToModel, WithHeadingRow, WithChunkReading, WithB
         $value = $this->cleanFormulaForNumeric($value);
         if ($value === null || $value === '') return null;
 
-        if (is_numeric($value)) return (int) $value;
+        if (is_numeric($value)) return (int)$value;
 
-        $s = trim((string) $value);
-
-        if (preg_match('/-?\d+/', $s, $m)) {
-            return (int) $m[0];
+        if (preg_match('/-?\d+/', (string)$value, $m)) {
+            return (int)$m[0];
         }
 
         return null;
@@ -138,24 +131,34 @@ class DataGiziImport implements ToModel, WithHeadingRow, WithChunkReading, WithB
         if (is_numeric($value)) {
             try {
                 return ExcelDate::excelToDateTimeObject($value)->format('Y-m-d');
-            } catch (\Throwable $e) {
-                // ignore
-            }
+            } catch (\Throwable $e) {}
         }
 
-        $s  = str_replace('/', '-', trim((string) $value));
+        $s  = str_replace('/', '-', trim((string)$value));
         $ts = strtotime($s);
-        if ($ts === false) {
-            return null;
-        }
+        if ($ts === false) return null;
 
         return date('Y-m-d', $ts);
     }
 
-    // ============== inti: mapping row → DataGizi ==============
+    // ambil status dari gabungan "2.5 Normal"
+    private function extractStatus($value): ?string
+    {
+        if ($value === null) return null;
+
+        $s = preg_replace('/-?\d+(?:[.,]\d+)?/', '', (string)$value);
+        $s = trim($s);
+
+        return $s !== '' ? $s : null;
+    }
+
+    /* ============================================================
+       ======================= MAPPING ROW =========================
+       ============================================================ */
 
     public function model(array $row)
     {
+        // WAJIB: desa harus ada
         $desa = $this->safeString(
             $row['desa_kel'] ??
             $row['desakel'] ??
@@ -165,14 +168,16 @@ class DataGiziImport implements ToModel, WithHeadingRow, WithChunkReading, WithB
         );
 
         if ($desa === null || $desa === '') {
-            return null;
+            return null; // skip row
         }
 
-        $bb = $this->toDecimal($row['bb_kg'] ?? $row['berat'] ?? null);
-        $tb = $this->toDecimal($row['tb_cm'] ?? $row['tinggi'] ?? null);
+        /* --------------------- STANDARD VALUE --------------------- */
 
-        $bb_lahir = $this->toDecimal($row['bb_lahir'] ?? $row['bb_lahir_kg'] ?? null);
-        $tb_lahir = $this->toDecimal($row['tb_lahir'] ?? $row['tb_lahir_cm'] ?? null);
+        $bb        = $this->toDecimal($row['bb_kg'] ?? $row['berat'] ?? null);
+        $tb        = $this->toDecimal($row['tb_cm'] ?? $row['tinggi'] ?? null);
+
+        $bb_lahir  = $this->toDecimal($row['bb_lahir'] ?? $row['bb_lahir_kg'] ?? null);
+        $tb_lahir  = $this->toDecimal($row['tb_lahir'] ?? $row['tb_lahir_cm'] ?? null);
 
         $lila          = $this->toDecimal($row['lila'] ?? null);
         $lingkarKepala = $this->toDecimal($row['lingkar_kepala'] ?? null);
@@ -181,16 +186,27 @@ class DataGiziImport implements ToModel, WithHeadingRow, WithChunkReading, WithB
         $zs_tb_u  = $this->toDecimal($row['zs_tb_u'] ?? $row['zs_tbu'] ?? null);
         $zs_bb_tb = $this->toDecimal($row['zs_bb_tb'] ?? $row['zs_bbtb'] ?? null);
 
-        $bb_u  = $this->toDecimal($row['bb_u'] ?? null);
-        $tb_u  = $this->toDecimal($row['tb_u'] ?? null);
-        $bb_tb = $this->toDecimal($row['bb_tb'] ?? null);
-
-        $usiaRaw   = $row['usia'] ?? $row['usia_bulan'] ?? null;
-        $usiaInt   = $this->toIntOrNull($usiaRaw);
+        $usiaInt   = $this->toIntOrNull($row['usia'] ?? $row['usia_bulan'] ?? null);
         $anakKeInt = $this->toIntOrNull($row['anak_ke'] ?? null);
 
         $tglKunjungan = $this->toDateYmd($row['tanggal_kunjungan'] ?? $row['tgl_kunjungan'] ?? null);
         $tglLahir     = $this->toDateYmd($row['tanggal_lahir'] ?? $row['tgl_lahir'] ?? null);
+
+        /* ------------------- AUTO-SPLIT ANGKA + STATUS ------------------- */
+
+        $bb_u_raw  = $row['bb_u'] ?? null;
+        $tb_u_raw  = $row['tb_u'] ?? null;
+        $bb_tb_raw = $row['bb_tb'] ?? null;
+
+        $bb_u  = $this->toDecimal($bb_u_raw);
+        $tb_u  = $this->toDecimal($tb_u_raw);
+        $bb_tb = $this->toDecimal($bb_tb_raw);
+
+        $status_bb_u  = $this->extractStatus($row['kategori_bb_u'] ?? $row['status_bb_u'] ?? $bb_u_raw);
+        $status_tb_u  = $this->extractStatus($row['kategori_tb_u'] ?? $row['status_tb_u'] ?? $tb_u_raw);
+        $status_bb_tb = $this->extractStatus($row['kategori_bb_tb'] ?? $row['status_bb_tb'] ?? $bb_tb_raw);
+
+        /* ------------------------ FINAL MODEL ------------------------ */
 
         return new DataGizi([
             'user_id'        => $this->userId,
@@ -200,8 +216,9 @@ class DataGiziImport implements ToModel, WithHeadingRow, WithChunkReading, WithB
             'tgl_kunjungan'  => $tglKunjungan,
             'desa_kelurahan' => $desa,
             'alamat'         => $this->safeString($row['alamat_anak'] ?? $row['alamat'] ?? null, 255),
-            'rt'             => $this->safeString($row['rt'] ?? null, 50),
-            'rw'             => $this->safeString($row['rw'] ?? null, 50),
+
+            'rt' => $this->safeString($row['rt'] ?? null, 50),
+            'rw' => $this->safeString($row['rw'] ?? null, 50),
 
             'nama'           => $this->safeString($row['nama_anak'] ?? $row['nama'] ?? null, 150),
             'tgl_lahir'      => $tglLahir,
@@ -230,6 +247,7 @@ class DataGiziImport implements ToModel, WithHeadingRow, WithChunkReading, WithB
             'tinggi'         => $tb,
             'lila'           => $lila,
             'lingkar_kepala' => $lingkarKepala,
+
             'cara_ukur'      => $this->safeString($row['cara_ukur'] ?? null, 50),
             'edema'          => $this->safeString($row['edema'] ?? null, 20),
 
@@ -247,34 +265,19 @@ class DataGiziImport implements ToModel, WithHeadingRow, WithChunkReading, WithB
                 50
             ),
 
-            'bb_u'           => $bb_u,
-            'zs_bb_u'        => $zs_bb_u,
-            'status_bb_u'    => $this->safeString(
-                $row['kategori_bb_u'] ??
-                $row['status_bb_u'] ??
-                $row['bbu'] ?? null,
-                100
-            ),
+            'bb_u'        => $bb_u,
+            'zs_bb_u'     => $zs_bb_u,
+            'status_bb_u' => $status_bb_u,
 
-            'tb_u'           => $tb_u,
-            'zs_tb_u'        => $zs_tb_u,
-            'status_tb_u'    => $this->safeString(
-                $row['kategori_tb_u'] ??
-                $row['status_tb_u'] ??
-                $row['tbu'] ?? null,
-                100
-            ),
+            'tb_u'        => $tb_u,
+            'zs_tb_u'     => $zs_tb_u,
+            'status_tb_u' => $status_tb_u,
 
-            'bb_tb'          => $bb_tb,
-            'zs_bb_tb'       => $zs_bb_tb,
-            'status_bb_tb'   => $this->safeString(
-                $row['kategori_bb_tb'] ??
-                $row['status_bb_tb'] ??
-                $row['bbtb'] ?? null,
-                100
-            ),
+            'bb_tb'        => $bb_tb,
+            'zs_bb_tb'     => $zs_bb_tb,
+            'status_bb_tb' => $status_bb_tb,
 
-            'status'         => 'pending',
+            'status'       => 'pending',
         ]);
     }
 }
