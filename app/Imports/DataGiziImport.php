@@ -79,10 +79,16 @@ class DataGiziImport implements ToModel, WithHeadingRow, WithChunkReading, WithB
 
     private function safeString($value, ?int $maxLen = null): ?string
     {
+        // Jika numeric sangat besar (scientific notation), ubah ke string biasa
+        if (is_numeric($value) && stripos((string)$value, 'e+') !== false) {
+            $value = number_format($value, 0, '', ''); // ubah 1.23E+14 → 123000000000000
+        }
+
         $value = $this->cleanFormulaForString($value);
         if ($value === null || $value === '') return null;
 
-        $s = trim($value);
+        $s = trim((string)$value);
+
         if ($maxLen !== null && mb_strlen($s) > $maxLen) {
             $s = mb_substr($s, 0, $maxLen);
         }
