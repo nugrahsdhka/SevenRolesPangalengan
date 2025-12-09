@@ -236,7 +236,7 @@ class AdminController extends Controller
 
     public function showGiziDetail(Request $request, $desaKelurahan)
     {
-        $perPage = 20;
+        $perPage = 100;
 
         // =========================
         // 1. Tentukan periodYm (Y-m)
