@@ -65,13 +65,14 @@
 
             {{-- 1. Kartu Data Stunting --}}
             <a href="{{ route('data-stunting') }}"
-            class="group relative bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1 flex flex-col">
+                class="group relative bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1 flex flex-col">
 
                 {{-- Header Kartu (Merah) --}}
                 <div class="p-5 bg-gradient-to-r from-red-50 to-red-100/60 border-b border-red-200/50">
                     <div class="flex items-center gap-4">
                         <div class="flex-shrink-0 p-3 bg-white rounded-full shadow-md border border-red-100">
-                            <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z">
                                 </path>
@@ -96,11 +97,10 @@
                     <div class="flex flex-col sm:flex-row gap-4">
                         {{-- Stat 1 --}}
                         <div class="flex-1 bg-gray-50 rounded-xl p-4 border border-gray-200">
-                            <p class="text-sm font-semibold text-gray-500 uppercase tracking-wide">
-                                Total Kasus Stunting
+                            <p class="text-sm font-semibold text-gray-500 uppercase tracking-wide">Total Kasus Stunting
                             </p>
                             <p class="text-3xl font-bold text-red-600">
-                                {{ number_format((int) ($total_stunting ?? 0)) }}
+                                {{ number_format($total_stunting) }}
                             </p>
                             <p class="text-sm font-medium text-gray-700">
                                 anak
@@ -108,11 +108,10 @@
                         </div>
                         {{-- Stat 2 --}}
                         <div class="flex-1 bg-gray-50 rounded-xl p-4 border border-gray-200">
-                            <p class="text-sm font-semibold text-gray-500 uppercase tracking-wide">
-                                Total Anak Terukur
+                            <p class="text-sm font-semibold text-gray-500 uppercase tracking-wide">Total Anak Terukur
                             </p>
                             <p class="text-3xl font-bold text-gray-800">
-                                {{ number_format((int) ($total_anak ?? 0)) }}
+                                {{ number_format($total_anak) }}
                             </p>
                             <p class="text-sm font-medium text-gray-700">
                                 anak
@@ -137,13 +136,14 @@
 
             {{-- 2. Kartu Data Wilayah --}}
             <a href="{{ route('data-wilayah') }}"
-            class="group relative bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1 flex flex-col">
+                class="group relative bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1 flex flex-col">
 
                 {{-- Header Kartu (Merah) --}}
                 <div class="p-5 bg-gradient-to-r from-red-50 to-red-100/60 border-b border-red-200/50">
                     <div class="flex items-center gap-4">
                         <div class="flex-shrink-0 p-3 bg-white rounded-full shadow-md border border-red-100">
-                            <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
                             </svg>
@@ -169,21 +169,21 @@
                         <div class="bg-gray-50 rounded-xl p-3 border border-gray-200">
                             <p class="text-xs font-semibold text-gray-500 uppercase">BB/U</p>
                             <p class="text-xl font-bold text-gray-800">
-                                {{ number_format((float) (optional($avgZScores)->avg_bbu ?? 0), 2) }}
+                                {{ number_format($avgZScores->avg_bbu ?? 0, 2) }}
                             </p>
                         </div>
                         {{-- ZS TB/U --}}
                         <div class="bg-red-50 rounded-xl p-3 border border-red-200">
                             <p class="text-xs font-semibold text-red-700 uppercase">TB/U</p>
                             <p class="text-xl font-bold text-red-600">
-                                {{ number_format((float) (optional($avgZScores)->avg_tbu ?? 0), 2) }}
+                                {{ number_format($avgZScores->avg_tbu ?? 0, 2) }}
                             </p>
                         </div>
                         {{-- ZS BB/TB --}}
                         <div class="bg-gray-50 rounded-xl p-3 border border-gray-200">
                             <p class="text-xs font-semibold text-gray-500 uppercase">BB/TB</p>
                             <p class="text-xl font-bold text-gray-800">
-                                {{ number_format((float) (optional($avgZScores)->avg_bbtb ?? 0), 2) }}
+                                {{ number_format($avgZScores->avg_bbtb ?? 0, 2) }}
                             </p>
                         </div>
                     </div>
@@ -205,13 +205,14 @@
 
             {{-- 3. Kartu Analisis Hotspot --}}
             <a href="{{ route('analisis-hotspot') }}"
-            class="group relative bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1 flex flex-col">
+                class="group relative bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1 flex flex-col">
 
                 {{-- Header Kartu (Merah) --}}
                 <div class="p-5 bg-gradient-to-r from-red-50 to-red-100/60 border-b border-red-200/50">
                     <div class="flex items-center gap-4">
                         <div class="flex-shrink-0 p-3 bg-white rounded-full shadow-md border border-red-100">
-                            <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z">
                                 </path>
@@ -235,17 +236,15 @@
                     <p class="text-sm text-gray-600">
                         Desa dengan rata-rata Z-Score TB/U terendah (paling rawan) saat ini adalah:
                     </p>
-                    @if (!empty($desaTerawan))
+                    @if ($desaTerawan)
                         <div class="bg-gray-50 rounded-xl p-4 border border-gray-200">
                             <p class="text-sm font-semibold text-gray-500 uppercase tracking-wide">Desa Terawan</p>
                             <p class="text-2xl font-bold text-red-600 truncate">
-                                {{ $desaTerawan->desa_kelurahan ?? '-' }}
+                                {{ $desaTerawan->desa_kelurahan }}
                             </p>
                             <p class="text-sm font-medium text-gray-700">
-                                Rata-rata ZS:
-                                <strong class="text-red-600">
-                                    {{ number_format((float) ($desaTerawan->avg_zs_tbu ?? 0), 2) }} SD
-                                </strong>
+                                Rata-rata ZS: <strong
+                                    class="text-red-600">{{ number_format($desaTerawan->avg_zs_tbu, 2) }} SD</strong>
                             </p>
                         </div>
                     @else
@@ -271,17 +270,18 @@
 
             {{-- 4. Kartu Peta Faskes --}}
             <a href="{{ route('peta-faskes') }}"
-            class="group relative bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1 flex flex-col">
+                class="group relative bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1 flex flex-col">
 
                 {{-- Header Kartu (Merah) --}}
                 <div class="p-5 bg-gradient-to-r from-red-50 to-red-100/60 border-b border-red-200/50">
                     <div class="flex items-center gap-4">
                         <div class="flex-shrink-0 p-3 bg-white rounded-full shadow-md border border-red-100">
-                            <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
                                 <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" stroke-width="2"
                                     stroke-linecap="round" stroke-linejoin="round"></path>
                                 <circle cx="12" cy="10" r="3" stroke-width="2" stroke-linecap="round"
-                                        stroke-linejoin="round"></circle>
+                                    stroke-linejoin="round"></circle>
                             </svg>
                         </div>
                         <div>
@@ -304,7 +304,7 @@
                     <div class="bg-gray-50 rounded-xl p-4 border border-gray-200">
                         <p class="text-sm font-semibold text-gray-500 uppercase tracking-wide">Faskes Terdaftar</p>
                         <p class="text-3xl font-bold text-red-600">
-                            {{ number_format((int) ($total_faskes ?? 0)) }}
+                            {{ number_format($total_faskes) }}
                         </p>
                         <p class="text-sm font-medium text-gray-700">
                             Lokasi
