@@ -202,14 +202,14 @@
                                 <p>
                                     rata-rata
                                 </p>
-                                <p>tb/u</p>
+                                <p>zs tb/u</p>
                             </th>
                             <th scope="col"
                                 class="px-4 py-3 text-center text-xs font-bold text-gray-700 tracking-wider whitespace-nowrap md:whitespace-normal">
                                 <p>
                                     rata-rata
                                 </p>
-                                <p>bb/tb</p>
+                                <p>zs bb/tb</p>
                             </th>
                             <th
                                 class="px-4 py-3 text-center text-xs font-semibold tracking-wider text-gray-700">
