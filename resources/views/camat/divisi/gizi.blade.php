@@ -385,7 +385,7 @@
                                 <td class="whitespace-nowrap px-4 py-3 text-xs text-gray-600 text-center">
                                     @if ($item->user)
                                         <div class="font-medium text-gray-800">
-                                            {{ $item->user->name }}
+                                            {!! nl2br(e(str_replace(' ', "\n", $item->user->name))) !!}
                                         </div>
                                     @else
                                         <span class="text-gray-400 italic">Tidak diketahui</span>
