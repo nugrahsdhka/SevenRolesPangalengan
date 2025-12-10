@@ -411,7 +411,7 @@ class CamatController extends Controller
 
     public function showGiziDetail(Request $request, $desaKelurahan)
     {
-        $perPage = 50;
+        $perPage = 100;
 
         // =========================
         //  Tentukan periode aktif
