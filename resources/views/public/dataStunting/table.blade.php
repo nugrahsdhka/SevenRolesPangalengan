@@ -332,32 +332,32 @@
                                         <td class="whitespace-nowrap px-6 py-4 text-center">
                                             @if (is_null($avgZsTbU) || $data->total_anak == 0)
                                                 <span
-                                                    class="inline-flex items-center px-3.5 py-1.5 rounded-full text-xs font-bold shadow-sm
-                                                        bg-gradient-to-r from-gray-400 to-gray-500 text-white">
+                                                    class="inline-flex items-center px-4 py-2 rounded-full text-xs font-bold tracking-wide uppercase transition-all duration-300 hover:scale-105 hover:shadow-xl
+                                                        bg-gradient-to-br from-gray-400 via-gray-500 to-gray-600 text-white shadow-lg shadow-gray-400/50">
                                                     N/A
                                                 </span>
                                             @elseif ($avgZsTbU < -3)
                                                 <span
-                                                    class="inline-flex items-center px-3.5 py-1.5 rounded-full text-xs font-bold shadow-sm
-                                                        bg-gradient-to-r from-red-500 to-red-600 text-white">
+                                                    class="inline-flex items-center px-4 py-2 rounded-full text-xs font-bold tracking-wide uppercase transition-all duration-300 hover:scale-105 hover:shadow-xl
+                                                        bg-gradient-to-br from-red-500 via-red-600 to-rose-700 text-white shadow-lg shadow-red-500/50">
                                                     Sangat Pendek
                                                 </span>
                                             @elseif ($avgZsTbU < -2)
                                                 <span
-                                                    class="inline-flex items-center px-3.5 py-1.5 rounded-full text-xs font-bold shadow-sm
-                                                        bg-gradient-to-r from-orange-500 to-orange-600 text-white">
+                                                    class="inline-flex items-center px-4 py-2 rounded-full text-xs font-bold tracking-wide uppercase transition-all duration-300 hover:scale-105 hover:shadow-xl
+                                                        bg-gradient-to-br from-orange-400 via-orange-500 to-amber-600 text-white shadow-lg shadow-orange-500/50">
                                                     Pendek
                                                 </span>
                                             @elseif ($avgZsTbU <= 2)
                                                 <span
-                                                    class="inline-flex items-center px-3.5 py-1.5 rounded-full text-xs font-bold shadow-sm
-                                                        bg-gradient-to-r from-green-500 to-green-600 text-white">
+                                                    class="inline-flex items-center px-4 py-2 rounded-full text-xs font-bold tracking-wide uppercase transition-all duration-300 hover:scale-105 hover:shadow-xl
+                                                        bg-gradient-to-br from-green-400 via-green-500 to-emerald-600 text-white shadow-lg shadow-green-500/50">
                                                     Normal
                                                 </span>
                                             @else
                                                 <span
-                                                    class="inline-flex items-center px-3.5 py-1.5 rounded-full text-xs font-bold shadow-sm
-                                                        bg-gradient-to-r from-blue-500 to-blue-600 text-white">
+                                                    class="inline-flex items-center px-4 py-2 rounded-full text-xs font-bold tracking-wide uppercase transition-all duration-300 hover:scale-105 hover:shadow-xl
+                                                        bg-gradient-to-br from-blue-400 via-blue-500 to-indigo-600 text-white shadow-lg shadow-blue-500/50">
                                                     Tinggi
                                                 </span>
                                             @endif
