@@ -387,9 +387,6 @@
                                         <div class="font-medium text-gray-800">
                                             {{ $item->user->name }}
                                         </div>
-                                        <div class="text-[11px] text-gray-500">
-                                            {{ $item->user->email }}
-                                        </div>
                                     @else
                                         <span class="text-gray-400 italic">Tidak diketahui</span>
                                     @endif
