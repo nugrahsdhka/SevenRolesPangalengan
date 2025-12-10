@@ -291,11 +291,20 @@
                                                             'period' => $selectedPeriod,
                                                         ]) }}"
                                                     class="inline-flex items-center justify-center">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"
-                                                            class="w-4 h-4 text-blue-900">
-                                                            <circle cx="50" cy="50" r="45" fill="none" stroke="#000" stroke-width="2"/>
-                                                            <line x1="50" y1="25" x2="50" y2="60" stroke="#000" stroke-width="3" stroke-linecap="round"/>
-                                                            <circle cx="50" cy="70" r="3" fill="#000"/>
+                                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" class="w-4 h-4">
+                                                            <!-- Ekor (garis lurus) -->
+                                                            <path d="M3 10h9" 
+                                                                fill="none" 
+                                                                stroke="currentColor" 
+                                                                stroke-width="2" 
+                                                                stroke-linecap="round" />
+                                                            <!-- Kepala panah -->
+                                                            <path d="M9 6l5 4-5 4" 
+                                                                fill="none" 
+                                                                stroke="currentColor" 
+                                                                stroke-width="2" 
+                                                                stroke-linecap="round" 
+                                                                stroke-linejoin="round" />
                                                         </svg>
                                                     </a>
                                                     <span class="pointer-events-none absolute left-1/2 -translate-x-1/2 -top-8
