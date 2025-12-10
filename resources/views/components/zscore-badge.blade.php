@@ -47,7 +47,7 @@
             $classes = 'bg-gradient-to-r from-orange-400 to-orange-500 text-white';
 
         // --- Kuning ---
-        } elseif (str_contains($lower, 'risiko gizi lebih') && !str_contains($lower, 'risiko lebih')) {
+        } elseif (str_contains($lower, 'risiko gizi lebih') || str_contains($lower, 'risiko lebih')) {
             $classes = 'bg-gradient-to-r from-yellow-300 to-yellow-400 text-gray-900';
 
         // --- Hijau ---
