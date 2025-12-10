@@ -6,7 +6,7 @@
         ? \Carbon\Carbon::parse($currentPeriod)->isoFormat('MMMM Y')
         : now()->isoFormat('MMMM Y');
 @endphp
-<div class="flex flex-col-reverse lg:flex-row gap-2 px-4 py-2 backdrop-blur-sm" x-data="{ sidebarOpen: false }">
+<div class="flex flex-col-reverse lg:flex-row gap-2 px-2 py-2 backdrop-blur-sm" x-data="{ sidebarOpen: false }">
     {{-- List Desa --}}
     <div class="order-2 lg:order-1 lg:relative z-50">
         {{-- Sidebar desktop daftar desa --}}
