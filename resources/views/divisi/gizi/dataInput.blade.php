@@ -211,9 +211,12 @@
                                 </p>
                                 <p>zs bb/tb</p>
                             </th>
-                            <th
-                                class="px-4 py-3 text-center text-xs font-semibold tracking-wider text-gray-700">
-                                Petugas Input
+                            <th scope="col"
+                                class="px-4 py-3 text-center text-xs font-bold text-gray-700 tracking-wider whitespace-nowrap md:whitespace-normal">
+                                <p>
+                                    petugas
+                                </p>
+                                <p>input</p>
                             </th>
                             <th
                                 class="px-4 py-3 text-center text-xs font-semibold tracking-wider text-gray-700">
