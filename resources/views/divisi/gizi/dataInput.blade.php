@@ -179,35 +179,35 @@
                             <th scope="col"
                                 class="px-4 py-3 text-center text-xs font-bold text-gray-700 tracking-wider whitespace-nowrap md:whitespace-normal">
                                 <p>
-                                    rata-rata
+                                    average
                                 </p>
                                 <p>berat (kg)</p>
                             </th>
                             <th scope="col"
                                 class="px-4 py-3 text-center text-xs font-bold text-gray-700 tracking-wider whitespace-nowrap md:whitespace-normal">
                                 <p>
-                                    rata-rata
+                                    average
                                 </p>
                                 <p>tinggi (cm)</p>
                             </th>
                             <th scope="col"
                                 class="px-4 py-3 text-center text-xs font-bold text-gray-700 tracking-wider whitespace-nowrap md:whitespace-normal">
                                 <p>
-                                    rata-rata
+                                    average
                                 </p>
                                 <p>zs bb/u</p>
                             </th>
                             <th scope="col"
                                 class="px-4 py-3 text-center text-xs font-bold text-gray-700 tracking-wider whitespace-nowrap md:whitespace-normal">
                                 <p>
-                                    rata-rata
+                                    average
                                 </p>
                                 <p>zs tb/u</p>
                             </th>
                             <th scope="col"
                                 class="px-4 py-3 text-center text-xs font-bold text-gray-700 tracking-wider whitespace-nowrap md:whitespace-normal">
                                 <p>
-                                    rata-rata
+                                    average
                                 </p>
                                 <p>zs bb/tb</p>
                             </th>
