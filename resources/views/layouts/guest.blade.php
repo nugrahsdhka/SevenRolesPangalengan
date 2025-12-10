@@ -48,7 +48,6 @@
         </footer>
     @endif
 
-    <x-goToTop />
     @stack('scripts')
 </body>
 
