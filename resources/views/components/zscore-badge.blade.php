@@ -26,25 +26,48 @@
 
         $label = number_format($numeric, 2);
     } else {
-        // ===== CABANG TEKS (STATUS) =====
         $text  = (string) $value;
         $lower = mb_strtolower($text);
 
-        // Mapping warna berdasarkan kata kunci di status
-        if (str_contains($lower, 'normal')) {
-            $classes = 'bg-gradient-to-r from-green-500 to-emerald-600 text-white';
-        } elseif (str_contains($lower, 'risiko') || str_contains($lower, 'ringan')) {
-            $classes = 'bg-gradient-to-r from-yellow-400 to-amber-500 text-gray-900';
-        } elseif (str_contains($lower, 'kurang') || str_contains($lower, 'stunting') || str_contains($lower, 'buruk')) {
-            $classes = 'bg-gradient-to-r from-red-500 to-red-600 text-white';
-        } elseif (str_contains($lower, 'gemuk') || str_contains($lower, 'obes')) {
+        // --- Merah (severe) ---
+        if (str_contains($lower, 'sangat kurang') ||
+            str_contains($lower, 'resiko lebih') ||
+            str_contains($lower, 'sangat pendek') ||
+            str_contains($lower, 'risiko gizi kurang') ||
+            str_contains($lower, 'obesitas')) {
+
+            $classes = 'bg-gradient-to-r from-red-600 to-red-700 text-white';
+
+        // --- Orange ---
+        } elseif (str_contains($lower, 'kurang') && !str_contains($lower, 'sangat kurang')) {
+            // "kurang" tapi bukan "sangat kurang"
+            $classes = 'bg-gradient-to-r from-orange-400 to-orange-500 text-white';
+
+        } elseif (str_contains($lower, 'pendek') && !str_contains($lower, 'sangat pendek')) {
+            $classes = 'bg-gradient-to-r from-orange-400 to-orange-500 text-white';
+
+        // --- Kuning ---
+        } elseif (str_contains($lower, 'risiko gizi lebih')) {
+            $classes = 'bg-gradient-to-r from-yellow-300 to-yellow-400 text-gray-900';
+
+        // --- Hijau ---
+        } elseif (str_contains($lower, 'normal') ||
+                str_contains($lower, 'gizi baik')) {
+
+            $classes = 'bg-gradient-to-r from-green-500 to-green-600 text-white';
+
+        // --- Biru ---
+        } elseif (str_contains($lower, 'tinggi') ||
+                str_contains($lower, 'gizi lebih')) {
+
             $classes = 'bg-gradient-to-r from-blue-500 to-blue-600 text-white';
+
+        // --- Default (tidak terpetakan) ---
         } else {
-            // Status lain yang tidak terpetakan
             $classes = 'bg-gradient-to-r from-slate-400 to-slate-600 text-white';
         }
 
-        $label = $text; // Tampilkan teks status apa adanya
+        $label = $text;
     }
 @endphp
 
