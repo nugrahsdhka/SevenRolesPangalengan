@@ -285,7 +285,7 @@
 
                                             {{-- Detail --}}
                                             <td class="px-4 sm:px-6 py-3.5 whitespace-nowrap text-center">
-                                                <div class="relative inline-flex group z-50">
+                                                <div class="relative inline-flex group">
                                                     <a href="{{ route('data-wilayah-detail-gizi', [
                                                             'desa'   => $data->desa_kelurahan,
                                                             'period' => $selectedPeriod,
@@ -301,7 +301,7 @@
                                                     <span class="pointer-events-none absolute left-1/2 -translate-x-1/2 -top-8
                                                                 px-2 py-1 text-[11px] text-white bg-gray-800 rounded-md shadow-lg
                                                                 opacity-0 scale-95 group-hover:opacity-100 group-hover:scale-100
-                                                                transition duration-200">
+                                                                transition duration-200  z-50">
                                                         Detail
                                                     </span>
                                                 </div>
