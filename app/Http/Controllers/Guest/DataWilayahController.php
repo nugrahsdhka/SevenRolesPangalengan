@@ -25,7 +25,7 @@ class DataWilayahController extends Controller
             ->pluck('ym');
 
         $hasPeriodParam = $request->has('period');       // key ?period ada atau tidak
-        $selectedPeriod = $request->input('period');     // nilainya bisa: null / "" / "2025-01"
+        $selectedPeriod = $request->input('period');     // bisa: null / "" / "2025-01"
 
         if (!$hasPeriodParam && $availablePeriods->isNotEmpty()) {
             // Pertama kali buka halaman → pakai periode terbaru
@@ -59,7 +59,7 @@ class DataWilayahController extends Controller
             ->where('status', 'published')
             ->whereNotNull('period');
 
-        // Filter periode (kalau ada selectedPeriod yang aktif)
+        // Filter periode
         if (!empty($selectedPeriod)) {
             $query->whereDate('period', '=', $selectedPeriod . '-01');
         }
@@ -78,7 +78,7 @@ class DataWilayahController extends Controller
             ->paginate($perPage)
             ->appends([
                 'search' => $search,
-                'period' => $request->has('period') ? $request->input('period') : $selectedPeriod,
+                'period' => $hasPeriodParam ? $request->input('period') : $selectedPeriod,
             ]);
 
         return view('public.dataWilayah.index', compact(
@@ -87,5 +87,114 @@ class DataWilayahController extends Controller
             'availablePeriods',
             'selectedPeriod',
         ));
+    }
+
+    public function detailGizi(Request $request)
+    {
+        $desa = $request->query('desa');
+
+        if (!$desa) {
+            abort(404, 'Desa tidak ditemukan.');
+        }
+
+        // Periode (YYYY-MM atau null/"")
+        $periodYm = $request->query('period');
+        if ($periodYm === '') {
+            $periodYm = null;
+        }
+
+        // Filter tambahan
+        $filterPosyandu = $request->query('posyandu');
+        $filterRt       = $request->query('rt');
+        $filterRw       = $request->query('rw');
+
+        // Base query untuk desa + periode
+        $baseQuery = DataGizi::where('status', 'published')
+            ->whereNotNull('period')
+            ->where('desa_kelurahan', $desa);
+
+        if (!empty($periodYm)) {
+            $baseQuery->whereDate('period', '=', $periodYm . '-01');
+        }
+
+        // ============== OPTIONS FILTER ==============
+
+        $posyanduOptions = (clone $baseQuery)
+            ->select('posyandu')
+            ->whereNotNull('posyandu')
+            ->where('posyandu', '!=', '')
+            ->distinct()
+            ->orderBy('posyandu')
+            ->pluck('posyandu');
+
+        $rtOptions = (clone $baseQuery)
+            ->select('rt')
+            ->whereNotNull('rt')
+            ->where('rt', '!=', '')
+            ->distinct()
+            ->orderBy('rt')
+            ->pluck('rt');
+
+        $rwOptions = (clone $baseQuery)
+            ->select('rw')
+            ->whereNotNull('rw')
+            ->where('rw', '!=', '')
+            ->distinct()
+            ->orderBy('rw')
+            ->pluck('rw');
+
+        // ============== DATA ANAK (TERFILTER) ==============
+        $dataQuery = clone $baseQuery;
+
+        if (!empty($filterPosyandu)) {
+            $dataQuery->where('posyandu', $filterPosyandu);
+        }
+        if (!empty($filterRt)) {
+            $dataQuery->where('rt', $filterRt);
+        }
+        if (!empty($filterRw)) {
+            $dataQuery->where('rw', $filterRw);
+        }
+
+        $dataAnak = $dataQuery
+            ->select(
+                'nama',
+                'posyandu',
+                'rt',
+                'rw',
+                'tgl_lahir',
+                'berat',
+                'tinggi',
+                'bb_u',
+                'zs_bb_u',
+                'status_bb_u',
+                'tb_u',
+                'zs_tb_u',
+                'status_tb_u',
+                'bb_tb',
+                'zs_bb_tb',
+                'status_bb_tb'
+            )
+            ->orderBy('nama')
+            ->paginate(100)
+            ->appends([
+                'desa'     => $desa,
+                'period'   => $periodYm,
+                'posyandu' => $filterPosyandu,
+                'rt'       => $filterRt,
+                'rw'       => $filterRw,
+            ]);
+
+        return view('public.dataWilayah.detail', [
+            'desa'            => $desa,
+            'periodYm'        => $periodYm,
+            'dataAnak'        => $dataAnak,
+            'posyanduOptions' => $posyanduOptions,
+            'rtOptions'       => $rtOptions,
+            'rwOptions'       => $rwOptions,
+            'filterPosyandu'  => $filterPosyandu,
+            'filterRt'        => $filterRt,
+            'filterRw'        => $filterRw,
+        ]);
     }
 }

@@ -34,6 +34,7 @@ Route::get('/data-stunting/chart-zs', [DataStuntingController::class, 'getChartD
 
 // Data Wilayah
 Route::get('/data-wilayah', [DataWilayahController::class, 'index'])->name('data-wilayah');
+Route::get('/data-wilayah/detail', [DataWilayahController::class, 'detailGizi'])->name('data-wilayah-detail-gizi');
 
 // Analisis Hotspot
 Route::get('/analisis-hotspot', [AnalisisHotspotController::class, 'index'])->name('analisis-hotspot');
