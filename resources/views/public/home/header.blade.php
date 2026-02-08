@@ -1,8 +1,10 @@
-{{-- ====== MODERN HEADER WITH GLASSMORPHISM ====== --}}
-<header class="text-red-100 relative overflow-hidden bg-gradient-to-br from-red-800 via-red-800 to-rose-700">
+{{-- ====== PREMIUM HEADER WITH ADVANCED GLASSMORPHISM ====== --}}
+<header class="relative overflow-hidden bg-red-700">
+    {{-- Decorative Background Elements --}}
+    <div class="absolute top-0 right-0 -mt-20 -mr-20 w-96 h-96 bg-red-400 rounded-full blur-3xl opacity-50"></div>
+    <div class="absolute bottom-0 left-0 -mb-20 -ml-20 w-80 h-80 bg-rose-900 rounded-full blur-3xl opacity-30"></div>
 
     @php
-        // Siapkan label periode yang rapih (contoh: "November 2025" atau "Semua Periode")
         if (!empty($selectedPeriod)) {
             try {
                 $periodeLabel = \Carbon\Carbon::createFromFormat('Y-m', $selectedPeriod)->isoFormat('MMMM Y');
@@ -14,426 +16,176 @@
         }
     @endphp
 
-    {{-- Desktop View --}}
-    <div class="hidden md:block relative bg-red-800 py-3 border-b border-red-600/50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <p class="text-center text-sm font-medium tracking-wide">
-                Sistem Informasi Data Stunting Kecamatan Pangalengan
+    {{-- Top Bar (Info Sistem) --}}
+    <div class="relative bg-red-700 py-2 shadow-sm z-30">
+        <div class="max-w-7xl mx-auto px-4 flex justify-center md:justify-between items-center text-white">
+            <p class="text-[11px] md:text-xs font-bold uppercase tracking-[0.2em]">
+                Sistem Informasi Data Stunting <span class="hidden md:inline">• Kecamatan Pangalengan</span>
             </p>
         </div>
     </div>
 
-    {{-- Mobile View --}}
-    <div class="block md:hidden relative bg-red-800 py-3 border-b border-red-600/50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <p class="text-center text-sm font-medium tracking-wide">
-                Sistem Informasi
-            </p>
-            <p class="text-center text-sm font-medium tracking-wide">
-                Data Stunting Kecamatan Pangalengan
-            </p>
-        </div>
-    </div>
-
-    {{-- Main Header --}}
-    <div class="relative w-full px-4 sm:px-6 lg:px-8 py-8">
-        <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
-
-            {{-- Left: Logo & Info --}}
-            <div class="flex flex-col lg:flex-row items-center gap-6 group w-full">
-                <div class="relative flex-shrink-0">
-                    <div
-                        class="absolute inset-0 rounded-full bg-gradient-to-r from-red-400 to-rose-500 blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-500 animate-spin-slow">
-                    </div>
-                    <div
-                        class="relative bg-red-600 p-3 rounded-full ring-4 ring-red-600/50 flex items-center justify-center transition-all duration-500 group-hover:ring-8 group-hover:ring-red-400/30 group-hover:scale-110 group-hover:rotate-6">
-                        <img class="w-16 h-16 object-contain transition-transform duration-500 group-hover:scale-110 group-hover:-rotate-6"
-                            src="{{ asset('img/logo-kab-bandung.png') }}" alt="Logo Kabupaten Bandung">
+    {{-- Main Content Section --}}
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 relative z-20">
+        <div class="flex flex-col lg:flex-row items-center justify-between gap-10">
+            
+            {{-- Left: Identity --}}
+            <div class="flex flex-col md:flex-row items-center gap-6 text-center md:text-left w-full lg:w-auto">
+                {{-- Logo with Dynamic Ring --}}
+                <div class="relative group">
+                    <div class="absolute -inset-1 bg-gradient-to-r from-red-600 to-rose-500 rounded-full blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
+                    <div class="relative bg-red-600 p-4 rounded-full shadow-xl border border-red-700 transition-transform duration-500 group-hover:scale-105">
+                        <img class="w-16 h-16 md:w-20 md:h-20 object-contain"
+                             src="{{ asset('img/logo-kab-bandung.png') }}" alt="Logo Kabupaten Bandung">
                     </div>
                 </div>
 
-                <div
-                    class="relative min-w-[160px] bg-red-600/40 backdrop-blur-sm rounded-2xl px-6 py-4 border border-red-500/30 overflow-hidden">
-                    <div class="flex justify-center items-center flex-col md:justify-start md:items-start">
-                        <h1 class="text-xl font-bold relative z-10 text-white">Rumah Stunting Pangalengan</h1>
-                        <p class="text-sm text-red-100 mt-0.5 relative z-10">Kabupaten Bandung • Provinsi Jawa Barat
-                        </p>
-                    </div>
-
-                    {{-- Label Periode --}}
-                    <div class="mt-2 text-xs text-red-100/90 relative z-10">
-                        Periode data:
-                        <span class="font-semibold">
-                            {{ $periodeLabel }}
-                        </span>
-                    </div>
-
-                    <div class="flex gap-3 mt-3 text-sm relative z-10">
-                        <span class="font-medium px-3 py-1 bg-white/10 rounded-lg">{{ $total_faskes ?? 0 }}
-                            Faskes</span>
-                        <span class="font-medium px-3 py-1 bg-white/10 rounded-lg">{{ $total_desa ?? 0 }}
-                            Desa</span>
-                        <span
-                            class="block md:hidden font-medium px-3 py-1 bg-white/10 rounded-lg">{{ number_format($rata_rata_kasus ?? 0, 1) }}%
-                            Stunting</span>
+                <div>
+                    <h1 class="text-3xl md:text-4xl font-black text-white leading-tight">
+                        Rumah <span class="text-red-100">Stunting</span>
+                    </h1>
+                    <p class="text-gray-200 font-medium flex items-center justify-center md:justify-start gap-2 mt-1 text-sm md:text-base">
+                        <svg class="w-4 h-4 text-red-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path></svg>
+                        Pangalengan, Kabupaten Bandung
+                    </p>
+                    <div class="mt-4 flex flex-wrap justify-center md:justify-start gap-2">
+                        <span class="px-3 py-1 bg-red-50 text-red-700 text-[11px] font-bold rounded-full border border-red-100">PROVINSI JAWA BARAT</span>
+                        <span class="px-3 py-1 bg-gray-50 text-gray-600 text-[11px] font-bold rounded-full border border-gray-100">DATA TERVERIFIKASI</span>
                     </div>
                 </div>
             </div>
 
-            {{-- Right: Stats Cards --}}
-            <div class="hidden md:flex flex-col sm:flex-row gap-4 w-full lg:w-auto">
-
-                <div
-                    class="relative bg-red-600/50 backdrop-blur-sm rounded-xl px-8 py-4 flex flex-col items-center justify-center flex-1 min-w-[140px] border border-red-500/30 overflow-hidden">
-                    <p class="text-xs text-red-100 uppercase tracking-wide">Total Desa</p>
-                    <p class="text-4xl font-bold mt-1 text-white leading-none">{{ $total_desa ?? 0 }}</p>
+            {{-- Right: Integrated Stats --}}
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-4 w-full lg:w-auto">
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center justify-center transition-all hover:shadow-md">
+                    <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Total Desa</span>
+                    <span class="text-3xl font-black text-gray-900 mt-1">{{ $total_desa ?? 0 }}</span>
                 </div>
-
-                <div
-                    class="relative bg-red-600/50 backdrop-blur-sm rounded-xl px-8 py-4 flex flex-col items-center justify-center flex-1 min-w-[140px] border border-red-500/30 overflow-hidden">
-                    <p class="text-xs text-red-100 uppercase tracking-wide">Stunting (%)</p>
-                    <p class="text-4xl font-bold mt-1 text-white leading-none">
-                        {{ number_format($rata_rata_kasus ?? 0, 2) }}%</p>
+                <div class="bg-red-600 p-5 rounded-2xl shadow-lg shadow-red-100 flex flex-col items-center justify-center transition-all hover:scale-105 group">
+                    <span class="text-[10px] font-black text-red-100 uppercase tracking-widest">Prevalensi</span>
+                    <span class="text-3xl font-black text-white mt-1 group-hover:scale-110 transition-transform">{{ number_format($rata_rata_kasus ?? 0, 1) }}%</span>
                 </div>
-
-                <div
-                    class="relative bg-red-600/50 backdrop-blur-sm rounded-xl px-8 py-4 flex flex-col items-center justify-center flex-1 min-w-[140px] border border-red-500/30 overflow-hidden">
-                    <p class="text-xs text-red-100 uppercase tracking-wide">Faskes</p>
-                    <p class="text-4xl font-bold mt-1 text-white leading-none">{{ $total_faskes ?? 0 }}</p>
+                <div class="hidden md:flex bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center justify-center transition-all hover:shadow-md">
+                    <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Faskes</span>
+                    <span class="text-3xl font-black text-gray-900 mt-1">{{ $total_faskes ?? 0 }}</span>
                 </div>
-
             </div>
-
         </div>
 
-        {{-- ===== DISTRIBUTION CHART ===== --}}
-        <div class="mt-6">
-            <div
-                class="relative bg-red-700/30 backdrop-blur-sm rounded-2xl p-5 border border-red-600/40 overflow-hidden">
-                {{-- Decorative gradient overlay --}}
-                <div class="absolute inset-0 bg-gradient-to-br from-red-500/5 to-transparent pointer-events-none">
-                </div>
-
-                {{-- Header --}}
-                <div class="relative flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
-                    {{-- Kiri --}}
+        {{-- Distribution Chart Card --}}
+        <div class="mt-12 group">
+            <div class="bg-red-500/70 backdrop-blur-xl rounded-3xl p-6 md:p-8 border border-red-700 shadow-xl overflow-hidden relative">
+                {{-- Card Header --}}
+                <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8 relative z-10">
                     <div>
-                        <h3 class="text-sm font-bold text-white flex items-center gap-2">
-                            <svg class="w-2 h-2 md:w-4 md:h-4 text-red-300" fill="none" stroke="currentColor"
-                                viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z">
-                                </path>
-                            </svg>
-                            Distribusi Tinggi Badan
-                        </h3>
-                        <p class="text-xs text-red-200/80 mt-0.5">Tinggi Badan menurut Umur (TB/U)</p>
-                        <p class="text-[11px] text-red-200/80 mt-0.5">
-                            Periode:
-                            <span class="font-semibold">{{ $periodeLabel }}</span>
-                        </p>
+                        <div class="flex items-center gap-3 mb-2">
+                            <div class="p-2 bg-red-600 rounded-lg shadow-lg shadow-red-200">
+                                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                                </svg>
+                            </div>
+                            <h3 class="text-xl font-black text-red-200 uppercase tracking-tight">Status Stunting Balita (TB/U)</h3>
+                        </div>
+                        <p class="text-red-300 text-sm font-medium">Periode Laporan: <span class="text-white font-bold uppercase">{{ $periodeLabel }}</span></p>
                     </div>
 
-                    {{-- Kanan --}}
-                    <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 md:gap-3">
-                        {{-- Select Periode --}}
-                        <div class="flex gap-2 w-full">
-                            <x-period-dropdown
-                                :available-periods="$availablePeriods"
-                                :selected-period="$selectedPeriod"
-                                variant="red"
-                            />
-    
-    
-                            {{-- Box Total Anak --}}
-                            @if ($total_anak > 0)
-                                <div
-                                    class="text-right bg-red-600/30 backdrop-blur-sm rounded-xl px-4 py-2 border border-red-500/30">
-                                    <div class="text-2xl text-center font-bold text-white">{{ number_format($total_anak) }}
-                                    </div>
-                                    <div class="text-[10px] text-red-200/80 uppercase tracking-wide">Total Anak</div>
-                                </div>
-                            @endif
+                    <div class="flex items-center gap-3">
+                        <x-period-dropdown :available-periods="$availablePeriods" :selected-period="$selectedPeriod" variant="red" />
+                        <div class="bg-red-600 px-5 py-3 rounded-2xl shadow-lg">
+                            <p class="text-[10px] font-bold text-red-100 uppercase leading-none">Total Balita</p>
+                            <p class="text-xl font-black text-white mt-1">{{ number_format($total_anak) }}</p>
                         </div>
                     </div>
                 </div>
 
-                {{-- ===== LOGIKA IF/ELSE DIMULAI DI SINI ===== --}}
                 @if ($total_anak > 0)
-
-                    <div x-data="{ activeCategory: null }" @mouseleave="activeCategory = null">
-
-                        {{-- Bar Chart (Jika ADA Data) --}}
-                        <div class="relative mb-4">
-                            <div
-                                class="relative w-full bg-red-950/40 rounded-lg h-2.5 overflow-hidden flex border border-red-700/40 shadow-inner">
-                                @php
-                                    $distSangatPendek = number_format($distribusi['sangat_pendek'] ?? 0, 2);
-                                    $distPendek = number_format($distribusi['pendek'] ?? 0, 2);
-                                    $distNormal = number_format($distribusi['normal'] ?? 0, 2);
-                                    $distTinggi = number_format($distribusi['tinggi'] ?? 0, 2);
-                                @endphp
-
-                                @if (($distribusi['sangat_pendek'] ?? 0) > 0)
-                                    <div @mouseenter="activeCategory = 'sangat_pendek'"
-                                        :class="{
-                                            'from-red-400 to-red-500': activeCategory === 'sangat_pendek',
-                                            'from-red-500 to-red-600': activeCategory !== 'sangat_pendek'
-                                        }"
-                                        class="relative bg-gradient-to-r h-2.5 transition-all duration-300"
-                                        style="width: {{ $distribusi['sangat_pendek'] ?? 0 }}%">
-                                        <div class="absolute inset-0 bg-white/10"></div>
+                    <div x-data="{ active: null }" class="relative z-10">
+                        {{-- Advanced Bar --}}
+                        <div class="h-6 w-full bg-gray-100 rounded-full flex overflow-hidden shadow-inner p-1 mb-8">
+                            @foreach(['sangat_pendek' => 'bg-red-600', 'pendek' => 'bg-orange-500', 'normal' => 'bg-emerald-500', 'tinggi' => 'bg-blue-600'] as $key => $color)
+                                @if(($distribusi[$key] ?? 0) > 0)
+                                    <div @mouseenter="active = '{{$key}}'" @mouseleave="active = null"
+                                         class="{{ $color }} h-full transition-all duration-500 first:rounded-l-full last:rounded-r-full cursor-help relative group"
+                                         style="width: {{ $distribusi[$key] }}%">
+                                         <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                                     </div>
                                 @endif
-
-                                @if (($distribusi['pendek'] ?? 0) > 0)
-                                    <div @mouseenter="activeCategory = 'pendek'"
-                                        :class="{
-                                            'from-orange-300 to-orange-400': activeCategory === 'pendek',
-                                            'from-orange-400 to-orange-500': activeCategory !== 'pendek'
-                                        }"
-                                        class="relative bg-gradient-to-r h-2.5 transition-all duration-300"
-                                        style="width: {{ $distribusi['pendek'] ?? 0 }}%">
-                                        <div class="absolute inset-0 bg-white/10"></div>
-                                    </div>
-                                @endif
-
-                                @if (($distribusi['normal'] ?? 0) > 0)
-                                    <div @mouseenter="activeCategory = 'normal'"
-                                        :class="{
-                                            'from-emerald-300 to-emerald-400': activeCategory === 'normal',
-                                            'from-emerald-400 to-emerald-500': activeCategory !== 'normal'
-                                        }"
-                                        class="relative bg-gradient-to-r h-2.5 transition-all duration-300"
-                                        style="width: {{ $distribusi['normal'] ?? 0 }}%">
-                                        <div class="absolute inset-0 bg-white/10"></div>
-                                    </div>
-                                @endif
-
-                                @if (($distribusi['tinggi'] ?? 0) > 0)
-                                    <div @mouseenter="activeCategory = 'tinggi'"
-                                        :class="{
-                                            'from-blue-300 to-blue-400': activeCategory === 'tinggi',
-                                            'from-blue-400 to-blue-500': activeCategory !== 'tinggi'
-                                        }"
-                                        class="relative bg-gradient-to-r h-2.5 transition-all duration-300"
-                                        style="width: {{ $distribusi['tinggi'] ?? 0 }}%">
-                                        <div class="absolute inset-0 bg-white/10"></div>
-                                    </div>
-                                @endif
-                            </div>
+                            @endforeach
                         </div>
 
-                        {{-- Legend Cards (Jika ADA Data) --}}
-                        <div class="relative grid grid-cols-2 lg:grid-cols-4 gap-2.5">
+                        {{-- Legend Grid --}}
+                        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                            @php
+                                $categories = [
+                                    ['id' => 'sangat_pendek', 'label' => 'Sangat Pendek', 'color' => 'bg-red-600', 'text' => 'text-red-600'],
+                                    ['id' => 'pendek', 'label' => 'Pendek', 'color' => 'bg-orange-500', 'text' => 'text-orange-500'],
+                                    ['id' => 'normal', 'label' => 'Normal', 'color' => 'bg-emerald-500', 'text' => 'text-emerald-500'],
+                                    ['id' => 'tinggi', 'label' => 'Tinggi', 'color' => 'bg-blue-600', 'text' => 'text-blue-600']
+                                ];
+                            @endphp
 
-                            {{-- Sangat Pendek --}}
-                            <div @mouseenter="activeCategory = 'sangat_pendek'"
-                                :class="{
-                                    'bg-white/15 border-white/30 scale-[1.02]': activeCategory === 'sangat_pendek',
-                                    'bg-white/10 border-white/20': activeCategory !== 'sangat_pendek'
-                                }"
-                                class="group relative backdrop-blur-sm rounded-xl p-3 border transition-all duration-300">
-                                <div class="flex items-center justify-between">
-                                    <div class="flex items-center gap-2">
-                                        <div
-                                            class="w-2 h-2 md:w-4 md:h-4 rounded-full bg-red-500 shadow-lg shadow-red-500/50 ring-2 ring-white/20">
-                                        </div>
-                                        <div>
-                                            <div
-                                                class="hidden md:block text-[10px] md:text-[13px] font-bold text-white">
-                                                Sangat Pendek</div>
-                                            <div
-                                                class="block md:hidden text-[10px] md:text-[13px] font-bold text-white">
-                                                Sgt. Pendek</div>
-                                            <div class="text-[9px] md:text-[11px] text-red-200/70 mt-0.5">
-                                                {{ number_format($distribusi_counts['sangat_pendek'] ?? 0) }} anak
-                                            </div>
-                                        </div>
+                            @foreach($categories as $cat)
+                                <div @mouseenter="active = '{{ $cat['id'] }}'" @mouseleave="active = null"
+                                    {{-- Logika Class: Saat di-hover menjadi lebih terang dan border lebih tegas --}}
+                                    :class="active === '{{ $cat['id'] }}' 
+                                            ? 'bg-white/25 border-white/50 scale-105 shadow-lg shadow-black/10' 
+                                            : 'bg-white/10 border-white/20'"
+                                    class="p-5 rounded-[2rem] border backdrop-blur-md transition-all duration-500 group cursor-default">
+                                    
+                                    <div class="flex items-center gap-3 mb-3">
+                                        {{-- Dot Indikator dengan Glow Effect --}}
+                                        <div class="w-3 h-3 rounded-full {{ $cat['color'] }} shadow-[0_0_10px_rgba(255,255,255,0.4)]"></div>
+                                        
+                                        {{-- Label Kategori --}}
+                                        <span class="text-[10px] font-black text-red-100 uppercase tracking-[0.15em] opacity-80 group-hover:opacity-100 transition-opacity">
+                                            {{ $cat['label'] }}
+                                        </span>
                                     </div>
-                                    <div class="text-[10px] md:text-base font-bold text-white">
-                                        {{ $distSangatPendek }}%</div>
-                                </div>
-                            </div>
 
-                            {{-- Pendek --}}
-                            <div @mouseenter="activeCategory = 'pendek'"
-                                :class="{
-                                    'bg-white/15 border-white/30 scale-[1.02]': activeCategory === 'pendek',
-                                    'bg-white/10 border-white/20': activeCategory !== 'pendek'
-                                }"
-                                class="group relative backdrop-blur-sm rounded-xl p-3 border transition-all duration-300">
-                                <div class="flex items-center justify-between">
-                                    <div class="flex items-center gap-2">
-                                        <div
-                                            class="w-2 h-2 md:w-4 md:h-4 rounded-full bg-orange-400 shadow-lg shadow-orange-400/50 ring-2 ring-white/20">
-                                        </div>
-                                        <div>
-                                            <div class="text-[10px] md:text-[13px] font-bold text-white">Pendek
-                                            </div>
-                                            <div class="text-[9px] md:text-[11px] text-red-200/70 mt-0.5">
-                                                {{ number_format($distribusi_counts['pendek'] ?? 0) }} anak
-                                            </div>
-                                        </div>
+                                    <div class="flex flex-col">
+                                        {{-- Angka Persentase --}}
+                                        <span class="text-3xl font-black text-white tracking-tighter leading-none">
+                                            {{ number_format($distribusi[$cat['id']] ?? 0, 1) }}%
+                                        </span>
+                                        
+                                        {{-- Counter Anak --}}
+                                        <span class="text-[11px] font-bold text-red-200 mt-2 flex items-center gap-1.5">
+                                            <svg class="w-3 h-3 opacity-60" fill="currentColor" viewBox="0 0 20 20">
+                                                <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z"></path>
+                                            </svg>
+                                            {{ number_format($distribusi_counts[$cat['id']] ?? 0) }} Anak
+                                        </span>
                                     </div>
-                                    <div class="text-[10px] md:text-base font-bold text-white">
-                                        {{ $distPendek }}%</div>
                                 </div>
-                            </div>
-
-                            {{-- Normal --}}
-                            <div @mouseenter="activeCategory = 'normal'"
-                                :class="{
-                                    'bg-white/15 border-white/30 scale-[1.02]': activeCategory === 'normal',
-                                    'bg-white/10 border-white/20': activeCategory !== 'normal'
-                                }"
-                                class="group relative backdrop-blur-sm rounded-xl p-3 border transition-all duration-300">
-                                <div class="flex items-center justify-between">
-                                    <div class="flex items-center gap-2">
-                                        <div
-                                            class="w-2 h-2 md:w-4 md:h-4 rounded-full bg-emerald-500 shadow-lg shadow-emerald-500/50 ring-2 ring-white/20">
-                                        </div>
-                                        <div>
-                                            <div class="text-[10px] md:text-[13px] font-bold text-white">Normal
-                                            </div>
-                                            <div class="text-[9px] md:text-[11px] text-red-200/70 mt-0.5">
-                                                {{ number_format($distribusi_counts['normal'] ?? 0) }} anak
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="text-[10px] md:text-base font-bold text-white">
-                                        {{ $distNormal }}%</div>
-                                </div>
-                            </div>
-
-                            {{-- Tinggi --}}
-                            <div @mouseenter="activeCategory = 'tinggi'"
-                                :class="{
-                                    'bg-white/15 border-white/30 scale-[1.02]': activeCategory === 'tinggi',
-                                    'bg-white/10 border-white/20': activeCategory !== 'tinggi'
-                                }"
-                                class="group relative backdrop-blur-sm rounded-xl p-3 border transition-all duration-300">
-                                <div class="flex items-center justify-between">
-                                    <div class="flex items-center gap-2">
-                                        <div
-                                            class="w-2 h-2 md:w-4 md:h-4 rounded-full bg-blue-500 shadow-lg shadow-blue-500/50 ring-2 ring-white/20">
-                                        </div>
-                                        <div>
-                                            <div class="text-[10px] md:text-[13px] font-bold text-white">Tinggi
-                                            </div>
-                                            <div class="text-[9px] md:text-[11px] text-red-200/70 mt-0.5">
-                                                {{ number_format($distribusi_counts['tinggi'] ?? 0) }} anak
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="text-[10px] md:text-base font-bold text-white">
-                                        {{ $distTinggi }}%</div>
-                                </div>
-                            </div>
+                            @endforeach
                         </div>
-
                     </div>
                 @else
-                    {{-- Tampilan Bar Chart (Jika TIDAK Ada Data) --}}
-                    <div class="relative mb-4">
-                        <div
-                            class="relative w-full bg-red-950/40 rounded-lg h-2.5 overflow-hidden border border-dashed border-red-700/50">
+                    <div class="py-12 flex flex-col items-center justify-center text-center">
+                        <div class="p-4 bg-gray-50 rounded-full mb-4">
+                            <svg class="w-8 h-8 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg>
                         </div>
+                        <p class="text-gray-400 font-bold uppercase text-xs tracking-widest">Tidak ada data untuk periode ini</p>
                     </div>
-
-                    {{-- Tampilan Legend (Jika TIDAK Ada Data) --}}
-                    <div class="relative grid grid-cols-2 lg:grid-cols-4 gap-2.5 opacity-50">
-                        <div class="bg-white/5 backdrop-blur-sm rounded-xl p-3 border border-white/10">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center gap-2">
-                                    <div class="w-2 h-2 md:w-4 md:h-4 rounded-full bg-red-300/30"></div>
-                                    <div>
-                                        <div class="text-[10px] md:text-[13px] font-bold text-red-200/50">Sangat
-                                            Pendek</div>
-                                        <div class="text-[9px] md:text-[11px] text-red-200/30 mt-0.5">— anak</div>
-                                    </div>
-                                </div>
-                                <div class="text-[10px] md:text-base font-bold text-red-200/50">—</div>
-                            </div>
-                        </div>
-
-                        <div class="bg-white/5 backdrop-blur-sm rounded-xl p-3 border border-white/10">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center gap-2">
-                                    <div class="w-2 h-2 md:w-4 md:h-4 rounded-full bg-red-300/30"></div>
-                                    <div>
-                                        <div class="text-[10px] md:text-[13px] font-bold text-red-200/50">Pendek
-                                        </div>
-                                        <div class="text-[9px] md:text-[11px] text-red-200/30 mt-0.5">— anak</div>
-                                    </div>
-                                </div>
-                                <div class="text-[10px] md:text-base font-bold text-red-200/50">—</div>
-                            </div>
-                        </div>
-
-                        <div class="bg-white/5 backdrop-blur-sm rounded-xl p-3 border border-white/10">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center gap-2">
-                                    <div class="w-2 h-2 md:w-4 md:h-4 rounded-full bg-red-300/30"></div>
-                                    <div>
-                                        <div class="text-[10px] md:text-[13px] font-bold text-red-200/50">Normal
-                                        </div>
-                                        <div class="text-[9px] md:text-[11px] text-red-200/30 mt-0.5">— anak</div>
-                                    </div>
-                                </div>
-                                <div class="text-[10px] md:text-base font-bold text-red-200/50">—</div>
-                            </div>
-                        </div>
-
-                        <div class="bg-white/5 backdrop-blur-sm rounded-xl p-3 border border-white/10">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center gap-2">
-                                    <div class="w-2 h-2 md:w-4 md:h-4 rounded-full bg-red-300/30"></div>
-                                    <div>
-                                        <div class="text-[10px] md:text-[13px] font-bold text-red-200/50">Tinggi
-                                        </div>
-                                        <div class="text-[9px] md:text-[11px] text-red-200/30 mt-0.5">— anak</div>
-                                    </div>
-                                </div>
-                                <div class="text-[10px] md:text-base font-bold text-red-200/50">—</div>
-                            </div>
-                        </div>
-                    </div>
-
                 @endif
-                {{-- ===== AKHIR LOGIKA IF/ELSE ===== --}}
             </div>
         </div>
-
     </div>
 
-    <style>
-        @keyframes spin-slow {
-            from {
-                transform: rotate(0deg);
-            }
+    <div 
+        x-data="{ visible: true }"
+        x-init="
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 0) visible = false
+            })
+        "
+        x-show="visible"
+        x-transition.opacity.duration.500ms
+        class="hidden md:flex absolute bottom-6 left-1/2 -translate-x-1/2 z-40 flex-col items-center gap-2 text-white/80"
+    >
+        <span class="text-[10px] font-bold uppercase tracking-[0.3em] animate-scroll-indicator">
+            Scroll ke bawah
+        </span>
+    </div>
 
-            to {
-                transform: rotate(360deg);
-            }
-        }
-
-        .animate-spin-slow {
-            animation: spin-slow 8s linear infinite;
-        }
-
-        @keyframes scan {
-            0% {
-                transform: translateX(-100%);
-            }
-
-            100% {
-                transform: translateX(1000%);
-            }
-        }
-
-        .animate-scan {
-            animation: scan 2s ease-in-out infinite;
-        }
-    </style>
 </header>

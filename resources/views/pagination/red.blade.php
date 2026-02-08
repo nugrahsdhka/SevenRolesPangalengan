@@ -5,7 +5,7 @@
     @endphp
 
     <nav role="navigation" aria-label="Pagination"
-         class="flex flex-col justify-center md:flex-row items-center md:justify-between gap-3 mt-4">
+         class="flex flex-col justify-center md:flex-row items-center md:justify-between gap-1">
 
         {{-- Info kiri --}}
         @if ($paginator->firstItem())

@@ -10,8 +10,8 @@
         if (!empty($periodYm)) {
             try {
                 $periodLabel = \Carbon\Carbon::createFromFormat('Y-m', $periodYm)->isoFormat('MMMM Y');
-            } catch (\Exception $e) {
-                $periodLabel = $periodYm;
+            } catch (\Exception $e) { 
+                $periodLabel = $periodYm; 
             }
         } else {
             $periodLabel = 'Semua Periode';
@@ -22,343 +22,199 @@
         $filterRw       = $filterRw ?? request('rw');
     @endphp
 
-    <div class="pb-2">
-        <section id="detail-wilayah">
-            <div class="px-2 space-y-3">
-
-                {{-- ========== HEADER + FILTER (FILTER DI KANAN) ========== --}}
-                <div class="pt-3">
-                    <div class="bg-white backdrop-blur-lg rounded-2xl shadow-xl border border-gray-200
-                                overflow-hidden max-h-[20vh]">
-
-                        {{-- Scroll internal jika konten melebihi 20vh --}}
-                        <div class="h-full overflow-y-auto">
-                            <div class="px-4 sm:px-6 py-3 sm:py-4">
-
-                                <div class="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-
-                                    {{-- ========== KIRI: TITLE + INFO DESA ========== --}}
-                                    <div class="space-y-1.5">
-                                        <h1 class="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 leading-tight">
-                                            Detail Data Anak per Desa
+    <div class="min-h-screen bg-gray-50/50 pb-12">
+        <section id="detail-wilayah" class="max-w-7xl mx-auto px-2">
+            
+            {{-- ========== HEADER INFO & FILTER ========== --}}
+            <div class="py-2">
+                <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="p-6 md:p-8">
+                        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-8">
+                            
+                            {{-- Identity Section --}}
+                            <div class="space-y-4">
+                                <div class="flex items-center gap-4">
+                                    <a href="{{ route('data-wilayah', ['period' => $periodYm]) }}" 
+                                       class="p-3 bg-gray-100 text-gray-500 rounded-2xl hover:bg-red-600 hover:text-white transition-all shadow-sm group">
+                                        <svg class="w-5 h-5 transition-transform group-hover:-translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7" />
+                                        </svg>
+                                    </a>
+                                    <div>
+                                        <h1 class="text-3xl font-black text-gray-900 tracking-tight uppercase leading-none">
+                                            Detail <span class="text-red-600">Wilayah</span>
                                         </h1>
+                                        <p class="mt-2 text-gray-500 font-bold uppercase text-[10px] tracking-[0.2em]">Data Agregat per Anak</p>
+                                    </div>
+                                </div>
+                                <div class="flex flex-wrap gap-3">
+                                    <div class="flex items-center gap-2 px-5 py-2.5 bg-red-50 rounded-2xl border border-red-100">
+                                        <span class="text-[10px] font-black text-red-400 uppercase tracking-widest leading-none">Wilayah</span>
+                                        <span class="text-sm font-black text-red-700 uppercase leading-none">{{ $desa ?? '-' }}</span>
+                                    </div>
+                                    <div class="flex items-center gap-2 px-5 py-2.5 bg-gray-900 rounded-2xl border border-gray-800">
+                                        <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none">Periode</span>
+                                        <span class="text-sm font-black text-white uppercase leading-none">{{ $periodLabel }}</span>
+                                    </div>
+                                </div>
+                            </div>
 
-                                        <div class="flex flex-wrap gap-x-4 gap-y-1 text-xs sm:text-sm text-gray-600">
-                                            <p class="flex items-center gap-1">
-                                                <span class="font-semibold text-gray-800">Desa/Kelurahan:</span>
-                                                <span class="truncate max-w-[180px] sm:max-w-[220px] lg:max-w-xs">
-                                                    {{ $desa ?? '-' }}
-                                                </span>
-                                            </p>
-                                            <p class="flex items-center gap-1">
-                                                <span class="font-semibold text-gray-800">Periode:</span>
-                                                <span>{{ $periodLabel }}</span>
-                                            </p>
-                                        </div>
+                            {{-- Filter Toolbar --}}
+                            <div class="w-full lg:w-auto">
+                                <form action="{{ route('data-wilayah-detail-gizi') }}" method="GET" 
+                                      class="grid grid-cols-2 md:flex md:items-end gap-3">
+                                    <input type="hidden" name="desa" value="{{ $desa }}">
+                                    <input type="hidden" name="period" value="{{ $periodYm }}">
+
+                                    <div class="col-span-2 md:w-44">
+                                        <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Posyandu</label>
+                                        <select name="posyandu" class="w-full px-4 py-3 bg-gray-50 border-none rounded-2xl text-sm font-bold text-gray-700 focus:ring-2 focus:ring-red-500 transition-all cursor-pointer">
+                                            <option value="">Semua Posyandu</option>
+                                            @foreach ($posyanduOptions ?? [] as $pos)
+                                                <option value="{{ $pos }}" @selected($filterPosyandu === $pos)>{{ $pos }}</option>
+                                            @endforeach
+                                        </select>
                                     </div>
 
-                                    {{-- ========== KANAN: BUTTON + FILTER TOOLBAR ========== --}}
-                                    <div class="w-full lg:w-auto space-y-2">
+                                    <div class="w-full md:w-20">
+                                        <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1 text-center">RT</label>
+                                        <select name="rt" class="w-full px-4 py-3 bg-gray-50 border-none rounded-2xl text-sm font-bold text-gray-700 focus:ring-2 focus:ring-red-500 transition-all">
+                                            <option value="">RT</option>
+                                            @foreach ($rtOptions ?? [] as $rt)
+                                                <option value="{{ $rt }}" @selected($filterRt === $rt)>{{ $rt }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
 
-                                        {{-- Tombol kembali --}}
-                                        <div class="flex justify-start lg:justify-end">
-                                            <a href="{{ route('data-wilayah', ['period' => $periodYm]) }}"
-                                            class="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2
-                                                    text-xs sm:text-sm font-semibold rounded-xl
-                                                    border border-gray-300 text-gray-700 bg-white
-                                                    hover:bg-gray-50 hover:border-gray-400
-                                                    shadow-sm hover:shadow-md
-                                                    transition-all duration-200">
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                        d="M15 19l-7-7 7-7" />
+                                    <div class="w-full md:w-20">
+                                        <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1 text-center">RW</label>
+                                        <select name="rw" class="w-full px-4 py-3 bg-gray-50 border-none rounded-2xl text-sm font-bold text-gray-700 focus:ring-2 focus:ring-red-500 transition-all">
+                                            <option value="">RW</option>
+                                            @foreach ($rwOptions ?? [] as $rw)
+                                                <option value="{{ $rw }}" @selected($filterRw === $rw)>{{ $rw }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+
+                                    <div class="col-span-2 md:w-auto">
+                                        <button type="submit" class="w-full px-8 py-3 bg-red-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-red-700 shadow-lg shadow-red-200 transition-all active:scale-95">
+                                            Filter
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {{-- ========== STICKY TABLE CONTAINER ========== --}}
+            <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden flex flex-col max-h-[85vh]">
+                
+                {{-- Area Scrollable --}}
+                <div class="overflow-auto scrollbar-hide">
+                    <table class="w-full min-w-[1200px] border-separate border-spacing-0">
+                        <thead class="sticky top-0 z-30">
+                            <tr class="bg-gray-50">
+                                {{-- Kolom No (Sticky) --}}
+                                <th class="sticky left-0 top-0 z-40 bg-gray-50 px-6 py-5 text-left text-[10px] font-black text-gray-400 tracking-[0.2em] border-b border-gray-200">
+                                    NO
+                                </th>
+                                <th class="px-4 py-5 text-left text-[10px] font-black text-gray-400 tracking-[0.2em] border-b border-gray-200 uppercase">Nama Anak</th>
+                                <th class="px-4 py-5 text-left text-[10px] font-black text-gray-400 tracking-[0.2em] border-b border-gray-200 uppercase">Posyandu</th>
+                                <th class="px-4 py-5 text-center text-[10px] font-black text-gray-400 tracking-[0.2em] border-b border-gray-200 uppercase">RT/RW</th>
+                                <th class="px-4 py-5 text-center text-[10px] font-black text-gray-400 tracking-[0.2em] border-b border-gray-200 uppercase">Tgl Lahir</th>
+                                <th class="px-4 py-5 text-center text-[10px] font-black text-gray-400 tracking-[0.2em] border-b border-gray-200 uppercase whitespace-nowrap">B (kg) / T (cm)</th>
+                                <th class="px-4 py-5 text-center text-[10px] font-black text-gray-400 tracking-[0.2em] border-b border-gray-200 uppercase">ZS BB/U</th>
+                                <th class="px-4 py-5 text-center text-[10px] font-black text-gray-400 tracking-[0.2em] border-b border-gray-200 uppercase">ZS TB/U</th>
+                                <th class="px-4 py-5 text-center text-[10px] font-black text-gray-400 tracking-[0.2em] border-b border-gray-200 uppercase whitespace-nowrap">ZS BB/TB</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100">
+                            @forelse ($dataAnak as $index => $row)
+                                <tr class="group hover:bg-red-50/30 transition-colors">
+                                    <td class="sticky left-0 z-10 bg-white group-hover:bg-red-50/30 px-6 py-5 text-xs font-black text-gray-400 border-r border-gray-50 transition-colors">
+                                        {{ ($dataAnak->firstItem() ?? 0) + $index }}
+                                    </td>
+                                    <td class="px-4 py-5">
+                                        <p class="text-sm font-black text-gray-900 group-hover:text-red-600 transition-colors uppercase leading-tight">
+                                            {{ $row->nama ?? '-' }}
+                                        </p>
+                                    </td>
+                                    <td class="px-4 py-5">
+                                        <span class="text-[10px] font-black text-gray-500 uppercase tracking-widest">{{ $row->posyandu ?? '-' }}</span>
+                                    </td>
+                                    <td class="px-4 py-5 text-center">
+                                        <span class="inline-flex px-2.5 py-1 bg-gray-100 text-gray-600 text-[10px] font-black rounded-lg">RT {{ $row->rt }} / RW {{ $row->rw }}</span>
+                                    </td>
+                                    <td class="px-4 py-5 text-center">
+                                        <span class="text-xs font-bold text-gray-500">
+                                            {{ $row->tgl_lahir ? \Carbon\Carbon::parse($row->tgl_lahir)->format('d-m-Y') : '-' }}
+                                        </span>
+                                    </td>
+                                    <td class="px-4 py-5 text-center">
+                                        <div class="flex items-center justify-center gap-1.5">
+                                            <span class="text-xs font-black text-gray-800">{{ $row->berat ?? '-' }}</span>
+                                            <span class="text-[10px] font-bold text-gray-300">/</span>
+                                            <span class="text-xs font-black text-gray-800">{{ $row->tinggi ?? '-' }}</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-4 py-5 text-center">
+                                        @include('components.zscore-badge', ['value' => $row->zs_bb_u])
+                                    </td>
+                                    <td class="px-4 py-5 text-center">
+                                        @include('components.zscore-badge', ['value' => $row->zs_tb_u])
+                                    </td>
+                                    <td class="px-4 py-5 text-center">
+                                        @include('components.zscore-badge', ['value' => $row->zs_bb_tb])
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="9" class="px-6 py-24 text-center">
+                                        <div class="flex flex-col items-center">
+                                            <div class="p-6 bg-gray-50 rounded-full mb-4 text-gray-300">
+                                                <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
                                                 </svg>
-                                                <span class="whitespace-nowrap">Kembali ke Data Wilayah</span>
-                                            </a>
+                                            </div>
+                                            <p class="text-gray-400 font-black uppercase text-xs tracking-widest">Tidak Ada Data Ditemukan</p>
                                         </div>
-
-                                        {{-- FILTER TOOLBAR --}}
-                                        <form action="{{ route('data-wilayah-detail-gizi') }}" method="GET"
-                                            class="flex flex-wrap items-end gap-2.5 sm:gap-3 lg:gap-3.5
-                                                    justify-start lg:justify-end">
-
-                                            {{-- Hidden --}}
-                                            <input type="hidden" name="desa" value="{{ $desa }}">
-                                            <input type="hidden" name="period" value="{{ $periodYm }}">
-
-                                            {{-- Posyandu --}}
-                                            <div class="flex flex-col">
-                                                <label class="text-[11px] sm:text-xs font-semibold text-gray-700 mb-1">
-                                                    Posyandu
-                                                </label>
-                                                <select name="posyandu"
-                                                        class="min-w-[130px] sm:min-w-[150px]
-                                                            px-3 py-1.5 border border-gray-300 rounded-xl
-                                                            text-xs sm:text-sm font-medium text-gray-700
-                                                            focus:ring-2 focus:ring-red-500 focus:border-red-500
-                                                            hover:border-gray-400 transition-colors">
-                                                    <option value="">Semua</option>
-                                                    @foreach ($posyanduOptions ?? [] as $pos)
-                                                        <option value="{{ $pos }}" @selected($filterPosyandu === $pos)>
-                                                            {{ $pos }}
-                                                        </option>
-                                                    @endforeach
-                                                </select>
-                                            </div>
-
-                                            {{-- RT --}}
-                                            <div class="flex flex-col">
-                                                <label class="text-[11px] sm:text-xs font-semibold text-gray-700 mb-1">
-                                                    RT
-                                                </label>
-                                                <select name="rt"
-                                                        class="w-20 sm:w-24 px-3 py-1.5 border border-gray-300 rounded-xl
-                                                            text-xs sm:text-sm font-medium text-gray-700
-                                                            focus:ring-2 focus:ring-red-500 focus:border-red-500
-                                                            hover:border-gray-400 transition-colors">
-                                                    <option value="">Semua</option>
-                                                    @foreach ($rtOptions ?? [] as $rt)
-                                                        <option value="{{ $rt }}" @selected($filterRt === $rt)>
-                                                            {{ $rt }}
-                                                        </option>
-                                                    @endforeach
-                                                </select>
-                                            </div>
-
-                                            {{-- RW --}}
-                                            <div class="flex flex-col">
-                                                <label class="text-[11px] sm:text-xs font-semibold text-gray-700 mb-1">
-                                                    RW
-                                                </label>
-                                                <select name="rw"
-                                                        class="w-20 sm:w-24 px-3 py-1.5 border border-gray-300 rounded-xl
-                                                            text-xs sm:text-sm font-medium text-gray-700
-                                                            focus:ring-2 focus:ring-red-500 focus:border-red-500
-                                                            hover:border-gray-400 transition-colors">
-                                                    <option value="">Semua</option>
-                                                    @foreach ($rwOptions ?? [] as $rw)
-                                                        <option value="{{ $rw }}" @selected($filterRw === $rw)>
-                                                            {{ $rw }}
-                                                        </option>
-                                                    @endforeach
-                                                </select>
-                                            </div>
-
-                                            {{-- Tombol --}}
-                                            <div class="flex gap-1.5 sm:gap-2">
-                                                <a href="{{ route('data-wilayah-detail-gizi', [
-                                                        'desa'   => $desa,
-                                                        'period' => $periodYm,
-                                                    ]) }}"
-                                                class="px-3 py-1.5 text-[11px] sm:text-xs font-semibold
-                                                        border border-gray-300 rounded-xl
-                                                        text-gray-600 bg-white hover:bg-gray-50 hover:border-gray-400
-                                                        transition-all">
-                                                    Reset
-                                                </a>
-
-                                                <button type="submit"
-                                                        class="px-3 sm:px-4 py-1.5 text-[11px] sm:text-xs font-semibold text-white
-                                                            rounded-xl bg-gradient-to-r from-red-600 to-pink-600
-                                                            shadow-md hover:shadow-lg hover:from-red-700 hover:to-pink-700
-                                                            transform hover:scale-[1.02] active:scale-95
-                                                            transition-all duration-200">
-                                                    Terapkan
-                                                </button>
-                                            </div>
-                                        </form>
-
-                                    </div>
-                                </div>
-
-                            </div>
-                        </div>
-
-                    </div>
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
                 </div>
 
-                {{-- ========== CARD TABEL DETAIL ANAK ========== --}}
-                <div class="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
-                    <div class="relative">
-                        <div class="max-h-[85vh] overflow-y-auto overflow-x-auto bg-white">
-                            <table class="w-full min-w-[1200px] divide-y divide-gray-200">
-
-                                {{-- THEAD (STICKY) --}}
-                                <thead class="sticky top-0 z-20 bg-gradient-to-r from-gray-50 to-gray-100 shadow-sm">
-                                    <tr class="uppercase border-b border-gray-200 text-[11px] sm:text-xs">
-                                        <th class="px-4 py-3 text-left font-bold text-gray-700 tracking-wider">
-                                            No
-                                        </th>
-                                        <th class="px-4 py-3 text-left font-bold text-gray-700 tracking-wider">
-                                            Nama
-                                        </th>
-                                        <th class="px-4 py-3 text-left font-bold text-gray-700 tracking-wider">
-                                            Posyandu
-                                        </th>
-                                        <th class="px-4 py-3 text-center font-bold text-gray-700 tracking-wider">
-                                            RT
-                                        </th>
-                                        <th class="px-4 py-3 text-center font-bold text-gray-700 tracking-wider">
-                                            RW
-                                        </th>
-                                        <th class="px-4 py-3 text-center font-bold text-gray-700 tracking-wider whitespace-nowrap">
-                                            Tanggal Lahir
-                                        </th>
-                                        <th class="px-4 py-3 text-center font-bold text-gray-700 tracking-wider whitespace-nowrap">
-                                            Berat (kg)
-                                        </th>
-                                        <th class="px-4 py-3 text-center font-bold text-gray-700 tracking-wider whitespace-nowrap">
-                                            Tinggi (cm)
-                                        </th>
-                                        <th class="px-4 py-3 text-center font-bold text-gray-700 tracking-wider whitespace-nowrap">
-                                            ZS BB/U
-                                        </th>
-                                        <th class="px-4 py-3 text-center font-bold text-gray-700 tracking-wider whitespace-nowrap">
-                                            Status BB/U
-                                        </th>
-                                        <th class="px-4 py-3 text-center font-bold text-gray-700 tracking-wider whitespace-nowrap">
-                                            ZS TB/U
-                                        </th>
-                                        <th class="px-4 py-3 text-center font-bold text-gray-700 tracking-wider whitespace-nowrap">
-                                            Status TB/U
-                                        </th>
-                                        <th class="px-4 py-3 text-center font-bold text-gray-700 tracking-wider whitespace-nowrap">
-                                            ZS BB/TB
-                                        </th>
-                                        <th class="px-4 py-3 text-center font-bold text-gray-700 tracking-wider whitespace-nowrap">
-                                            Status BB/TB
-                                        </th>
-                                    </tr>
-                                </thead>
-
-                                <tbody class="bg-white divide-y divide-gray-100 text-xs sm:text-sm">
-                                    @forelse ($dataAnak as $index => $row)
-                                        <tr class="hover:bg-gray-50 transition-colors duration-150">
-
-                                            {{-- No --}}
-                                            <td class="px-4 py-3 whitespace-nowrap text-gray-700">
-                                                {{ ($dataAnak->firstItem() ?? 0) + $index }}
-                                            </td>
-
-                                            {{-- Nama --}}
-                                            <td class="px-4 py-3 whitespace-nowrap text-gray-900 font-semibold">
-                                                {{ $row->nama ?? '-' }}
-                                            </td>
-
-                                            {{-- Posyandu --}}
-                                            <td class="px-4 py-3 whitespace-nowrap text-gray-700">
-                                                {{ $row->posyandu ?? '-' }}
-                                            </td>
-
-                                            {{-- RT --}}
-                                            <td class="px-4 py-3 whitespace-nowrap text-center text-gray-700">
-                                                {{ $row->rt ?? '-' }}
-                                            </td>
-
-                                            {{-- RW --}}
-                                            <td class="px-4 py-3 whitespace-nowrap text-center text-gray-700">
-                                                {{ $row->rw ?? '-' }}
-                                            </td>
-
-                                            {{-- Tanggal lahir --}}
-                                            <td class="px-4 py-3 whitespace-nowrap text-center text-gray-700">
-                                                @if ($row->tgl_lahir)
-                                                    {{ $row->tgl_lahir instanceof \Carbon\Carbon
-                                                        ? $row->tgl_lahir->format('d-m-Y')
-                                                        : \Carbon\Carbon::parse($row->tgl_lahir)->format('d-m-Y') }}
-                                                @else
-                                                    -
-                                                @endif
-                                            </td>
-
-                                            {{-- Berat --}}
-                                            <td class="px-4 py-3 whitespace-nowrap text-center text-gray-700">
-                                                {{ !is_null($row->berat) ? number_format($row->berat, 1) : '-' }}
-                                            </td>
-
-                                            {{-- Tinggi --}}
-                                            <td class="px-4 py-3 whitespace-nowrap text-center text-gray-700">
-                                                {{ !is_null($row->tinggi) ? number_format($row->tinggi, 1) : '-' }}
-                                            </td>
-
-                                            {{-- ZS BB/U --}}
-                                            <td class="px-4 py-3 whitespace-nowrap text-center">
-                                                @include('components.zscore-badge', ['value' => $row->zs_bb_u])
-                                            </td>
-
-                                            {{-- Status BB/U (PAKAI zscore-badge) --}}
-                                            <td class="px-4 py-3 whitespace-nowrap text-center">
-                                                @include('components.zscore-badge', ['value' => $row->status_bb_u])
-                                            </td>
-
-                                            {{-- ZS TB/U --}}
-                                            <td class="px-4 py-3 whitespace-nowrap text-center">
-                                                @include('components.zscore-badge', ['value' => $row->zs_tb_u])
-                                            </td>
-
-                                            {{-- Status TB/U (PAKAI zscore-badge) --}}
-                                            <td class="px-4 py-3 whitespace-nowrap text-center">
-                                                @include('components.zscore-badge', ['value' => $row->status_tb_u])
-                                            </td>
-
-                                            {{-- ZS BB/TB --}}
-                                            <td class="px-4 py-3 whitespace-nowrap text-center">
-                                                @include('components.zscore-badge', ['value' => $row->zs_bb_tb])
-                                            </td>
-
-                                            {{-- Status BB/TB (PAKAI zscore-badge) --}}
-                                            <td class="px-4 py-3 whitespace-nowrap text-center">
-                                                @include('components.zscore-badge', ['value' => $row->status_bb_tb])
-                                            </td>
-
-                                        </tr>
-                                    @empty
-                                        <tr>
-                                            <td colspan="14" class="px-6 py-12 text-center">
-                                                <div class="flex flex-col items-center justify-center">
-                                                    <svg class="w-16 h-16 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                            d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0 18 0z" />
-                                                    </svg>
-                                                    <p class="text-sm font-medium text-gray-500">
-                                                        Tidak ada data anak untuk desa ini pada periode yang dipilih.
-                                                    </p>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    @endforelse
-                                </tbody>
-
-
-                            </table>
-                        </div>
-                    </div>
-
-                    {{-- PAGINATION --}}
-                    @if (isset($dataAnak) && $dataAnak instanceof \Illuminate\Pagination\LengthAwarePaginator)
-                        <div class="px-4 py-3 bg-gray-50 border-t border-gray-200">
-                            <div class="flex items-center justify-between">
-                                <div class="text-xs text-gray-500">
-                                    Halaman
-                                    <span class="font-semibold text-gray-700">{{ $dataAnak->currentPage() }}</span>
-                                    dari
-                                    <span class="font-semibold text-gray-700">{{ $dataAnak->lastPage() }}</span>
-                                </div>
-                                <div>
-                                    {{ $dataAnak->appends([
-                                        'desa'     => $desa,
-                                        'period'   => $periodYm,
-                                        'posyandu' => $filterPosyandu,
-                                        'rt'       => $filterRt,
-                                        'rw'       => $filterRw,
-                                    ])->links() }}
-                                </div>
+                {{-- PAGINATION --}}
+                @if (isset($dataAnak) && $dataAnak instanceof \Illuminate\Pagination\LengthAwarePaginator)
+                    <div class="px-8 py-5 bg-gray-50/50 border-t border-gray-100 mt-auto">
+                        <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+                            <div class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">
+                                Menampilkan <span class="text-red-600">{{ $dataAnak->firstItem() }} - {{ $dataAnak->lastItem() }}</span> dari {{ $dataAnak->total() }} Anak
+                            </div>
+                            <div class="pagination-rsp">
+                                {{ $dataAnak->appends(request()->query())->links() }}
                             </div>
                         </div>
-                    @endif
-                </div>
-
+                    </div>
+                @endif
             </div>
         </section>
     </div>
+
+    <style>
+        /* Custom Pagination Red Theme */
+        .pagination-rsp nav span[aria-current="page"] span {
+            @apply bg-red-600 border-red-600 rounded-xl font-black text-xs text-white shadow-lg shadow-red-200 !important;
+        }
+        .pagination-rsp nav a, .pagination-rsp nav span {
+            @apply rounded-xl border-gray-200 text-xs font-black uppercase tracking-tighter hover:bg-red-50 hover:text-red-600 transition-all !important;
+        }
+
+        /* Hilangkan scrollbar tapi tetap bisa scroll */
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
 </x-guest-layout>

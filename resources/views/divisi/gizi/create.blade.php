@@ -328,7 +328,6 @@
                             class="relative border-2 border-dashed rounded-xl p-6 sm:p-8 text-center transition-all duration-200 cursor-pointer hover:border-red-400 hover:bg-red-50/50"
                             @click="$refs.fileInput.click()">
 
-                            {{-- Ikon + animasi drag --}}
                             <div class="flex justify-center mb-3">
                                 <div class="relative">
                                     <svg class="w-12 h-12 text-gray-300 transition-transform duration-200"
@@ -346,7 +345,6 @@
                                 </div>
                             </div>
 
-                            {{-- Teks default (belum ada file) --}}
                             <div x-show="!hasFiles">
                                 <p class="text-sm font-medium text-gray-700 mb-1">
                                     <span class="text-red-600">Klik untuk upload</span> atau drag & drop file
@@ -356,7 +354,6 @@
                                 </p>
                             </div>
 
-                            {{-- Daftar file (vertikal + scrollable) --}}
                             <div x-show="hasFiles" x-transition
                                 class="mt-2 p-3 bg-white rounded-lg border border-green-200 text-left w-full mx-auto max-w-md">
                                 <div class="flex items-center justify-between mb-2">
@@ -383,7 +380,6 @@
                                     </button>
                                 </div>
 
-                                {{-- LIST VERTIKAL + SCROLL --}}
                                 <ul class="text-xs text-gray-700 space-y-1 max-h-24 overflow-y-auto pr-1">
                                     <template x-for="(file, index) in files" :key="index">
                                         <li class="flex items-center gap-2">
@@ -394,7 +390,6 @@
                                 </ul>
                             </div>
 
-                            {{-- Input file tersembunyi --}}
                             <input
                                 type="file"
                                 name="files[]"
@@ -519,7 +514,7 @@
                                                     <li class="flex items-start gap-2">
                                                         <span
                                                             class="flex-shrink-0 w-1.5 h-1.5 bg-red-500 rounded-full mt-1.5"></span>
-                                                        <span>Maksimal ukuran file: 2MB</span>
+                                                        <span>Maksimal ukuran file: 10MB</span>
                                                     </li>
                                                 </ul>
                                             </div>
