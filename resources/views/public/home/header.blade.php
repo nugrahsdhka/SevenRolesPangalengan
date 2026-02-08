@@ -22,6 +22,9 @@
             <p class="text-[11px] md:text-xs font-bold uppercase tracking-[0.2em]">
                 Sistem Informasi Data Stunting <span class="hidden md:inline">• Kecamatan Pangalengan</span>
             </p>
+            <p class="hidden md:block text-[11px] md:text-xs font-bold uppercase tracking-[0.2em]">
+                {{ date('d-M-Y') }} 
+            </p>
         </div>
     </div>
 

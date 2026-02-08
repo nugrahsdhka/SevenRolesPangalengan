@@ -48,11 +48,11 @@
                                     </div>
                                 </div>
                                 <div class="flex flex-wrap gap-3">
-                                    <div class="flex items-center gap-2 px-5 py-2.5 bg-red-50 rounded-2xl border border-red-100">
+                                    <div class="flex w-full md:w-auto items-center gap-2 px-5 py-2.5 bg-red-50 rounded-2xl border border-red-100">
                                         <span class="text-[10px] font-black text-red-400 uppercase tracking-widest leading-none">Wilayah</span>
                                         <span class="text-sm font-black text-red-700 uppercase leading-none">{{ $desa ?? '-' }}</span>
                                     </div>
-                                    <div class="flex items-center gap-2 px-5 py-2.5 bg-gray-900 rounded-2xl border border-gray-800">
+                                    <div class="flex w-full md:w-auto items-center gap-2 px-5 py-2.5 bg-gray-900 rounded-2xl border border-gray-800">
                                         <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none">Periode</span>
                                         <span class="text-sm font-black text-white uppercase leading-none">{{ $periodLabel }}</span>
                                     </div>

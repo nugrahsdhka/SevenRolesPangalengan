@@ -5,154 +5,87 @@
 
     @include('layouts.nav_public')
 
-    {{-- Header --}}
-    <div class="mt-2 px-2">
-        <div class="bg-white backdrop-blur-lg rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
-            <div class="p-3 md:py-4">
-                {{-- FLEX: selalu justify-between untuk semua device --}}
-                <div class="flex items-center justify-between gap-4 md:py-2">
+    <div class="min-h-screen bg-gray-50/50 pb-12">
+        <section id="tab-map" class="max-w-7xl mx-auto px-2">
+            
+            {{-- ========== HEADER: TITLE + FILTER ========== --}}
+            <div class="py-2">
+                <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="p-6 md:p-8">
+                        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-8">
+                            
+                            {{-- Title Section --}}
+                            <div>
+                                <h1 class="text-2xl font-black text-gray-900 tracking-tight uppercase">
+                                    Peta <span class="text-red-600">Faskes</span>
+                                </h1>
+                                <p class="mt-1 text-gray-500 font-bold uppercase text-[10px] tracking-[0.2em]">
+                                    Sebaran Fasilitas Kesehatan Kecamatan Pangalengan
+                                </p>
+                            </div>
 
-                    {{-- Title Section --}}
-                    <div class="flex flex-col">
-                        <h1 class="block md:hidden text-xl font-bold text-gray-900">
-                            Peta Faskes
-                        </h1>
-                        <h1 class="hidden md:block text-xl font-bold text-gray-900">
-                            Peta Fasilitas Kesehatan
-                        </h1>
-                        <p class="mt-1 text-sm text-gray-500">
-                            Stunting Kecamatan Pangalengan
-                        </p>
-                    </div>
+                            {{-- Filter Section --}}
+                            <div class="w-full lg:w-auto">
+                                <div class="flex flex-col sm:flex-row items-center gap-4 bg-gray-50 p-2 rounded-[2rem] border border-gray-100">
+                                    
+                                    {{-- Filter Checkboxes --}}
+                                    <div class="flex items-center gap-4 px-4 py-2">
+                                        <label class="flex items-center gap-2 cursor-pointer group">
+                                            <div class="relative flex items-center">
+                                                <input id="filterPuskesmas" type="checkbox" checked
+                                                       class="w-5 h-5 text-red-600 border-gray-300 rounded-lg focus:ring-red-500 focus:ring-offset-0 transition-all cursor-pointer">
+                                            </div>
+                                            <span class="text-xs font-black text-gray-600 uppercase tracking-widest group-hover:text-red-600 transition-colors">Puskesmas</span>
+                                        </label>
+                                        
+                                        <div class="w-px h-4 bg-gray-300"></div>
 
-                    {{-- Kanan: Filter + Tombol Modal --}}
-                    <div class="flex items-center gap-3">
-                        {{-- Filter Jenis Faskes --}}
-                        <div class="hidden md:flex flex-col items-end gap-1 sm:gap-2 text-xs md:text-sm">
-                            <label class="inline-flex items-center gap-1 cursor-pointer">
-                                <span class="text-gray-700">Puskesmas</span>
-                                <input id="filterPuskesmas" type="checkbox"
-                                    class="h-4 w-4 text-red-600 border-gray-300 rounded focus:ring-red-500">
-                            </label>
-                            <label class="inline-flex items-center gap-1 cursor-pointer">
-                                <span class="text-gray-700">Posyandu</span>
-                                <input id="filterPosyandu" type="checkbox"
-                                    class="h-4 w-4 text-red-600 border-gray-300 rounded focus:ring-red-500">
-                            </label>
+                                        <label class="flex items-center gap-2 cursor-pointer group">
+                                            <div class="relative flex items-center">
+                                                <input id="filterPosyandu" type="checkbox" checked
+                                                       class="w-5 h-5 text-red-600 border-gray-300 rounded-lg focus:ring-red-500 focus:ring-offset-0 transition-all cursor-pointer">
+                                            </div>
+                                            <span class="text-xs font-black text-gray-600 uppercase tracking-widest group-hover:text-red-600 transition-colors">Posyandu</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-
-                        {{-- Tombol Modal --}}
-                        <button id="openInfoModalBtn"
-                            class="p-3 text-white bg-gradient-to-r from-red-600 to-pink-600 rounded-xl
-                                shadow-lg hover:shadow-xl hover:from-red-700 hover:to-pink-700
-                                transform hover:scale-110 active:scale-95 transition-all duration-200
-                                group">
-                            <svg class="w-6 h-6 transition-transform group-hover:rotate-12 duration-200"
-                                fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" clip-rule="evenodd"
-                                    d="M18 10a8 8 0 11-16 0 8 8 0 
-                                    0116 0zm-7-4a1 1 0 11-2 0 1 1 
-                                    0 012 0zM9 9a1 1 0 000 2v3a1 1 
-                                    0 001 1h1a1 1 0 100-2v-3a1 1 
-                                    0 00-1-1H9z" />
-                            </svg>
-                        </button>
                     </div>
-
                 </div>
             </div>
-        </div>
+
+            {{-- ========== MAP CONTAINER ========== --}}
+            <div class="bg-white rounded-[2.5rem] shadow-xl border border-gray-100 overflow-hidden relative">
+                <div class="p-2">
+                    <div id="map" class="rounded-[2rem] w-full h-[65vh] md:h-[80vh] z-10"></div>
+                </div>
+            </div>
+        </section>
     </div>
 
-    {{-- Konten Peta --}}
-    <section id="tab-map">
-        <div class="bg-white rounded-lg overflow-hidden flex items-center justify-center">
-            <div class="p-2 w-full">
-                {{-- Map Container --}}
-                <div id="map" class="rounded-lg w-full h-[73vh] md:h-[70vh]"></div>
-            </div>
-        </div>
-
-        {{-- Modal Keterangan Peta --}}
-        <div id="infoModalOverlay"
-            class="fixed inset-0 bg-gray-600 bg-opacity-75 overflow-y-auto h-full w-full z-50 flex items-center justify-center p-4 hidden">
-            <div class="relative mx-auto border w-full max-w-md sm:max-w-lg md:max-w-xl shadow-lg rounded-xl bg-white transform transition-all duration-300 scale-95 opacity-0"
-                id="infoModalContent">
-                {{-- Modal Header --}}
-                <div class="flex justify-between items-center px-6 py-4 border-b border-gray-200">
-                    <p class="text-lg font-bold text-gray-800">Keterangan Peta Fasilitas Kesehatan</p>
-                    <button id="closeInfoModalBtnHeader"
-                        class="text-gray-400 hover:text-gray-600 transition-colors duration-200">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M6 18L18 6M6 6l12 12"></path>
-                        </svg>
-                    </button>
-                </div>
-
-                {{-- Modal Body --}}
-                <div class="px-6 py-5 space-y-4 text-sm text-gray-700 max-h-[70vh] overflow-y-auto">
-                    <ul class="list-disc list-inside space-y-3 pl-4">
-                        <li>
-                            <strong>Batas Wilayah:</strong> Area hijau semi-transparan pada peta
-                            merepresentasikan batas desa di Kecamatan Pangalengan.
-                        </li>
-                        <li>
-                            <strong>Marker Fasilitas Kesehatan:</strong> Setiap ikon pin merah pada peta menunjukkan
-                            lokasi suatu fasilitas kesehatan (faskes), seperti puskesmas, klinik, atau rumah sakit.
-                        </li>
-                        <li>
-                            <strong>Interaksi:</strong>
-                            <ul class="ml-6 mt-1 space-y-1 text-xs list-none">
-                                <li>• Klik marker untuk melihat nama faskes, jenis, alamat, dan koordinat.</li>
-                                <li>• Anda dapat melakukan zoom in/out dan drag untuk menjelajahi wilayah.</li>
-                            </ul>
-                        </li>
-                        <li>
-                            <strong>Akurasi Lokasi:</strong> Titik koordinat berasal dari data yang diinput pada sistem.
-                            Jika terdapat perbedaan dengan lokasi sebenarnya di lapangan, silakan lakukan pembaruan
-                            data.
-                        </li>
-                    </ul>
-
-                    <p class="mt-3 text-xs text-gray-500">
-                        <em>*Peta menggunakan basemap OpenStreetMap dan batas administrasi desa Kecamatan
-                            Pangalengan.</em>
-                    </p>
-                </div>
-
-                {{-- Modal Footer --}}
-                <div class="px-6 py-4 bg-gray-50 border-t border-gray-200 text-right rounded-b-xl">
-                    <button id="closeInfoModalBtnFooter"
-                        class="px-5 py-2 bg-gray-600 text-white text-sm font-semibold rounded-lg shadow hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors duration-200">
-                        Tutup
-                    </button>
-                </div>
-            </div>
-        </div>
-    </section>
 
     @push('styles')
         {{-- Leaflet CSS --}}
         <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
             integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
-
+    
         <style>
             /* Fix supaya map tidak menutupi navbar & modal */
             .leaflet-container {
                 z-index: 0 !important;
             }
-
+    
             /* Hindari Tailwind ngerusak style image Leaflet */
             .leaflet-container img {
                 max-width: none !important;
             }
-
+    
             #map {
                 width: 100%;
                 /* Tinggi diatur via Tailwind: h-[60vh] md:h-[600px] */
             }
-
+    
             /* Hilangin outline kotak saat klik layer/marker */
             .leaflet-container .leaflet-interactive:focus,
             .leaflet-container .leaflet-interactive:focus-visible,
@@ -160,28 +93,28 @@
             .leaflet-container:focus-visible {
                 outline: none;
             }
-
+    
             /* Icon marker faskes (divIcon) */
             .faskes-marker-icon {
                 background: transparent;
                 border: none;
             }
-
+    
             .faskes-marker-icon svg {
                 display: block;
             }
         </style>
     @endpush
-
+    
     @push('scripts')
         <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
             integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-
+    
         {{-- Leaflet --}}
         <script>
             document.addEventListener('DOMContentLoaded', () => {
                 const map = L.map('map');
-
+    
                 // Basemap: Esri World Imagery
                 L.tileLayer(
                     'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
@@ -189,17 +122,17 @@
                         attribution: '&copy; <a href="https://www.esri.com/en-us/home" target="_blank" rel="noopener noreferrer">Esri</a>'
                     }
                 ).addTo(map);
-
+    
                 // Data faskes dari controller (Laravel → JS)
                 const faskes = @json($faskes);
-
+    
                 // Simpan semua marker untuk kebutuhan filter
                 const markers = [];
-
+    
                 // Ambil elemen checkbox filter
                 const filterPuskesmas = document.getElementById('filterPuskesmas');
                 const filterPosyandu = document.getElementById('filterPosyandu');
-
+    
                 // 1) Tambahkan batas wilayah Kecamatan Pangalengan
                 fetch('{{ asset('maps/PetaDesaKecPangalengan.geojson') }}')
                     .then(r => r.json())
@@ -212,12 +145,12 @@
                                 fillOpacity: 0.15
                             }
                         }).addTo(map);
-
+    
                         const bounds = batasLayer.getBounds();
                         map.fitBounds(bounds, {
                             padding: [20, 20]
                         });
-
+    
                         const minZoom = 12;
                         if (map.getZoom() < minZoom) {
                             map.setZoom(minZoom);
@@ -227,7 +160,7 @@
                         console.error('Gagal memuat batas wilayah:', err);
                         map.setView([-7.16, 107.57], 11);
                     });
-
+    
                 // 2) Peta jenis faskes → icon SVG
                 const iconMap = {
                     Posyandu: "{{ asset('img/icons/posyandu-pin.svg') }}",
@@ -237,16 +170,16 @@
                     'Praktik Dokter': "{{ asset('img/icons/praktik-dokter-pin.svg') }}",
                     Lainnya: "{{ asset('img/icons/lainnya.svg') }}",
                 };
-
+    
                 // 3) Generator icon berdasarkan jenis
                 function getFaskesIcon(jenis) {
                     const url = iconMap[jenis] ?? "{{ asset('img/icons/default-pin.svg') }}";
-
+    
                     // Jika Puskesmas → icon lebih besar
                     const size = (jenis === 'Puskesmas') ? [18, 28] : [14, 24];
                     const anchor = (jenis === 'Puskesmas') ? [11, 36] : [7, 24];
                     const popupYOffset = (jenis === 'Puskesmas') ? -28 : -20;
-
+    
                     return L.icon({
                         iconUrl: url, // path icon SVG
                         iconSize: size, // [width, height] dalam px
@@ -254,7 +187,7 @@
                         popupAnchor: [0, popupYOffset] // popup muncul sedikit di atas icon
                     });
                 }
-
+    
                 // 4) Tambahkan marker faskes dengan icon sesuai jenis
                 faskes.forEach(item => {
                     const {
@@ -264,18 +197,18 @@
                         jenis,
                         alamat
                     } = item;
-
+    
                     // Skip jika koordinat tidak valid
                     if (!lat || !lng) return;
-
+    
                     const j = jenis || 'Lainnya';
-
+    
                     const marker = L.marker([lat, lng], {
                         icon: getFaskesIcon(j),
                         // Puskesmas selalu di atas marker lain
                         zIndexOffset: (j === 'Puskesmas') ? 1000 : 0
                     }).addTo(map);
-
+    
                     marker.bindPopup(`
                         <div style="min-width: 220px">
                             <strong>${nama_faskes || 'Fasilitas Kesehatan'}</strong><br>
@@ -284,28 +217,28 @@
                             Koordinat: ${lat}, ${lng}
                         </div>
                     `);
-
+    
                     // Simpan ke array markers
                     markers.push({
                         marker,
                         jenis: j
                     });
                 });
-
+    
                 // 5) Fungsi apply filter berdasarkan checkbox
                 function applyFaskesFilter() {
                     if (!filterPuskesmas || !filterPosyandu) return;
-
+    
                     const showPuskesmas = filterPuskesmas.checked;
                     const showPosyandu = filterPosyandu.checked;
-
+    
                     // Jika tidak ada checkbox yang dicentang → tampilkan semua
                     const anyChecked = showPuskesmas || showPosyandu;
-
+    
                     markers.forEach(item => {
                         const jenisLower = (item.jenis || '').toLowerCase();
                         let shouldShow = true;
-
+    
                         if (anyChecked) {
                             if (jenisLower === 'puskesmas'.toLowerCase()) {
                                 shouldShow = showPuskesmas;
@@ -319,7 +252,7 @@
                             // Tidak ada filter aktif → tampilkan semua
                             shouldShow = true;
                         }
-
+    
                         if (shouldShow) {
                             if (!map.hasLayer(item.marker)) {
                                 item.marker.addTo(map);
@@ -331,7 +264,7 @@
                         }
                     });
                 }
-
+    
                 // 6) Event listener untuk checkbox
                 if (filterPuskesmas && filterPosyandu) {
                     filterPuskesmas.addEventListener('change', applyFaskesFilter);
@@ -339,54 +272,5 @@
                 }
             });
         </script>
-
-        {{-- Modal --}}
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                const modalOverlay = document.getElementById('infoModalOverlay');
-                const modalContent = document.getElementById('infoModalContent');
-                const openBtn = document.getElementById('openInfoModalBtn');
-                const closeBtnHeader = document.getElementById('closeInfoModalBtnHeader');
-                const closeBtnFooter = document.getElementById('closeInfoModalBtnFooter');
-
-                function openModal() {
-                    if (modalOverlay) {
-                        modalOverlay.classList.remove('hidden');
-                        void modalContent.offsetWidth; // trigger reflow
-                        modalContent.classList.remove('scale-95', 'opacity-0');
-                        modalContent.classList.add('scale-100', 'opacity-100');
-                    }
-                }
-
-                function closeModal() {
-                    if (modalOverlay) {
-                        modalContent.classList.add('scale-95', 'opacity-0');
-                        modalContent.classList.remove('scale-100', 'opacity-100');
-                        setTimeout(() => {
-                            modalOverlay.classList.add('hidden');
-                        }, 300);
-                    }
-                }
-
-                if (openBtn) openBtn.addEventListener('click', openModal);
-                if (closeBtnHeader) closeBtnHeader.addEventListener('click', closeModal);
-                if (closeBtnFooter) closeBtnFooter.addEventListener('click', closeModal);
-
-                if (modalOverlay) {
-                    modalOverlay.addEventListener('click', function(event) {
-                        if (event.target === modalOverlay) {
-                            closeModal();
-                        }
-                    });
-                }
-
-                document.addEventListener('keydown', function(event) {
-                    if (event.key === 'Escape' && !modalOverlay.classList.contains('hidden')) {
-                        closeModal();
-                    }
-                });
-            });
-        </script>
     @endpush
-
 </x-guest-layout>
