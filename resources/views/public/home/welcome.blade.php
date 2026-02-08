@@ -220,7 +220,7 @@
 
                     <div class="mt-6">
                         <h3 class="text-2xl font-bold text-gray-900 group-hover:text-red-600 transition-colors">Peta Faskes</h3>
-                        <p class="text-gray-500 mt-2 leading-relaxed">Lokasi jaringan Puskesmas, Klinik, dan Posyandu di wilayah operasional.</p>
+                        <p class="text-gray-500 mt-2 leading-relaxed">Lokasi jaringan Puskesmas, dan Posyandu di wilayah Kecamatan Pangalengan.</p>
                     </div>
 
                     <div class="mt-8 flex items-center bg-gray-50 rounded-2xl p-5 border border-gray-100 group-hover:bg-red-50/30 transition-colors">

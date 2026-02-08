@@ -15,11 +15,11 @@
                         <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-8">
                             
                             {{-- Title Section --}}
-                            <div>
+                            <div class="flex flex-col justify-center items-center md:items-start md:justify-start">
                                 <h1 class="text-2xl font-black text-gray-900 tracking-tight uppercase">
                                     Peta <span class="text-red-600">Faskes</span>
                                 </h1>
-                                <p class="mt-1 text-gray-500 font-bold uppercase text-[10px] tracking-[0.2em]">
+                                <p class="hidden md:block mt-1 text-gray-500 font-bold uppercase text-[10px] tracking-[0.2em]">
                                     Sebaran Fasilitas Kesehatan Kecamatan Pangalengan
                                 </p>
                             </div>

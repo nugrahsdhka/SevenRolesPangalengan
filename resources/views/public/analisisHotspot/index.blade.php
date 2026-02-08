@@ -20,7 +20,7 @@
                                     <h1 class="text-2xl font-black text-gray-900 tracking-tight uppercase">
                                         Analisis <span class="text-red-600">Hotspot</span>
                                     </h1>
-                                    <p class="mt-1 text-gray-500 font-bold uppercase text-[10px] tracking-[0.2em]">
+                                    <p class="hidden md:block mt-1 text-gray-500 font-bold uppercase text-[10px] tracking-[0.2em]">
                                         Peta Sebaran Stunting Kecamatan Pangalengan
                                     </p>
                                 </div>

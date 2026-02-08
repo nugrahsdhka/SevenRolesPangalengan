@@ -1,405 +1,204 @@
-<div class="px-2 py-2 flex flex-col gap-4">
-    {{-- HEADER CARD: Judul + Tombol + Tabs + Periode --}}
-    <div class="rounded-xl shadow-sm border border-gray-200 bg-white px-4 py-3">
-        <div class="space-y-0">
-            {{-- Baris 1: Judul + Periode Aktif + Tombol Tambah --}}
-            <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between text-center lg:text-left">
-                {{-- Kiri: Judul + Periode Aktif --}}
-                <div
-                    class="flex flex-col sm:flex-row sm:items-center sm:justify-center lg:justify-start gap-4 w-full lg:w-auto">
-                    <div class="w-full">
-                        <h3 class="text-sm md:text-lg font-extrabold text-gray-800">
-                            Data Gizi per Desa/Kelurahan
-                        </h3>
-                        @php
-                            // Tentukan periode aktif untuk ditampilkan (label seperti "November 2025")
-                            $activePeriodYm = $periodYm ?? now()->format('Y-m');
-                            $activePeriodLabel = null;
-                            if (!empty($availablePeriods)) {
-                                foreach ($availablePeriods as $p) {
-                                    $ym = \Carbon\Carbon::parse($p)->format('Y-m');
-                                    if ($ym === $activePeriodYm) {
-                                        $activePeriodLabel = \Carbon\Carbon::parse($p)->isoFormat('MMMM Y');
-                                        break;
+<div class="space-y-2">
+    {{-- ========== HEADER CARD: JUDUL & AKSI UTAMA ========== --}}
+    <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+        <div class="p-6 md:p-8">
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+                {{-- Kiri: Judul & Info Periode --}}
+                <div class="space-y-4">
+                    <div class="flex items-center gap-3">
+                        <div class="p-3 bg-red-100 text-red-600 rounded-2xl">
+                            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                            </svg>
+                        </div>
+                        <div>
+                            <h1 class="text-2xl font-black text-gray-900 tracking-tight uppercase leading-none">
+                                Data <span class="text-red-600">Diinput</span>
+                            </h1>
+                            @php
+                                $activePeriodYm = $periodYm ?? now()->format('Y-m');
+                                $activePeriodLabel = 'Semua Periode';
+                                if (!empty($availablePeriods)) {
+                                    foreach ($availablePeriods as $p) {
+                                        if (\Carbon\Carbon::parse($p)->format('Y-m') === $activePeriodYm) {
+                                            $activePeriodLabel = \Carbon\Carbon::parse($p)->isoFormat('MMMM Y');
+                                            break;
+                                        }
                                     }
                                 }
-                            }
-                            if (!$activePeriodLabel) {
-                                $activePeriodLabel = \Carbon\Carbon::createFromFormat(
-                                    'Y-m',
-                                    $activePeriodYm,
-                                )->isoFormat('MMMM Y');
-                            }
-                        @endphp
-                        <p class="text-xs text-gray-500 mt-1">
-                            Periode aktif:
-                            <span class="font-semibold text-gray-800">
-                                {{ $activePeriodLabel }}
-                            </span>
-                        </p>
+                            @endphp
+                            <p class="mt-1.5 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">
+                                Periode Aktif: <span class="text-gray-700">{{ $activePeriodLabel }}</span>
+                            </p>
+                        </div>
                     </div>
                 </div>
-                {{-- Kanan: Tombol Tambah / Import Data --}}
-                <div class="w-full lg:w-auto flex flex-col sm:flex-row items-center justify-center lg:justify-end gap-3">
-                    <a href="{{ route('gizi.index', [
-                        'view' => 'tambah',
-                        'period' => $periodYm ?? now()->format('Y-m'),
-                        'status' => 'pending',
-                    ]) }}"
-                        class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5
-                            text-sm font-medium text-white
-                            bg-gradient-to-r from-red-600 to-red-700
-                            rounded-lg hover:from-red-700 hover:to-red-800
-                            active:from-red-800 active:to-red-900
-                            transition-all duration-200 shadow-md hover:shadow-lg">
-                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+
+                {{-- Kanan: Tombol Aksi --}}
+                <div class="w-full lg:w-auto">
+                    <a href="{{ route('gizi.index', ['view' => 'tambah', 'period' => $activePeriodYm, 'status' => 'pending']) }}"
+                       class="w-full inline-flex items-center justify-center gap-3 px-8 py-3.5 bg-red-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-red-700 shadow-lg shadow-red-200 transition-all active:scale-95 group">
+                        <svg class="w-5 h-5 transition-transform group-hover:rotate-90" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4" />
                         </svg>
-                        <span class="whitespace-nowrap">Tambah / Import Data</span>
+                        Tambah / Import Data
                     </a>
                 </div>
             </div>
-            {{-- Baris 2: Status Tabs + Periode Selector --}}
-            <div
-                class="flex flex-col lg:flex-row lg:justify-between items-center gap-3 text-center lg:text-left w-full">
-                {{-- Status Tabs --}}
-                <div class="border-t border-gray-100 pt-3 w-full lg:w-auto lg:flex lg:items-center">
-                    <nav class="flex flex-row flex-wrap gap-2 justify-center lg:justify-start" role="tablist"
-                        aria-label="Status data">
-                        @foreach ($tabItems as $key => $meta)
-                            @php $active = ($status === $key); @endphp
-                            <a href="{{ route('gizi.index', [
-                                'view' => 'data',
-                                'period' => $periodYm ?? now()->format('Y-m'),
-                                'status' => $key,
-                            ]) }}"
-                                role="tab" aria-selected="{{ $active ? 'true' : 'false' }}"
-                                class="
-                                    group relative
-                                    flex items-center justify-between sm:justify-center
-                                    gap-3
-                                    px-4 py-3 sm:py-4
-                                    text-xs sm:text-sm font-medium border-b-2 transition-all duration-200
-                                    {{ $active
-                                        ? $meta['text'] . ' ' . $meta['border'] . ' ' . $meta['bg']
-                                        : 'text-gray-500 border-transparent hover:text-gray-700 hover:border-gray-300 hover:bg-gray-50' }}
-                            ">
-                                {{-- Label + Dot + Badge (mobile = flex-col, desktop = flex-row) --}}
-                                <span class="flex flex-col sm:flex-row items-center sm:items-center gap-1 sm:gap-3">
-                                    {{-- Label + Dot --}}
-                                    <span class="flex items-center gap-2">
-                                        {{-- Animated Dot Indicator --}}
-                                        <span
-                                            class="relative flex h-2 w-2 {{ $active ? '' : 'opacity-0 group-hover:opacity-50' }}">
-                                            @if ($active && ($counts[$key] ?? 0) > 0)
-                                                <span
-                                                    class="animate-ping absolute inline-flex h-full w-full rounded-full {{ $meta['dot'] }} opacity-75"></span>
-                                            @endif
-                                            <span
-                                                class="relative inline-flex rounded-full h-2 w-2 {{ $meta['dot'] }}"></span>
-                                        </span>
-                                        <span>{{ $meta['label'] }}</span>
-                                    </span>
-                                    {{-- Badge jumlah data --}}
-                                    <span
-                                        class="inline-flex items-center justify-center min-w-[2rem] px-2.5 py-1
-                                            rounded-full text-[11px] sm:text-xs font-semibold transition-all duration-200
-                                            {{ $active
-                                                ? $meta['badge_bg'] . ' ' . $meta['badge_text'] . ' shadow-sm'
-                                                : 'bg-gray-100 text-gray-600 group-hover:bg-gray-200' }}">
-                                        {{ $counts[$key] ?? 0 }}
-                                    </span>
-                                </span>
-                                {{-- Active Indicator Line (desktop) --}}
-                                @if ($active)
-                                    <span
-                                        class="absolute bottom-0 left-0 right-0 h-0.5 {{ $meta['bg'] }} hidden sm:block"></span>
-                                @endif
-                            </a>
-                        @endforeach
-                    </nav>
+        </div>
+    </div>
+
+    {{-- ========== TAB NAVIGATION & PERIODE FILTER ========== --}}
+    <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-4">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+            {{-- Modern Segmented Control for Status --}}
+            <nav class="flex p-1.5 bg-gray-100 rounded-[2rem] shadow-inner w-full lg:w-auto overflow-x-auto no-scrollbar">
+                @foreach ($tabItems as $key => $meta)
+                    @php $active = ($status === $key); @endphp
+                    <a href="{{ route('gizi.index', ['view' => 'data', 'period' => $activePeriodYm, 'status' => $key]) }}"
+                       class="flex items-center gap-3 px-6 py-2.5 rounded-[1.8rem] text-[10px] font-black uppercase tracking-widest transition-all duration-300 whitespace-nowrap
+                       {{ $active ? 'bg-white ' . $meta['text'] . ' shadow-sm' : 'text-gray-400 hover:text-gray-600' }}">
+                        
+                        <span class="relative flex h-2 w-2">
+                            @if ($active && ($counts[$key] ?? 0) > 0)
+                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full {{ $meta['dot'] }} opacity-75"></span>
+                            @endif
+                            <span class="relative inline-flex rounded-full h-2 w-2 {{ $meta['dot'] }}"></span>
+                        </span>
+                        {{ $meta['label'] }}
+                        <span class="ml-1 px-2 py-0.5 rounded-lg {{ $active ? $meta['badge_bg'] : 'bg-gray-200 text-gray-500' }}">
+                            {{ $counts[$key] ?? 0 }}
+                        </span>
+                    </a>
+                @endforeach
+            </nav>
+
+            {{-- Period Filter --}}
+            <form method="GET" action="{{ route('gizi.index') }}" class="flex items-center gap-3 w-full lg:w-auto">
+                <input type="hidden" name="view" value="data" />
+                <input type="hidden" name="status" value="{{ $status ?? 'pending' }}" />
+                <div class="relative flex-1 lg:flex-none">
+                    <select name="period" required
+                            class="w-full lg:w-56 pl-4 pr-10 py-3 bg-gray-50 border-none rounded-2xl text-xs font-black text-gray-700 uppercase tracking-widest focus:ring-2 focus:ring-red-500 transition-all appearance-none cursor-pointer">
+                        @forelse($availablePeriods ?? [] as $p)
+                            @php $ym = \Carbon\Carbon::parse($p)->format('Y-m'); @endphp
+                            <option value="{{ $ym }}" {{ ($periodYm ?? $activePeriodYm) === $ym ? 'selected' : '' }}>
+                                {{ \Carbon\Carbon::parse($p)->isoFormat('MMMM Y') }}
+                            </option>
+                        @empty
+                            <option value="{{ now()->format('Y-m') }}">{{ now()->isoFormat('MMMM Y') }}</option>
+                        @endforelse
+                    </select>
+                    <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none text-gray-400">
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7" /></svg>
+                    </div>
                 </div>
-                {{-- Periode Selector --}}
-                <div class="w-full lg:w-auto">
-                    <form method="GET" action="{{ route('gizi.index') }}"
-                        class="w-full lg:w-auto flex flex-col sm:flex-row items-center justify-center lg:justify-end gap-2 sm:gap-3">
-                        <input type="hidden" name="view" value="data" />
-                        <input type="hidden" name="status" value="{{ $status ?? 'pending' }}" />
-                        <div class="w-full sm:w-auto flex flex-col sm:flex-row sm:items-center gap-2">
-                            <label class="text-xs sm:text-sm text-gray-600 sm:whitespace-nowrap">
-                                Periode:
-                            </label>
-                            <select name="period" required
-                                class="text-xs sm:text-sm rounded-lg border-gray-300 focus:ring-red-500 focus:border-red-500 w-full sm:w-52">
-                                @forelse($availablePeriods ?? [] as $p)
-                                    @php
-                                        $ym = \Carbon\Carbon::parse($p)->format('Y-m');
-                                    @endphp
-                                    <option value="{{ $ym }}"
-                                        {{ ($periodYm ?? $activePeriodYm) === $ym ? 'selected' : '' }}>
-                                        {{ \Carbon\Carbon::parse($p)->isoFormat('MMMM Y') }}
-                                    </option>
-                                @empty
-                                    @php $ymNow = now()->format('Y-m'); @endphp
-                                    <option value="{{ $ymNow }}" selected>
-                                        {{ now()->isoFormat('MMMM Y') }}
-                                    </option>
-                                @endforelse
-                            </select>
-                        </div>
-                        <button type="submit"
-                            class="w-full sm:w-auto px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 active:bg-red-800 transition-all duration-200 shadow-sm hover:shadow-md">
-                            Tampilkan
-                        </button>
-                    </form>
-                </div>
-            </div>
+                <button type="submit" class="px-6 py-3 bg-gray-900 text-white rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] hover:bg-red-600 transition-all shadow-lg active:scale-95">
+                    Ganti
+                </button>
+            </form>
         </div>
     </div>
     
-    {{-- TABLE CARD --}}
-    <div class="bg-white/30 backdrop-blur-md border border-gray-200/30 rounded-xl px-2 py-3">
-        <div class="relative">
-            <div class="max-h-[64vh] md:max-h-[53vh] overflow-y-auto overflow-x-auto bg-white">
-                <table class="w-full min-w-[1200px]">
-                    <thead class="sticky top-0 z-20 bg-gray-50 shadow-sm uppercase">
-                        <tr class="border-b border-gray-200">
-                            <th
-                                class="px-4 py-3 text-left text-xs font-semibold tracking-wider text-gray-700">
-                                Periode
-                            </th>
-                            <th
-                                class="px-4 py-3 text-left text-xs font-semibold tracking-wider text-gray-700">
-                                Desa/Kelurahan
-                            </th>
-                            <th
-                                class="px-4 py-3 text-center text-xs font-semibold tracking-wider text-gray-700">
-                                Total Anak
-                            </th>
-                            <th scope="col"
-                                class="px-4 py-3 text-center text-xs font-bold text-gray-700 tracking-wider whitespace-nowrap md:whitespace-normal">
-                                <p>
-                                    average
-                                </p>
-                                <p>berat (kg)</p>
-                            </th>
-                            <th scope="col"
-                                class="px-4 py-3 text-center text-xs font-bold text-gray-700 tracking-wider whitespace-nowrap md:whitespace-normal">
-                                <p>
-                                    average
-                                </p>
-                                <p>tinggi (cm)</p>
-                            </th>
-                            <th scope="col"
-                                class="px-4 py-3 text-center text-xs font-bold text-gray-700 tracking-wider whitespace-nowrap md:whitespace-normal">
-                                <p>
-                                    average
-                                </p>
-                                <p>zs bb/u</p>
-                            </th>
-                            <th scope="col"
-                                class="px-4 py-3 text-center text-xs font-bold text-gray-700 tracking-wider whitespace-nowrap md:whitespace-normal">
-                                <p>
-                                    average
-                                </p>
-                                <p>zs tb/u</p>
-                            </th>
-                            <th scope="col"
-                                class="px-4 py-3 text-center text-xs font-bold text-gray-700 tracking-wider whitespace-nowrap md:whitespace-normal">
-                                <p>
-                                    average
-                                </p>
-                                <p>zs bb/tb</p>
-                            </th>
-                            <th scope="col"
-                                class="px-4 py-3 text-center text-xs font-bold text-gray-700 tracking-wider whitespace-nowrap md:whitespace-normal">
-                                <p>
-                                    petugas
-                                </p>
-                                <p>input</p>
-                            </th>
-                            <th
-                                class="px-4 py-3 text-center text-xs font-semibold tracking-wider text-gray-700">
-                                Status Data
-                            </th>
-                            <th
-                                class="px-4 py-3 text-center text-xs font-semibold tracking-wider text-gray-700">
-                                Aksi
-                            </th>
+    {{-- ========== STICKY TABLE CARD ========== --}}
+    <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden flex flex-col max-h-[70vh]">
+        <div class="overflow-auto scrollbar-hide">
+            <table class="w-full min-w-[1200px] border-separate border-spacing-0">
+                <thead class="sticky top-0 z-30">
+                    <tr class="bg-gray-50 uppercase border-b border-gray-100">
+                        <th class="px-6 py-5 text-left text-[10px] font-black text-gray-400 tracking-[0.2em]">Desa/Kelurahan</th>
+                        <th class="px-4 py-5 text-center text-[10px] font-black text-gray-400 tracking-[0.2em]">Total Anak</th>
+                        <th class="px-4 py-5 text-center text-[10px] font-black text-gray-400 tracking-[0.2em]">Avg BB & TB</th>
+                        <th class="px-4 py-5 text-center text-[10px] font-black text-gray-400 tracking-[0.2em]">Avg ZS BB/U</th>
+                        <th class="px-4 py-5 text-center text-[10px] font-black text-gray-400 tracking-[0.2em]">Avg ZS TB/U</th>
+                        <th class="px-4 py-5 text-center text-[10px] font-black text-gray-400 tracking-[0.2em]">Avg ZS BB/TB</th>
+                        <th class="px-4 py-5 text-center text-[10px] font-black text-gray-400 tracking-[0.2em]">Petugas Input</th>
+                        <th class="px-4 py-5 text-center text-[10px] font-black text-gray-400 tracking-[0.2em]">Status</th>
+                        <th class="px-6 py-5 text-right text-[10px] font-black text-gray-400 tracking-[0.2em]">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-50">
+                    @forelse ($aggregatedData as $item)
+                        @php
+                            $avgBerat = $item->total_anak > 0 ? $item->sum_berat / $item->total_anak : null;
+                            $avgTinggi = $item->total_anak > 0 ? $item->sum_tinggi / $item->total_anak : null;
+                        @endphp
+                        <tr class="group hover:bg-red-50/30 transition-colors">
+                            <td class="px-6 py-5">
+                                <span class="text-sm font-black text-gray-900 group-hover:text-red-600 transition-colors uppercase leading-none">{{ $item->desa_kelurahan }}</span>
+                                <p class="text-[9px] font-bold text-gray-400 mt-1 uppercase">{{ \Carbon\Carbon::parse($currentPeriod)->isoFormat('MMM Y') }}</p>
+                            </td>
+                            <td class="px-4 py-5 text-center">
+                                <span class="px-3 py-1 bg-gray-100 text-gray-600 text-[10px] font-black rounded-lg">{{ $item->total_anak }} Anak</span>
+                            </td>
+                            <td class="px-4 py-5 text-center">
+                                <div class="flex flex-col gap-0.5">
+                                    <span class="text-xs font-black text-gray-700">{{ number_format($avgBerat, 1) }} <small class="text-[9px] text-gray-400 uppercase">kg</small></span>
+                                    <span class="text-xs font-black text-gray-700">{{ number_format($avgTinggi, 1) }} <small class="text-[9px] text-gray-400 uppercase">cm</small></span>
+                                </div>
+                            </td>
+                            <td class="px-4 py-5 text-center"><x-zscore-badge :value="$item->sum_zs_bbu / ($item->total_anak ?: 1)" /></td>
+                            <td class="px-4 py-5 text-center"><x-zscore-badge :value="$item->sum_zs_tbu / ($item->total_anak ?: 1)" /></td>
+                            <td class="px-4 py-5 text-center"><x-zscore-badge :value="$item->sum_zs_bbtb / ($item->total_anak ?: 1)" /></td>
+                            <td class="px-4 py-5 text-center">
+                                <span class="text-[10px] font-black text-gray-600 uppercase leading-tight">{{ $item->user->name ?? 'System' }}</span>
+                            </td>
+                            <td class="px-4 py-5 text-center">
+                                @php
+                                    $statusStyle = match($item->status) {
+                                        'published' => 'bg-emerald-100 text-emerald-700',
+                                        'approved' => 'bg-blue-100 text-blue-700',
+                                        default => 'bg-amber-100 text-amber-700',
+                                    };
+                                @endphp
+                                <span class="px-3 py-1.5 rounded-full text-[9px] font-black uppercase tracking-tighter {{ $statusStyle }}">
+                                    {{ $item->status }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-5 text-right">
+                                <div class="flex items-center justify-end gap-2">
+                                    <a href="{{ route('gizi.index', ['view' => 'detail', 'desa' => $item->desa_kelurahan, 'period' => $activePeriodYm]) }}"
+                                       class="p-2 text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all shadow-sm border border-indigo-100 group/btn">
+                                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                                    </a>
+                                    @if ($item->status === 'pending')
+                                        <form action="{{ route('gizi.destroyAggregated') }}" method="POST" x-data>
+                                            @csrf
+                                            <input type="hidden" name="desa_kelurahan" value="{{ $item->desa_kelurahan }}">
+                                            <input type="hidden" name="status" value="pending">
+                                            <input type="hidden" name="period" value="{{ $periodYm }}">
+                                            <button type="button" 
+                                                    @click.prevent="$dispatch('open-confirm', { form: $el.closest('form'), title: 'Hapus Data?', message: 'Data desa {{ $item->desa_kelurahan }} akan dihapus permanen.' })"
+                                                    class="p-2 text-red-600 hover:bg-red-50 rounded-xl transition-all shadow-sm border border-red-100">
+                                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                            </button>
+                                        </form>
+                                    @endif
+                                </div>
+                            </td>
                         </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-200 bg-white">
-                        @forelse ($aggregatedData as $item)
-                            @php
-                                $avgBerat = $item->total_anak > 0 ? $item->sum_berat / $item->total_anak : null;
-                                $avgTinggi = $item->total_anak > 0 ? $item->sum_tinggi / $item->total_anak : null;
-                                $avgZsBBU = $item->total_anak > 0 ? $item->sum_zs_bbu / $item->total_anak : null;
-                                $avgZsTBU = $item->total_anak > 0 ? $item->sum_zs_tbu / $item->total_anak : null;
-                                $avgZsBBTB = $item->total_anak > 0 ? $item->sum_zs_bbtb / $item->total_anak : null;
-                            @endphp
-                            <tr class="transition hover:bg-gray-50">
-                                <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-600">
-                                    {{ \Carbon\Carbon::parse($currentPeriod)->isoFormat('MMMM Y') }}
-                                </td>
-                                <td class="whitespace-nowrap px-4 py-3">
-                                    <div class="text-sm font-semibold text-gray-900">
-                                        {{ $item->desa_kelurahan }}
-                                    </div>
-                                </td>
-                                <td class="whitespace-nowrap px-4 py-3 text-sm text-gray-600 text-center">
-                                    {{ $item->total_anak }}
-                                </td>
-                                <td class="whitespace-nowrap px-4 py-3 text-sm text-gray-600 text-center">
-                                    {{ !is_null($avgBerat) ? number_format($avgBerat, 2) : '-' }}
-                                </td>
-                                <td class="whitespace-nowrap px-4 py-3 text-sm text-gray-600 text-center">
-                                    {{ !is_null($avgTinggi) ? number_format($avgTinggi, 2) : '-' }}
-                                </td>
-                                <td class="whitespace-nowrap px-4 py-3 text-center">
-                                    <x-zscore-badge :value="$avgZsBBU" />
-                                </td>
-                                <td class="whitespace-nowrap px-4 py-3 text-center">
-                                    <x-zscore-badge :value="$avgZsTBU" />
-                                </td>
-                                <td class="whitespace-nowrap px-4 py-3 text-center">
-                                    <x-zscore-badge :value="$avgZsBBTB" />
-                                </td>
-                                <td class="whitespace-nowrap px-4 py-3 text-xs text-gray-600 text-center">
-                                    @if (isset($item->user))
-                                        <div class="font-medium text-gray-800">
-                                            {!! nl2br(e(str_replace(' ', "\n", $item->user->name))) !!}
-                                        </div>
-                                    @else
-                                        <span class="text-gray-400 italic">Tidak diketahui</span>
-                                    @endif
-                                </td>
-                                <td class="whitespace-nowrap px-4 py-3 text-center">
-                                    @if ($item->status === 'published')
-                                        <span
-                                            class="inline-flex items-center gap-1 rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-700">
-                                            <span class="h-1.5 w-1.5 rounded-full bg-green-600"></span>
-                                            Published
-                                        </span>
-                                    @elseif($item->status === 'approved')
-                                        <span
-                                            class="inline-flex items-center gap-1 rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-700">
-                                            <span class="h-1.5 w-1.5 rounded-full bg-blue-600"></span>
-                                            Approved
-                                        </span>
-                                    @else
-                                        <span
-                                            class="inline-flex items-center gap-1 rounded-full bg-yellow-100 px-3 py-1 text-xs font-medium text-yellow-700">
-                                            <span class="h-1.5 w-1.5 rounded-full bg-yellow-600"></span>
-                                            Pending
-                                        </span>
-                                    @endif
-                                </td>
-                                <td class="whitespace-nowrap px-4 py-3">
-                                    <div class="flex items-center justify-center gap-3">
-
-                                        {{-- Tombol DETAIL selalu muncul --}}
-                                        <a href="{{ route('gizi.index', [
-                                            'view'   => 'detail',
-                                            'desa'   => $item->desa_kelurahan,
-                                            'period' => $periodYm ?? now()->format('Y-m'),
-                                        ]) }}"
-                                            class="text-sm font-medium text-indigo-600 transition hover:text-indigo-800 hover:underline">
-                                            Detail
-                                        </a>
-
-                                        {{-- Hanya tampilkan tombol HAPUS kalau status = pending --}}
-                                        @if ($item->status === 'pending')
-                                            <span class="text-gray-300">|</span>
-
-                                            {{-- FORM DELETE AGGREGATED --}}
-                                            <form action="{{ route('gizi.destroyAggregated') }}" method="POST" x-data>
-                                                @csrf
-
-                                                {{-- Desa yang akan dihapus --}}
-                                                <input type="hidden" name="desa_kelurahan" value="{{ $item->desa_kelurahan }}">
-
-                                                {{-- Hanya boleh hapus pending --}}
-                                                <input type="hidden" name="status" value="pending">
-
-                                                {{-- Periode dalam format YYYY-MM --}}
-                                                <input type="hidden" name="period" value="{{ $periodYm }}">
-
-                                                <button type="button"
-                                                    @click.prevent="
-                                                        $dispatch('open-confirm', {
-                                                            form: $el.closest('form'),
-                                                            title: 'Hapus Data Desa {{ $item->desa_kelurahan }}',
-                                                            message: 'Yakin ingin menghapus seluruh data desa {{ $item->desa_kelurahan }} pada periode {{ \Carbon\Carbon::createFromFormat('Y-m', $periodYm)->isoFormat('MMMM Y') }}? Tindakan ini tidak dapat dibatalkan.',
-                                                            okText: 'Ya, Hapus',
-                                                            cancelText: 'Batal'
-                                                        })
-                                                    "
-                                                    class="text-sm font-medium text-red-600 transition hover:text-red-800 hover:underline">
-                                                    Hapus
-                                                </button>
-                                            </form>
-                                        @endif
-
-                                    </div>
-                                </td>
-
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="10" class="px-6 py-12 text-center">
-                                    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24"
-                                        stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
-                                    </svg>
-                                    @php
-                                        $totalDataInPeriod =
-                                            ($statusCounts['pending'] ?? 0) +
-                                            ($statusCounts['approved'] ?? 0) +
-                                            ($statusCounts['published'] ?? 0);
-                                    @endphp
-                                    @if ($totalDataInPeriod === 0)
-                                        <p class="mt-4 text-sm text-gray-500">
-                                            Data tidak ditemukan untuk periode ini
-                                        </p>
-                                    @else
-                                        @if ($status === 'pending')
-                                            <p class="mt-4 text-sm text-gray-500">
-                                                Semua data untuk periode ini sudah diproses
-                                                (di-approve/publish).
-                                            </p>
-                                        @elseif ($status === 'approved')
-                                            <p class="mt-4 text-sm text-gray-500">
-                                                Belum ada data gizi pada periode ini yang
-                                                di-approve.
-                                            </p>
-                                        @elseif ($status === 'published')
-                                            <p class="mt-4 text-sm text-gray-500">
-                                                Belum ada data gizi pada periode ini yang
-                                                di-publish.
-                                            </p>
-                                        @endif
-                                    @endif
-                                    @if ($status === 'pending')
-                                        <a href="{{ route('gizi.index', [
-                                            'view' => 'tambah',
-                                            'period' => $periodYm ?? now()->format('Y-m'),
-                                        ]) }}"
-                                            class="mt-4 inline-flex items-center gap-2 text-sm font-medium text-red-600 hover:text-red-700">
-                                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24"
-                                                stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M12 4v16m8-8H4" />
-                                            </svg>
-                                            {{ $totalDataInPeriod === 0 ? 'Tambah Data Pertama' : 'Tambah Data Lagi' }}
-                                        </a>
-                                    @endif
-                                </td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
+                    @empty
+                        <tr>
+                            <td colspan="9" class="px-6 py-24 text-center">
+                                <div class="flex flex-col items-center opacity-40">
+                                    <svg class="w-16 h-16 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" /></svg>
+                                    <p class="text-xs font-black uppercase tracking-widest text-gray-500">Belum ada data untuk ditampilkan</p>
+                                </div>
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
+
+<style>
+    /* Styling khusus agar sticky header tidak patah saat scroll */
+    .border-separate { border-collapse: separate; }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    
+    /* Hover effect row */
+    .group:hover td { @apply border-red-100; }
+</style>

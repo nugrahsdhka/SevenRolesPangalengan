@@ -239,41 +239,39 @@ class AdminController extends Controller
         $perPage = 100;
 
         // =========================
-        // 1. Tentukan periodYm (Y-m)
+        //  Tentukan periode aktif
         // =========================
-        $periodYm = $request->input('period'); // dari query ?period=2025-11 (misalnya)
+        $periodYm = $request->input('period');
 
-        if (! $periodYm) {
-            // kalau tidak dikirim dari URL, ambil periode TERBARU untuk desa ini
+        if (!$periodYm) {
+            // Kalau tidak dikirim di URL, ambil periode TERBARU yang punya data untuk desa ini
             $latestPeriod = DataGizi::where('desa_kelurahan', $desaKelurahan)
-                ->whereIn('status', ['pending', 'approved', 'published'])
-                ->max('period'); // kolom 'period' di DB (tipe date)
+                ->max('period');
 
             if ($latestPeriod) {
-                $periodYm = \Carbon\Carbon::parse($latestPeriod)->format('Y-m');
+                $periodYm = Carbon::parse($latestPeriod)->format('Y-m');
             } else {
-                // kalau benar-benar belum ada data untuk desa ini → pakai bulan sekarang
+                // fallback kalau benar-benar belum ada data
                 $periodYm = now()->format('Y-m');
             }
         }
 
-        // Normalisasi + safety: pastikan periodYm valid
-        try {
-            $period = \Carbon\Carbon::createFromFormat('Y-m', $periodYm)->startOfMonth();
-        } catch (\Exception $e) {
-            $period = now()->startOfMonth();
-            $periodYm = $period->format('Y-m');
-        }
-
-        $year  = $period->year;
-        $month = $period->month;
+        [$year, $month] = explode('-', $periodYm);
+        $currentPeriod = Carbon::createFromDate($year, $month, 1);
 
         // =========================
-        // 2. Statistik untuk card di atas
-        //    (hanya approved + published)
+        //  Daftar periode untuk dropdown (kalau nanti mau dipakai di Blade)
+        // =========================
+        $availablePeriods = DataGizi::where('desa_kelurahan', $desaKelurahan)
+            ->select(DB::raw('DATE_FORMAT(period, "%Y-%m-01") as period_date'))
+            ->distinct()
+            ->orderBy('period_date', 'desc')
+            ->pluck('period_date');
+
+        // =========================
+        //  Statistik per desa & periode
         // =========================
         $statistik = DataGizi::where('desa_kelurahan', $desaKelurahan)
-            ->whereIn('status', ['approved', 'published'])
             ->whereYear('period', $year)
             ->whereMonth('period', $month)
             ->select(
@@ -285,27 +283,25 @@ class AdminController extends Controller
             ->first();
 
         // =========================
-        // 3. Data individu per anak
-        //    (admin boleh lihat pending + approved + published)
+        //  Data individual (hanya Approved & Published) per periode
         // =========================
         $dataGizi = DataGizi::where('desa_kelurahan', $desaKelurahan)
-            ->whereIn('status', ['pending', 'approved', 'published'])
             ->whereYear('period', $year)
             ->whereMonth('period', $month)
+            ->whereIn('status', ['pending','approved', 'published'])
             ->orderBy('created_at', 'desc')
             ->paginate($perPage);
 
-        // Biar pagination tetap bawa query ?period, ?from, ?status (kalau ada)
-        $dataGizi->appends($request->only('period', 'from', 'status'));
+        // Pastikan pagination tetap bawa query ?period & ?from
+        $dataGizi->appends($request->only('period', 'from'));
 
-        // =========================
-        // 4. Kirim ke view
-        // =========================
         return view('detail.detailGizi', [
-            'desaKelurahan' => $desaKelurahan,
-            'statistik'     => $statistik,
-            'dataGizi'      => $dataGizi,
-            'periodYm'      => $periodYm,   // 🔹 ini yang dipakai Blade untuk label periode & backUrl
+            'desaKelurahan'   => $desaKelurahan,
+            'statistik'       => $statistik,
+            'dataGizi'        => $dataGizi,
+            'periodYm'        => $periodYm,
+            'currentPeriod'   => $currentPeriod,
+            'availablePeriods'=> $availablePeriods,
         ]);
     }
 

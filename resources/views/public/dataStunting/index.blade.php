@@ -24,11 +24,11 @@
                         <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-8">
                             
                             {{-- Title Section --}}
-                            <div>
+                            <div class="flex flex-col justify-center items-center md:items-start md:justify-start">
                                 <h1 class="text-2xl font-black text-gray-900 tracking-tight uppercase">
                                     Data <span class="text-red-600">Stunting</span>
                                 </h1>
-                                <p class="hidden md:block mt-2 text-gray-500 font-medium tracking-wide">
+                                <p class="hidden md:block mt-1 text-gray-500 font-bold uppercase text-[10px] tracking-[0.2em]">
                                     Informasi Gizi & Statistik Stunting Anak per Desa
                                 </p>
                             </div>

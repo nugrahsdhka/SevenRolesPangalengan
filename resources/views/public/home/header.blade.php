@@ -23,7 +23,7 @@
                 Sistem Informasi Data Stunting <span class="hidden md:inline">• Kecamatan Pangalengan</span>
             </p>
             <p class="hidden md:block text-[11px] md:text-xs font-bold uppercase tracking-[0.2em]">
-                {{ date('d-M-Y') }} 
+                {{ date('d M Y') }} 
             </p>
         </div>
     </div>
@@ -60,9 +60,13 @@
 
             {{-- Right: Integrated Stats --}}
             <div class="grid grid-cols-2 md:grid-cols-3 gap-4 w-full lg:w-auto">
-                <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center justify-center transition-all hover:shadow-md">
+                <div class="hidden md:flex bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center justify-center transition-all hover:shadow-md">
                     <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Total Desa</span>
                     <span class="text-3xl font-black text-gray-900 mt-1">{{ $total_desa ?? 0 }}</span>
+                </div>
+                <div class="md:hidden bg-red-600 p-5 rounded-2xl shadow-lg shadow-red-100 flex flex-col items-center justify-center transition-all hover:scale-105 group">
+                    <span class="text-[10px] font-black text-red-100 uppercase tracking-widest">Total Desa</span>
+                    <span class="text-3xl font-black text-white mt-1 group-hover:scale-110 transition-transform">{{ $total_desa ?? 0 }}</span>
                 </div>
                 <div class="bg-red-600 p-5 rounded-2xl shadow-lg shadow-red-100 flex flex-col items-center justify-center transition-all hover:scale-105 group">
                     <span class="text-[10px] font-black text-red-100 uppercase tracking-widest">Prevalensi</span>
@@ -104,8 +108,14 @@
                 @if ($total_anak > 0)
                     <div x-data="{ active: null }" class="relative z-10">
                         {{-- Advanced Bar --}}
-                        <div class="h-6 w-full bg-gray-100 rounded-full flex overflow-hidden shadow-inner p-1 mb-8">
-                            @foreach(['sangat_pendek' => 'bg-red-600', 'pendek' => 'bg-orange-500', 'normal' => 'bg-emerald-500', 'tinggi' => 'bg-blue-600'] as $key => $color)
+                        <div class="h-6 w-full bg-red-700/30 rounded-full flex overflow-hidden shadow-inner p-1 mb-8">
+                            @foreach([
+                                'sangat_pendek' => 'bg-red-600 shadow-red-500/50',
+                                'pendek'        => 'bg-orange-500 shadow-orange-400/50',
+                                'normal'        => 'bg-emerald-500 shadow-emerald-400/50',
+                                'tinggi'        => 'bg-blue-600 shadow-blue-500/50',
+                            ] as $key => $color)
+
                                 @if(($distribusi[$key] ?? 0) > 0)
                                     <div @mouseenter="active = '{{$key}}'" @mouseleave="active = null"
                                          class="{{ $color }} h-full transition-all duration-500 first:rounded-l-full last:rounded-r-full cursor-help relative group"
@@ -137,7 +147,7 @@
                                     
                                     <div class="flex items-center gap-3 mb-3">
                                         {{-- Dot Indikator dengan Glow Effect --}}
-                                        <div class="w-3 h-3 rounded-full {{ $cat['color'] }} shadow-[0_0_10px_rgba(255,255,255,0.4)]"></div>
+                                        <div class="w-3 h-3 rounded-full {{ $cat['color'] }} shadow-[0_0_10px_rgb(220, 38, 38)]"></div>
                                         
                                         {{-- Label Kategori --}}
                                         <span class="text-[10px] font-black text-red-100 uppercase tracking-[0.15em] opacity-80 group-hover:opacity-100 transition-opacity">
