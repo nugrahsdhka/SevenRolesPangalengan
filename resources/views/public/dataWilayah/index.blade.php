@@ -95,7 +95,6 @@
                                 <th class="px-4 py-5 text-center text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">ZS BB/U</th>
                                 <th class="px-4 py-5 text-center text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">ZS TB/U</th>
                                 <th class="px-4 py-5 text-center text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">ZS BB/TB</th>
-                                <th class="px-6 py-5 text-right text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Aksi</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-50">
@@ -129,27 +128,12 @@
                                     <td class="px-4 py-5 text-center">
                                         @include('components.zscore-badge', ['value' => $avgZsBbTb])
                                     </td>
-                                    <td class="px-6 py-5 text-right">
-                                        <a href="{{ route('data-wilayah-detail-gizi', ['desa' => $data->desa_kelurahan, 'period' => $selectedPeriod]) }}" 
-                                           class="inline-flex items-center gap-2 px-4 py-2 bg-gray-900 text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-red-600 transition-all shadow-sm">
-                                            Detail
-                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                                            </svg>
-                                        </a>
-                                    </td>
                                 </tr>
                             @empty
                                 <tr>
                                     <td colspan="8" class="px-6 py-20">
                                         <div class="flex flex-col items-center justify-center text-center">
-                                            <div class="p-4 bg-gray-50 rounded-full mb-4">
-                                                <svg class="w-12 h-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
-                                                </svg>
-                                            </div>
-                                            <h3 class="text-sm font-black text-gray-900 uppercase">Data Tidak Ditemukan</h3>
-                                            <p class="text-xs text-gray-400 mt-1 uppercase tracking-wider">Coba sesuaikan filter periode atau nama desa Anda.</p>
+                                            <h3 class="text-sm font-black text-gray-400 uppercase">tidak ada Data Ditemukan</h3>
                                         </div>
                                     </td>
                                 </tr>
