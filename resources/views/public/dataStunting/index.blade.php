@@ -34,7 +34,7 @@
                             </div>
 
                             {{-- View Switcher (Segmented Control) --}}
-                            <div class="inline-flex p-1.5 bg-gray-100 rounded-[2rem] shadow-inner">
+                            <div class="inline-flex justify-center p-1.5 bg-gray-100 rounded-[2rem] shadow-inner">
                                 <a href="{{ $tableUrl }}" 
                                    class="flex items-center gap-2 px-8 py-3 rounded-[1.8rem] text-sm font-black uppercase tracking-widest transition-all duration-300 {{ $currentView === 'table' ? 'bg-white text-red-600 shadow-sm' : 'text-gray-400 hover:text-gray-600' }}">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

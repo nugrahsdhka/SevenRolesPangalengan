@@ -164,24 +164,40 @@ class DataGizi extends Model
         }
     }
 
-    // ZS BB/U – string kosong → null
+    // ZS BB/U – Filter anomali & normalisasi
     public function setZsBbUAttribute($value)
     {
-        $this->attributes['zs_bb_u'] =
-            ($value === '' || $value === null) ? null : $value;
+        $filteredValue = ($value === '' || $value === null) ? null : $value;
+        
+        // Tambahan filter anomali
+        if ($filteredValue !== null && ($filteredValue < -6 || $filteredValue > 6)) {
+            $filteredValue = null;
+        }
+
+        $this->attributes['zs_bb_u'] = $filteredValue;
     }
 
-    // ZS TB/U – string kosong → null
+    // ZS TB/U – Filter anomali & normalisasi
     public function setZsTbUAttribute($value)
     {
-        $this->attributes['zs_tb_u'] =
-            ($value === '' || $value === null) ? null : $value;
+        $filteredValue = ($value === '' || $value === null) ? null : $value;
+
+        if ($filteredValue !== null && ($filteredValue < -6 || $filteredValue > 6)) {
+            $filteredValue = null;
+        }
+
+        $this->attributes['zs_tb_u'] = $filteredValue;
     }
 
-    // ZS BB/TB – string kosong → null
+    // ZS BB/TB – Filter anomali & normalisasi
     public function setZsBbTbAttribute($value)
     {
-        $this->attributes['zs_bb_tb'] =
-            ($value === '' || $value === null) ? null : $value;
+        $filteredValue = ($value === '' || $value === null) ? null : $value;
+
+        if ($filteredValue !== null && ($filteredValue < -6 || $filteredValue > 6)) {
+            $filteredValue = null;
+        }
+
+        $this->attributes['zs_bb_tb'] = $filteredValue;
     }
 }

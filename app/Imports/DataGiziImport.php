@@ -37,6 +37,18 @@ class DataGiziImport implements ToModel, WithHeadingRow, WithChunkReading, WithB
         return 500;
     }
 
+    private function filterZScore($value): ?float
+    {
+        if ($value === null) return null;
+
+        // Standar WHO Implausible values biasanya di luar -6 dan 6
+        if ($value < -6 || $value > 6) {
+            return null; 
+        }
+
+        return (float) $value;
+    }
+
     // =========================================================
     // Helpers: bersihkan formula/string/numeric/tanggal
     // =========================================================
@@ -190,9 +202,10 @@ class DataGiziImport implements ToModel, WithHeadingRow, WithChunkReading, WithB
         $lingkarKepala = $this->toDecimal($row['lingkar_kepala'] ?? null);
 
         // Z-score
-        $zs_bb_u  = $this->toDecimal($row['zs_bb_u'] ?? $row['zs_bbu'] ?? null);
-        $zs_tb_u  = $this->toDecimal($row['zs_tb_u'] ?? $row['zs_tbu'] ?? null);
-        $zs_bb_tb = $this->toDecimal($row['zs_bb_tb'] ?? $row['zs_bbtb'] ?? null);
+        $zs_bb_u  = $this->filterZScore($this->toDecimal($row['zs_bb_u'] ?? $row['zs_bbu'] ?? null));
+        $zs_tb_u  = $this->filterZScore($this->toDecimal($row['zs_tb_u'] ?? $row['zs_tbu'] ?? null));
+        $zs_bb_tb = $this->filterZScore($this->toDecimal($row['zs_bb_tb'] ?? $row['zs_bbtb'] ?? null));
+
 
         // Indeks BB/U, TB/U, BB/TB (kolom angka, misal 2.5, -1.8, dst)
         $bb_u  = $this->toDecimal($row['bb_u'] ?? null);
