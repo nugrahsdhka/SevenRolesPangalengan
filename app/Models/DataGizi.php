@@ -83,6 +83,7 @@ class DataGizi extends Model
         'status_bb_tb',
 
         // Workflow
+        'import_notes',
         'status',
         'is_published',
     ];
@@ -174,7 +175,8 @@ class DataGizi extends Model
             $filteredValue = null;
         }
 
-        $this->attributes['zs_bb_u'] = $filteredValue;
+        // $this->attributes['zs_bb_u'] = $filteredValue;
+        $this->attributes['zs_bb_u'] = ($value === '' || $value === null) ? null : $value;
     }
 
     // ZS TB/U – Filter anomali & normalisasi
@@ -186,7 +188,8 @@ class DataGizi extends Model
             $filteredValue = null;
         }
 
-        $this->attributes['zs_tb_u'] = $filteredValue;
+        // $this->attributes['zs_tb_u'] = $filteredValue;
+        $this->attributes['zs_tb_u'] = ($value === '' || $value === null) ? null : $value;
     }
 
     // ZS BB/TB – Filter anomali & normalisasi
@@ -198,6 +201,7 @@ class DataGizi extends Model
             $filteredValue = null;
         }
 
-        $this->attributes['zs_bb_tb'] = $filteredValue;
+        // $this->attributes['zs_bb_tb'] = $filteredValue;
+        $this->attributes['zs_bb_tb'] = ($value === '' || $value === null) ? null : $value;
     }
 }

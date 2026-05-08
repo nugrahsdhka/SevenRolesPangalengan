@@ -202,10 +202,17 @@ class DataGiziImport implements ToModel, WithHeadingRow, WithChunkReading, WithB
         $lingkarKepala = $this->toDecimal($row['lingkar_kepala'] ?? null);
 
         // Z-score
-        $zs_bb_u  = $this->filterZScore($this->toDecimal($row['zs_bb_u'] ?? $row['zs_bbu'] ?? null));
-        $zs_tb_u  = $this->filterZScore($this->toDecimal($row['zs_tb_u'] ?? $row['zs_tbu'] ?? null));
-        $zs_bb_tb = $this->filterZScore($this->toDecimal($row['zs_bb_tb'] ?? $row['zs_bbtb'] ?? null));
+        $zs_bb_u  = $this->toDecimal($row['zs_bb_u'] ?? $row['zs_bbu'] ?? null);
+        $zs_tb_u  = $this->toDecimal($row['zs_tb_u'] ?? $row['zs_tbu'] ?? null);
+        $zs_bb_tb = $this->toDecimal($row['zs_bb_tb'] ?? $row['zs_bbtb'] ?? null);
+        
+        $anomaliDetail = [];
+        if ($zs_bb_u !== null && ($zs_bb_u < -6 || $zs_bb_u > 6)) $anomaliDetail[] = "BB/U ($zs_bb_u)";
+        if ($zs_tb_u !== null && ($zs_tb_u < -6 || $zs_tb_u > 6)) $anomaliDetail[] = "TB/U ($zs_tb_u)";
+        if ($zs_bb_tb !== null && ($zs_bb_tb < -6 || $zs_bb_tb > 6)) $anomaliDetail[] = "BB/TB ($zs_bb_tb)";
 
+        $isAnomali = count($anomaliDetail) > 0;
+        $note = $isAnomali ? "Nilai ekstrem terdeteksi: " . implode(', ', $anomaliDetail    ) : null;
 
         // Indeks BB/U, TB/U, BB/TB (kolom angka, misal 2.5, -1.8, dst)
         $bb_u  = $this->toDecimal($row['bb_u'] ?? null);
@@ -322,7 +329,8 @@ class DataGiziImport implements ToModel, WithHeadingRow, WithChunkReading, WithB
             ),
 
             // Workflow
-            'status'         => 'pending',
+            'status'         => $isAnomali ? 'need_review' : 'pending',
+            'import_notes'   => $note,
         ]);
     }
 }

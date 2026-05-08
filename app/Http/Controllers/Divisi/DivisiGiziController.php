@@ -71,7 +71,7 @@ class DivisiGiziController extends Controller
         $periodYm         = date('Y-m', strtotime($currentPeriod));
 
         $status = $request->get('status', 'pending');
-        if (! in_array($status, ['pending', 'approved', 'published'])) {
+        if (! in_array($status, ['pending', 'approved', 'published', 'need_review'])) {
             $status = 'pending';
         }
 
@@ -91,9 +91,11 @@ class DivisiGiziController extends Controller
                 'status',
                 DB::raw('COUNT(*) as total_anak'),
                 DB::raw('MAX(created_at) as tanggal_input_terbaru'),
-                DB::raw('SUM(CASE WHEN zs_tb_u < -2 THEN 1 ELSE 0 END) as total_kasus_stunting'),
-                DB::raw('SUM(berat) as sum_berat'),
-                DB::raw('SUM(tinggi) as sum_tinggi'),
+                DB::raw('SUM(CASE WHEN zs_tb_u < -2 AND status != "need_review" THEN 1 ELSE 0 END) as total_kasus_stunting'),
+                DB::raw('SUM(CASE WHEN status != "need_review" THEN berat ELSE 0 END) as sum_berat'),
+                DB::raw('SUM(CASE WHEN status != "need_review" THEN tinggi ELSE 0 END) as sum_tinggi'),
+                // DB::raw('SUM(berat) as sum_berat'),
+                // DB::raw('SUM(tinggi) as sum_tinggi'),
                 DB::raw('SUM(zs_bb_u) as sum_zs_bbu'),
                 DB::raw('SUM(zs_tb_u) as sum_zs_tbu'),
                 DB::raw('SUM(zs_bb_tb) as sum_zs_bbtb'),
@@ -135,8 +137,14 @@ class DivisiGiziController extends Controller
             $selectedDesa = $request->get('desa') ?? $desaList->first();
 
             if ($selectedDesa) {
+                $statusAnak = $request->get('status_anak', 'all');
+
                 $detailBase = $base->clone()
                     ->where('desa_kelurahan', strtoupper($selectedDesa));
+
+                if ($statusAnak !== 'all') {
+                    $detailBase->where('status', $statusAnak);
+                }
 
                 $dataDetail = $detailBase->clone()
                     ->orderBy('created_at', 'desc')
@@ -146,9 +154,11 @@ class DivisiGiziController extends Controller
                         'view'   => 'detail',
                         'desa'   => $selectedDesa,
                         'period' => date('Y-m', strtotime($currentPeriod)),
-                    ]);
+                    ])
+                    ->appends($request->all());
 
                 $detailStat = $detailBase->clone()
+                    ->where('status', '!=', 'need_review')
                     ->selectRaw('
                         COUNT(*) as total_anak,
                         SUM(CASE WHEN zs_tb_u < -2 THEN 1 ELSE 0 END) as total_stunting,
@@ -233,11 +243,33 @@ class DivisiGiziController extends Controller
             'desa_kelurahan' => 'required|string|max:150',
             'berat'          => 'nullable|numeric',
             'tinggi'         => 'nullable|numeric',
+            'zs_tb_u'        => 'nullable|numeric',
+            'zs_bb_u'        => 'nullable|numeric',
+            'zs_bb_tb'       => 'nullable|numeric',
         ]);
 
-        $data_gizi->update($request->all());
+        $data = $request->only(['zs_tb_u', 'zs_bb_u', 'zs_bb_tb']);
 
-        return back()->with('success', 'Data berhasil diperbarui.');
+        // Re-Validation Range
+        $isStillAnomali = false;
+        foreach($data as $val) {
+            if ($val !== null && ($val < -6 || $val > 6)) {
+                $isStillAnomali = true;
+                break;
+            }
+        }
+
+        if ($isStillAnomali) {
+            $data['status'] = 'need_review';
+            $data['import_notes'] = "Data masih di luar batas normal (-6 s/d 6).";
+        } else {
+            $data['status'] = 'pending';
+            $data['import_notes'] = null; // Bersihkan catatan jika sudah benar
+        }
+
+        $data_gizi->update($data);
+
+        return back()->with('success', 'Data berhasil diperbarui dan telah masuk kembali ke antrean validasi.');
     }
 
     public function import(Request $request)
@@ -261,6 +293,19 @@ class DivisiGiziController extends Controller
                     $file
                 );
             }
+
+            // Hitung data yang baru saja diimport yang terdeteksi anomali
+            $anomaliCount = DataGizi::whereDate('period', $period)
+                ->where('status', 'need_review')
+                ->where('user_id', Auth::id())
+                ->count();
+
+            if ($anomaliCount > 0) {
+                return redirect()
+                    ->route('gizi.index', ['period' => $periodYm, 'status' => 'need_review'])
+                    ->with('warning', "Import selesai, namun ditemukan {$anomaliCount} data dengan nilai anomali. Silakan periksa kolom ANOMALI.");
+            }
+            // ---------------------------
 
             return redirect()
                 ->route('gizi.index', ['period' => $periodYm])

@@ -190,16 +190,14 @@ class CamatController extends Controller
         $modelName = 'App\\Models\\' . $request->model;
 
         if (!class_exists($modelName)) {
-            return back()
-                ->with('error', 'Tipe data tidak valid.')
-                ->withInput();
+            return back()->with('error', 'Tipe data tidak valid.')->withInput();
         }
 
-        // ===== DataGizi: update berdasarkan desa + periode =====
+        // ===== LOGIKA KHUSUS DATA GIZI (Agregasi) =====
         if ($request->model === 'DataGizi') {
             $request->validate([
                 'desa_kelurahan' => 'required|string',
-                'period'         => 'nullable|string', // 'Y-m'
+                'period'         => 'nullable|string',
             ]);
 
             $desaKelurahan = $request->desa_kelurahan;
@@ -212,40 +210,101 @@ class CamatController extends Controller
                 $query->whereYear('period', $year)->whereMonth('period', $month);
             }
 
-            // ⬇️ TIDAK ADA LAGI BLOK UNTUK STATUS "published"
-            // Semua status (pending, approved, published) boleh diubah
+            /**
+             * SISTEM PROTEKSI STATUS:
+             */
+            if ($request->new_status === 'approved') {
+                // Aksi Approve: Hanya ambil yang saat ini 'pending'
+                // Data 'published' dan 'need_review' tidak akan tersentuh
+                $query->where('status', 'pending');
+                $actionWord = "disetujui";
+            } else {
+                // Aksi Tarik Kembali: Hanya ambil yang saat ini 'approved'
+                // Data yang sudah 'published' tetap aman (tidak berubah jadi pending)
+                $query->where('status', 'approved');
+                $actionWord = "ditarik kembali ke Pending";
+            }
 
             $affectedRows = $query->update([
                 'status' => $request->new_status,
             ]);
 
-            $message = $request->new_status === 'approved'
-                ? "Semua data desa {$desaKelurahan} pada periode ini berhasil di-set ke Approved ({$affectedRows} data)."
-                : "Semua data desa {$desaKelurahan} pada periode ini berhasil di-set ke Pending ({$affectedRows} data).";
+            if ($affectedRows === 0) {
+                return back()->with('error', 'Tidak ada data yang memenuhi syarat untuk diupdate (Data mungkin sudah Published atau masih Anomali).');
+            }
 
-            return back()
-                ->with('success', $message)
-                ->with('active_tab', $request->active_tab);
+            return back()->with('success', "Berhasil: {$affectedRows} data desa {$desaKelurahan} {$actionWord}.")->with('active_tab', $request->active_tab);
         }
 
-        // ===== Model lain (Pencegahan, Penanggulangan, Desa): berdasarkan ID =====
-        $request->validate([
-            'id' => 'required|integer',
-        ]);
-
+        // ===== LOGIKA UNTUK MODEL LAIN (Berdasarkan ID) =====
+        $request->validate(['id' => 'required|integer']);
         $data = $modelName::findOrFail($request->id);
+        
+        // Proteksi untuk model non-agregat: Jangan izinkan menarik jika sudah published
+        if ($data->status === 'published' && $request->new_status === 'pending') {
+            return back()->with('error', 'Data yang sudah Published tidak dapat ditarik kembali.');
+        }
 
-        // ⬇️ Di sini juga TIDAK ADA LAGI larangan mengubah "published"
+        // Jangan izinkan ubah data anomali di sini
+        if ($data->status === 'need_review') {
+            return back()->with('error', 'Data anomali harus diperbaiki oleh Divisi Gizi terlebih dahulu.');
+        }
+
         $data->status = $request->new_status;
         $data->save();
 
-        $message = $request->new_status === 'approved'
-            ? 'Data berhasil di-approve.'
-            : 'Data berhasil ditarik kembali ke Pending.';
+        return back()->with('success', 'Status data berhasil diperbarui.')->with('active_tab', $request->active_tab);
+    }
 
-        return back()
-            ->with('success', $message)
-            ->with('active_tab', $request->active_tab);
+    public function bulkUpdateStatus(Request $request)
+    {
+        $request->validate([
+            'model_type' => 'required|string|in:gizi,pencegahan,penanggulangan,desa',
+            'action'     => 'required|string|in:approve_all,unapprove_all',
+            'active_tab' => 'required|string',
+            'period'     => 'nullable|string',
+        ]);
+
+        $modelMap = [
+            'gizi'           => \App\Models\DataGizi::class,
+            'pencegahan'     => \App\Models\DataPencegahan::class,
+            'penanggulangan' => \App\Models\DataPenanggulangan::class,
+            'desa'           => \App\Models\DataDesa::class,
+        ];
+
+        $modelClass = $modelMap[$request->model_type];
+        $periodYm   = $request->input('period');
+
+        try {
+            if ($request->action === 'approve_all') {
+                // Bulk Approve: Hanya menyasar status 'pending'
+                $query = $modelClass::where('status', 'pending');
+                $targetStatus = 'approved';
+            } else {
+                // Bulk Unapprove: Hanya menyasar status 'approved'
+                // Data 'published' terkunci secara otomatis karena tidak masuk filter ini
+                $query = $modelClass::where('status', 'approved');
+                $targetStatus = 'pending';
+            }
+
+            // Filter Periode (Khusus Gizi)
+            if ($request->model_type === 'gizi' && $periodYm) {
+                [$year, $month] = explode('-', $periodYm);
+                $query->whereYear('period', $year)->whereMonth('period', $month);
+            }
+
+            $affectedRows = $query->update(['status' => $targetStatus]);
+
+            if ($affectedRows === 0) {
+                return back()->with('error', 'Tidak ada data yang memenuhi syarat untuk diproses.');
+            }
+
+            return back()->with('success', "Berhasil memperbarui {$affectedRows} data.")
+                         ->with('active_tab', $request->active_tab);
+
+        } catch (\Exception $e) {
+            return back()->with('error', 'Terjadi kesalahan sistem saat pembaruan massal.');
+        }
     }
 
     public function destroy(Request $request)
@@ -312,100 +371,6 @@ class CamatController extends Controller
 
         return back()
             ->with('success', 'Data berhasil dihapus secara permanen.')
-            ->with('active_tab', $request->active_tab);
-    }
-
-    public function bulkUpdateStatus(Request $request)
-    {
-        $request->validate([
-            'model_type' => 'required|string|in:gizi,pencegahan,penanggulangan,desa',
-            'action'     => 'required|string|in:approve_all,unapprove_all',
-            'active_tab' => 'required|string',
-            'period'     => 'nullable|string', // khusus gizi
-        ]);
-
-        // Mapping dari string ke class Model
-        $modelMap = [
-            'gizi'          => DataGizi::class,
-            'pencegahan'    => DataPencegahan::class,
-            'penanggulangan'=> DataPenanggulangan::class,
-            'desa'          => DataDesa::class,
-        ];
-
-        $modelClass = $modelMap[$request->model_type] ?? null;
-
-        if (!$modelClass) {
-            return back()
-                ->with('error', 'Tipe data tidak valid.')
-                ->withInput();
-        }
-
-        $currentStatus = '';
-        $newStatus     = '';
-        $message       = '';
-
-        if ($request->action === 'approve_all') {
-            $currentStatus = 'pending';
-            $newStatus     = 'approved';
-            $message       = 'Semua data pending berhasil di-approve.';
-        } elseif ($request->action === 'unapprove_all') {
-            $currentStatus = 'approved';
-            $newStatus     = 'pending';
-            $message       = 'Semua data approved berhasil ditarik (un-approved).';
-        }
-
-        if ($currentStatus && $newStatus) {
-            try {
-                // Query dasar
-                $query = $modelClass::where('status', $currentStatus);
-
-                $periodYm = $request->input('period');
-
-                // Khusus gizi → filter per-periode
-                if ($request->model_type === 'gizi' && $periodYm) {
-                    [$year, $month] = explode('-', $periodYm);
-                    $query->whereYear('period', $year)->whereMonth('period', $month);
-
-                    // Untuk unapprove_all, jangan kalau masih ada published di periode tsb
-                    if ($request->action === 'unapprove_all') {
-                        $publishedQuery = $modelClass::where('status', 'published')
-                            ->whereYear('period', $year)
-                            ->whereMonth('period', $month);
-
-                        if ($publishedQuery->exists()) {
-                            return back()
-                                ->with('error', 'Gagal menarik semua data: terdapat data Published pada periode ini. Tarik data Published satu per satu jika diperlukan.')
-                                ->with('active_tab', $request->active_tab);
-                        }
-                    }
-                } else {
-                    // Model lain (global): cek published untuk unapprove_all
-                    if ($request->action === 'unapprove_all'
-                        && $modelClass::where('status', 'published')->exists()
-                    ) {
-                        return back()
-                            ->with('error', 'Gagal menarik semua data: Terdapat data yang sudah Published. Tarik data Published satu per satu jika diperlukan.')
-                            ->with('active_tab', $request->active_tab);
-                    }
-                }
-
-                // Lakukan update massal
-                $affectedRows = $query->update(['status' => $newStatus]);
-
-                if ($affectedRows == 0) {
-                    $message = 'Tidak ada data dengan status "' . $currentStatus . '" yang perlu diupdate.';
-                } else {
-                    $message .= " ({$affectedRows} data diupdate)";
-                }
-            } catch (\Exception $e) {
-                return back()
-                    ->with('error', 'Terjadi kesalahan saat update massal: ' . $e->getMessage())
-                    ->with('active_tab', $request->active_tab);
-            }
-        }
-
-        return back()
-            ->with('success', $message)
             ->with('active_tab', $request->active_tab);
     }
 

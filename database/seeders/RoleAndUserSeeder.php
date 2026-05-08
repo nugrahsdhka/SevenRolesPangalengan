@@ -30,7 +30,8 @@ class RoleAndUserSeeder extends Seeder
             ['email' => 'puskesmaspangalengan@rumahstuntingpangalengan.id'],
             [
                 'name'              => 'Puskesmas Pangalengan',
-                'password'          => Hash::make('puskesmaspangalengan123'),
+                // 'password'          => Hash::make('puskesmaspangalengan123'),
+                'password'          => Hash::make('111'),
                 'email_verified_at' => now(),
             ]
         );
