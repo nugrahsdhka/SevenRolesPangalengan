@@ -35,9 +35,20 @@
                 </div>
 
                 {{-- Kanan: Tombol Aksi --}}
-                <div class="w-full lg:w-auto">
+                <div class="w-full lg:w-auto flex flex-col sm:flex-row gap-3">
+                    {{-- Tombol Export --}}
+                    <button type="button" 
+                    onclick="downloadExcelFile('{{ route('gizi.export', ['period' => $activePeriodYm, 'status' => $status]) }}', 'Data_Gizi_{{ strtoupper($status) }}_{{ $activePeriodYm }}.xlsx')"
+                    class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-emerald-50 text-emerald-600 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-emerald-600 hover:text-white shadow-sm hover:shadow-lg transition-all active:scale-95 border border-emerald-100 hover:border-emerald-600 group">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                        </svg>
+                        Export Excel
+                    </button>
+
+                    {{-- Tombol Tambah --}}
                     <a href="{{ route('gizi.index', ['view' => 'tambah', 'period' => $activePeriodYm, 'status' => 'pending']) }}"
-                       class="w-full inline-flex items-center justify-center gap-3 px-8 py-3.5 bg-red-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-red-700 shadow-lg shadow-red-200 transition-all active:scale-95 group">
+                    class="w-full sm:w-auto inline-flex items-center justify-center gap-3 px-8 py-3.5 bg-red-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-red-700 shadow-lg shadow-red-200 transition-all active:scale-95 group">
                         <svg class="w-5 h-5 transition-transform group-hover:rotate-90" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4" />
                         </svg>
@@ -205,3 +216,45 @@
     /* Hover effect row */
     .group:hover td { @apply border-red-100; }
 </style>
+
+<script>
+    async function downloadExcelFile(url, filename) {
+        try {
+            // Karena menggunakan fetch, AppLoader Anda akan otomatis menyala
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error('Gagal memproses file dari server');
+            }
+
+            // Ubah response menjadi bentuk Blob (file biner)
+            const blob = await response.blob();
+
+            // Buat URL sementara untuk file Blob
+            const windowUrl = window.URL || window.webkitURL;
+            const downloadUrl = windowUrl.createObjectURL(blob);
+
+            // Buat elemen <a> virtual untuk memicu download di browser
+            const a = document.createElement('a');
+            a.href = downloadUrl;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            
+            // Bersihkan elemen virtual dan memori
+            a.remove();
+            windowUrl.revokeObjectURL(downloadUrl);
+
+            // AppLoader Anda akan otomatis mati setelah blok try/finally selesai dijalankan
+            
+        } catch (error) {
+            console.error('Error saat export:', error);
+            alert('Terjadi kesalahan saat mengunduh file Excel. Silakan coba lagi.');
+        }
+    }
+</script>

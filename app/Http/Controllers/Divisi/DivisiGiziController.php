@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
+use App\Exports\DataGiziExport;
 
 class DivisiGiziController extends Controller
 {
@@ -324,13 +325,33 @@ class DivisiGiziController extends Controller
         }
     }
 
+    public function export(Request $request)
+    {
+        // Ambil parameter
+        $period = $request->get('period'); // Format YYYY-MM
+        $status = $request->get('status', 'pending');
+        
+        // Validasi format periode
+        if (!preg_match('/^\d{4}-\d{2}$/', $period)) {
+            return back()->with('error', 'Format periode tidak valid.');
+        }
+
+        $periodDate = date('Y-m-01', strtotime($period));
+        $userRoleName = Auth::user()->roles->first()->name;
+
+        // Nama file dinamis
+        $fileName = "Data_Gizi_" . strtoupper($status) . "_" . $period . ".xlsx";
+
+        return Excel::download(new DataGiziExport($periodDate, $status, $userRoleName), $fileName);
+    }
+
     public function destroyAggregated(Request $request)
     {
         // 1. Validasi input
         $request->validate([
             'period'         => ['required', 'regex:/^\d{4}-\d{2}(-\d{2})?$/'],
             'desa_kelurahan' => 'required|string|max:150',
-            'status'         => ['required', Rule::in(['pending', 'approved', 'published'])],
+            'status'         => ['required', Rule::in(['pending', 'approved', 'published', 'need_review'])], 
         ]);
 
         $currentUser  = Auth::user();
@@ -341,12 +362,15 @@ class DivisiGiziController extends Controller
             ? ($request->period . '-01')
             : $request->period;
 
-        $periodDate  = date('Y-m-01', strtotime($period));   // buat whereDate
-        $periodParam = date('Y-m', strtotime($periodDate));  // buat redirect
+        $periodDate  = date('Y-m-01', strtotime($period));   
+        $periodParam = date('Y-m', strtotime($periodDate));  
 
         // 3. Standarisasi desa & status
         $desa   = strtoupper(trim($request->desa_kelurahan));
         $status = $request->status;
+
+        // Menyesuaikan label status untuk keperluan pesan (UI)
+        $statusLabel = $status === 'need_review' ? 'ANOMALI' : strtoupper($status);
 
         // 4. PROTEKSI: kalau dia mencoba hapus approved/published -> tolak
         if (in_array($status, ['approved', 'published'])) {
@@ -356,17 +380,17 @@ class DivisiGiziController extends Controller
             );
         }
 
-        // 5. Hapus hanya data PENDING untuk desa + periode + role ini
+        // 5. Hapus data sesuai status (pending / need_review) untuk desa + periode + role ini
         $deleted = DataGizi::where('desa_kelurahan', $desa)
             ->whereDate('period', $periodDate)
-            ->where('status', 'pending') // paksa pending, lebih aman
+            ->where('status', $status) 
             ->whereHas('user.roles', fn($q) => $q->where('name', $userRoleName))
             ->delete();
 
         if ($deleted === 0) {
             return back()->with(
                 'error',
-                'Tidak ada data pending yang dihapus untuk desa dan periode tersebut.'
+                "Tidak ada data {$statusLabel} yang dihapus untuk desa dan periode tersebut."
             );
         }
 
@@ -374,7 +398,7 @@ class DivisiGiziController extends Controller
             ->route('gizi.index', ['period' => $periodParam])
             ->with(
                 'success',
-                "Semua data PENDING ({$deleted} baris) untuk desa {$desa} pada periode ini berhasil dihapus."
+                "Semua data {$statusLabel} ({$deleted} baris) untuk desa {$desa} pada periode ini berhasil dihapus."
             );
     }
 }

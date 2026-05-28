@@ -88,7 +88,6 @@ Route::get('/dashboard', function () {
 Route::middleware('auth', 'verified')->group(function () {
     // Divisi Gizi
     Route::middleware(['role:Divisi Gizi'])->prefix('divisi-gizi')->name('gizi.')->group(function () {
-        Route::resource('/', DivisiGiziController::class)->parameters(['' => 'data_gizi']);
         Route::post('/aggregated-delete', [DivisiGiziController::class, 'destroyAggregated'])->name('destroyAggregated');
 
         Route::get('/gizi/desa/{desa}', [DivisiGiziController::class, 'detail'])->name('detail');
@@ -102,6 +101,11 @@ Route::middleware('auth', 'verified')->group(function () {
             
         Route::delete('/divisi/gizi/aggregat', [DivisiGiziController::class, 'destroyAggregat'])
             ->name('gizi.destroyAggregat');
+
+        Route::get('export', [App\Http\Controllers\Divisi\DivisiGiziController::class, 'export'])
+            ->name('export');
+
+        Route::resource('/', DivisiGiziController::class)->parameters(['' => 'data_gizi']);
     });
 
     // Divisi Pencegahan
