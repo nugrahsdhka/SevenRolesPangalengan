@@ -62,9 +62,17 @@
             <div class="grid grid-cols-2 md:grid-cols-3 gap-4 w-full lg:w-auto">
                 
                 {{-- Total Desa --}}
-                <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center justify-center">
+                <div class="hidden bg-white p-5 rounded-2xl shadow-sm border border-gray-100 lg:flex flex-col items-center justify-center">
                     <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Total Desa</span>
                     <span class="text-3xl font-black text-gray-900 mt-1">{{ $total_desa ?? 0 }}</span>
+                </div>
+
+                {{-- Total Desa (Hanya muncul di mode mobile/layar kecil, disembunyikan di desktop) --}}
+                <div class="lg:hidden bg-red-600 p-5 rounded-2xl shadow-lg shadow-red-100 flex flex-col items-center justify-center transition-all hover:scale-105 group">
+                    <span class="text-[10px] font-black text-red-100 uppercase tracking-widest">Total Desa</span>
+                    <span class="text-3xl font-black text-white mt-1 group-hover:scale-110 transition-transform">
+                        {{ $total_desa ?? 0 }}
+                    </span>
                 </div>
 
                 {{-- Prevalensi Rata-rata per Desa --}}
@@ -75,8 +83,8 @@
                     </span>
                 </div>
 
-                {{-- Faskes --}}
-                <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center justify-center">
+                {{-- Faskes (Hanya muncul di mode desktop) --}}
+                <div class="hidden lg:flex bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex-col items-center justify-center transition-all hover:shadow-md">
                     <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Faskes</span>
                     <span class="text-3xl font-black text-gray-900 mt-1">{{ $total_faskes ?? 0 }}</span>
                 </div>
