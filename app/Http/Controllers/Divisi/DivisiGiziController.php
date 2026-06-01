@@ -92,11 +92,13 @@ class DivisiGiziController extends Controller
                 'status',
                 DB::raw('COUNT(*) as total_anak'),
                 DB::raw('MAX(created_at) as tanggal_input_terbaru'),
-                DB::raw('SUM(CASE WHEN zs_tb_u < -2 AND status != "need_review" THEN 1 ELSE 0 END) as total_kasus_stunting'),
+                
+                // --- PERHITUNGAN PREVALENSI STUNTING (Persentase) ---
+                DB::raw('ROUND(SUM(CASE WHEN zs_tb_u < -2 AND status != "need_review" THEN 1 ELSE 0 END) * 100.0 / NULLIF(COUNT(*), 0), 2) as prevalensi_stunting'),
+
+                // --- Field lainnya ---
                 DB::raw('SUM(CASE WHEN status != "need_review" THEN berat ELSE 0 END) as sum_berat'),
                 DB::raw('SUM(CASE WHEN status != "need_review" THEN tinggi ELSE 0 END) as sum_tinggi'),
-                // DB::raw('SUM(berat) as sum_berat'),
-                // DB::raw('SUM(tinggi) as sum_tinggi'),
                 DB::raw('SUM(zs_bb_u) as sum_zs_bbu'),
                 DB::raw('SUM(zs_tb_u) as sum_zs_tbu'),
                 DB::raw('SUM(zs_bb_tb) as sum_zs_bbtb'),
@@ -117,6 +119,9 @@ class DivisiGiziController extends Controller
             ->paginate(50)
             ->onEachSide(1);
 
+        $totalPrevalensiKecamatan = (clone $aggregatedData->getCollection())
+            ->avg('prevalensi_stunting') ?? 0;
+
         foreach ($aggregatedData as $row) {
             if (!empty($row->user_id)) {
                 $user = \App\Models\User::find($row->user_id);
@@ -125,8 +130,6 @@ class DivisiGiziController extends Controller
                 }
             }
         }
-
-
 
         if ($view === 'detail') {
             $desaList = $base->clone()
@@ -187,7 +190,8 @@ class DivisiGiziController extends Controller
             'selectedDesa',
             'dataDetail',
             'detailStat',
-            'periodYm'
+            'periodYm',
+            'totalPrevalensiKecamatan'
         ));
     }
 

@@ -36,6 +36,13 @@
 
                 {{-- Kanan: Tombol Aksi --}}
                 <div class="w-full lg:w-auto flex flex-col sm:flex-row gap-3">
+
+                    {{-- Badge Prevalensi --}}
+                    <div class="w-full sm:w-auto px-6 py-3.5 bg-red-50 text-red-700 rounded-2xl border border-red-100 flex items-center justify-center gap-2 shadow-sm">
+                        <span class="text-[9px] font-black uppercase tracking-widest opacity-70">Prevalensi Kec.</span>
+                        <span class="text-sm font-black tracking-tight">{{ number_format($totalPrevalensiKecamatan ?? 0, 2) }}%</span>
+                    </div>
+
                     {{-- Tombol Export --}}
                     <button type="button" 
                     onclick="downloadExcelFile('{{ route('gizi.export', ['period' => $activePeriodYm, 'status' => $status]) }}', 'Data_Gizi_{{ strtoupper($status) }}_{{ $activePeriodYm }}.xlsx')"
@@ -123,6 +130,7 @@
                         <th class="px-4 py-5 text-center text-[10px] font-black text-gray-400 tracking-[0.2em]">Avg ZS BB/U</th>
                         <th class="px-4 py-5 text-center text-[10px] font-black text-gray-400 tracking-[0.2em]">Avg ZS TB/U</th>
                         <th class="px-4 py-5 text-center text-[10px] font-black text-gray-400 tracking-[0.2em]">Avg ZS BB/TB</th>
+                        <th class="px-4 py-5 text-center text-[10px] font-black text-gray-400 tracking-[0.2em]">Prevalensi</th>
                         <th class="px-4 py-5 text-center text-[10px] font-black text-gray-400 tracking-[0.2em]">Petugas Input</th>
                         <th class="px-4 py-5 text-center text-[10px] font-black text-gray-400 tracking-[0.2em]">Status</th>
                         <th class="px-6 py-5 text-right text-[10px] font-black text-gray-400 tracking-[0.2em]">Aksi</th>
@@ -151,6 +159,16 @@
                             <td class="px-4 py-5 text-center"><x-zscore-badge :value="$item->sum_zs_bbu / ($item->total_anak ?: 1)" /></td>
                             <td class="px-4 py-5 text-center"><x-zscore-badge :value="$item->sum_zs_tbu / ($item->total_anak ?: 1)" /></td>
                             <td class="px-4 py-5 text-center"><x-zscore-badge :value="$item->sum_zs_bbtb / ($item->total_anak ?: 1)" /></td>
+                            <td class="px-4 py-5 text-center">
+                                @php
+                                    $p = $item->prevalensi_stunting ?? 0;
+                                    $colorClass = $p > 20 ? 'bg-red-100 text-red-700' : ($p > 10 ? 'bg-amber-100 text-amber-700' : 'bg-emerald-100 text-emerald-700');
+                                @endphp
+                                
+                                <span class="px-3 py-1 rounded-full text-[10px] font-black {{ $colorClass }}">
+                                    {{ number_format($p, 2) }}%
+                                </span>
+                            </td>
                             <td class="px-4 py-5 text-center">
                                 <span class="text-[10px] font-black text-gray-600 uppercase leading-tight">{{ $item->user->name ?? 'System' }}</span>
                             </td>

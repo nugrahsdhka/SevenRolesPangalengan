@@ -65,6 +65,7 @@ class CamatController extends Controller
                 'status',
                 DB::raw('COUNT(*) as total_anak'),
                 DB::raw('SUM(CASE WHEN zs_tb_u < -2 THEN 1 ELSE 0 END) as total_kasus_stunting'),
+                DB::raw('ROUND(SUM(CASE WHEN zs_tb_u < -2 THEN 1 ELSE 0 END) * 100.0 / NULLIF(COUNT(*), 0), 2) as prevalensi_stunting'),
                 DB::raw('SUM(zs_tb_u) as sum_zs_tbu'),
                 DB::raw('MAX(created_at) as tanggal_input_terbaru'),
                 DB::raw("
@@ -87,6 +88,12 @@ class CamatController extends Controller
             ->orderBy('tanggal_input_terbaru', 'desc');
 
         $allData['gizi'] = $giziQuery->paginate($perPage, ['*'], 'gizi_page');
+
+        $totalPrevalensiKecamatan = (clone $giziQuery)
+            ->getQuery()
+            ->reorder()
+            ->get()
+            ->avg('prevalensi_stunting') ?? 0;
 
         // =========================
         //  LOAD USER UNTUK GIZI (VERSI AMAN)
@@ -175,7 +182,8 @@ class CamatController extends Controller
             'periodYm',
             'availablePeriods',
             'status',
-            'statusCounts'
+            'statusCounts',
+            'totalPrevalensiKecamatan'
         ));
     }
 

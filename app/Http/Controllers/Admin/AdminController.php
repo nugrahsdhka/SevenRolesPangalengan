@@ -93,21 +93,13 @@ class AdminController extends Controller
                 'status',
                 DB::raw('COUNT(*) as total_anak'),
                 DB::raw('SUM(CASE WHEN zs_tb_u < -2 THEN 1 ELSE 0 END) as total_kasus_stunting'),
+                DB::raw('ROUND(SUM(CASE WHEN zs_tb_u < -2 THEN 1 ELSE 0 END) * 100.0 / NULLIF(COUNT(*), 0), 2) as prevalensi_stunting'),
                 DB::raw('SUM(zs_tb_u) as sum_zs_tbu'),
                 DB::raw('MAX(created_at) as tanggal_input_terbaru'),
-                DB::raw('(
-                    SELECT user_id
-                    FROM data_gizis dg2
-                    WHERE dg2.desa_kelurahan = data_gizis.desa_kelurahan
-                    AND dg2.status = data_gizis.status
-                    AND YEAR(dg2.period) = ' . $currentPeriod->year . '
-                    AND MONTH(dg2.period) = ' . $currentPeriod->month . '
-                    ORDER BY created_at DESC
-                    LIMIT 1
-                ) as user_id')
+                DB::raw("(SELECT user_id FROM data_gizis dg2 WHERE dg2.desa_kelurahan = data_gizis.desa_kelurahan AND dg2.status = data_gizis.status AND YEAR(dg2.period) = " . $currentPeriod->year . " AND MONTH(dg2.period) = " . $currentPeriod->month . " ORDER BY created_at DESC LIMIT 1) as user_id")
             )
             ->whereIn('status', $allowedStatuses)
-            ->where('status', $status) // TAB: hanya status aktif
+            ->where('status', $status)
             ->whereYear('period', $currentPeriod->year)
             ->whereMonth('period', $currentPeriod->month)
             ->groupBy('desa_kelurahan', 'status')
@@ -115,6 +107,13 @@ class AdminController extends Controller
             ->orderBy('tanggal_input_terbaru', 'desc');
 
         $allData['gizi'] = $giziQuery->paginate($perPage, ['*'], 'gizi_page');
+
+        // 2. HITUNG RATA-RATA PREVALENSI KECAMATAN (Gunakan query baru yang terpisah agar aman)
+        $totalPrevalensiKecamatan = (clone $giziQuery)
+            ->getQuery() // Mengambil query tanpa pagination
+            ->reorder()  // Hapus semua order by agar tidak mengganggu
+            ->get()      // Ambil hasil per desa
+            ->avg('prevalensi_stunting'); // Hitung rata-rata dari koleksi hasil
 
         // Load user dari user_id hasil subquery
         foreach ($allData['gizi'] as $item) {
@@ -179,6 +178,7 @@ class AdminController extends Controller
             'statusCounts'     => $statusCounts,
             'periodYm'         => $periodYm,
             'availablePeriods' => $availablePeriods,
+            'totalPrevalensiKecamatan' => round($totalPrevalensiKecamatan ?? 0, 2),
         ]);
     }
 

@@ -62,12 +62,19 @@ class HomeController extends Controller
             )
             ->first();
 
+        $total_anak     = $stats->total_anak ?? 0;
+        $total_stunting  = $stats->total_stunting ?? 0; 
+
         // 4. Proses Angka (Header)
-        $total_anak      = $stats->total_anak ?? 0;
-        $total_stunting  = $stats->total_stunting ?? 0;
-        $rata_rata_kasus = ($total_anak > 0)
-            ? ($total_stunting / $total_anak) * 100
-            : 0;
+        $prevalensiPerDesa = (clone $dataGiziBaseQuery)
+            ->whereNotNull('zs_tb_u')
+            ->selectRaw('SUM(CASE WHEN zs_tb_u < -2 THEN 1 ELSE 0 END) * 100.0 / NULLIF(COUNT(*), 0) as p')
+            ->groupBy('desa_kelurahan')
+            ->get();
+
+        // Ambil rata-rata dari prevalensi tiap desa
+        $rata_rata_kasus = $prevalensiPerDesa->avg('p') ?? 0;
+        $rata_rata_kasus = round($rata_rata_kasus, 2);
 
         // Data untuk Counts (dipakai di legend chart header)
         $distribusi_counts = [

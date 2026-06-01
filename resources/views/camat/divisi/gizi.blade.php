@@ -55,30 +55,41 @@
                 </div>
 
                 {{-- Kanan: Filter Periode --}}
-                <form method="GET" action="{{ route('camat.review') }}" class="flex items-center gap-3 w-full lg:w-auto">
-                    <input type="hidden" name="active_tab" value="gizi">
-                    <input type="hidden" name="status" value="{{ $status }}">
-                    
-                    <div class="relative flex-1 lg:flex-none">
-                        <select name="period" required
-                                class="w-full lg:w-56 pl-5 pr-10 py-3 bg-gray-50 border-none rounded-2xl text-[11px] font-black text-gray-700 uppercase tracking-widest focus:ring-2 focus:ring-red-500 transition-all appearance-none cursor-pointer">
-                            @forelse($availablePeriods ?? [] as $p)
-                                @php $ym = \Carbon\Carbon::parse($p)->format('Y-m'); @endphp
-                                <option value="{{ $ym }}" {{ ($periodYm ?? now()->format('Y-m')) === $ym ? 'selected' : '' }}>
-                                    {{ \Carbon\Carbon::parse($p)->isoFormat('MMMM Y') }}
-                                </option>
-                            @empty
-                                <option value="{{ now()->format('Y-m') }}">{{ now()->isoFormat('MMMM Y') }}</option>
-                            @endforelse
-                        </select>
-                        <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none text-gray-400">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7" /></svg>
+                <div class="flex flex-col sm:flex-row items-center gap-4 w-full lg:w-auto">               
+                    <div class="bg-red-50 border border-red-100 px-6 py-3 rounded-2xl flex items-center gap-3 w-full lg:w-auto justify-center lg:justify-start">
+                        <div class="flex flex-col">
+                            <span class="text-[9px] font-black text-red-400 uppercase tracking-widest">Prevalensi Kec.</span>
+                            <span class="text-sm font-black text-red-700 tracking-tight leading-none">
+                                {{ number_format($totalPrevalensiKecamatan ?? 0, 2) }}%
+                            </span>
                         </div>
                     </div>
-                    <button type="submit" class="px-6 py-3 bg-gray-900 text-white rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] hover:bg-red-600 transition-all shadow-lg active:scale-95">
-                        Tampilkan
-                    </button>
-                </form>
+                    
+                    <form method="GET" action="{{ route('camat.review') }}" class="flex items-center gap-3 w-full lg:w-auto">
+                        <input type="hidden" name="active_tab" value="gizi">
+                        <input type="hidden" name="status" value="{{ $status }}">
+                        
+                        <div class="relative flex-1 lg:flex-none">
+                            <select name="period" required
+                                    class="w-full lg:w-56 pl-5 pr-10 py-3 bg-gray-50 border-none rounded-2xl text-[11px] font-black text-gray-700 uppercase tracking-widest focus:ring-2 focus:ring-red-500 transition-all appearance-none cursor-pointer">
+                                @forelse($availablePeriods ?? [] as $p)
+                                    @php $ym = \Carbon\Carbon::parse($p)->format('Y-m'); @endphp
+                                    <option value="{{ $ym }}" {{ ($periodYm ?? now()->format('Y-m')) === $ym ? 'selected' : '' }}>
+                                        {{ \Carbon\Carbon::parse($p)->isoFormat('MMMM Y') }}
+                                    </option>
+                                @empty
+                                    <option value="{{ now()->format('Y-m') }}">{{ now()->isoFormat('MMMM Y') }}</option>
+                                @endforelse
+                            </select>
+                            <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none text-gray-400">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7" /></svg>
+                            </div>
+                        </div>
+                        <button type="submit" class="px-6 py-3 bg-gray-900 text-white rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] hover:bg-red-600 transition-all shadow-lg active:scale-95">
+                            Tampilkan
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
@@ -147,6 +158,7 @@
                         <th class="px-8 py-5 text-left text-[10px] font-black text-gray-400 tracking-[0.2em] border-b border-gray-100 bg-gray-50">Desa/Kelurahan</th>
                         <th class="px-4 py-5 text-center text-[10px] font-black text-gray-400 tracking-[0.2em] border-b border-gray-100 bg-gray-50">Total Anak</th>
                         <th class="px-4 py-5 text-center text-[10px] font-black text-gray-400 tracking-[0.2em] border-b border-gray-100 bg-gray-50">Avg ZS TB/U</th>
+                        <th class="px-4 py-5 text-center text-[10px] font-black text-gray-400 tracking-[0.2em] border-b border-gray-100 bg-gray-50">Prevalensi Stunting</th>
                         <th class="px-4 py-5 text-center text-[10px] font-black text-gray-400 tracking-[0.2em] border-b border-gray-100 bg-gray-50">Status</th>
                         <th class="px-4 py-5 text-center text-[10px] font-black text-gray-400 tracking-[0.2em] border-b border-gray-100 bg-gray-50">Petugas</th>
                         <th class="px-4 py-5 text-center text-[10px] font-black text-gray-400 tracking-[0.2em] border-b border-gray-100 bg-gray-50">Terakhir Input</th>
@@ -165,6 +177,16 @@
                             </td>
                             <td class="px-4 py-6 text-center">
                                 <x-zscore-badge :value="$avgZsTbu" />
+                            </td>
+                            <td class="px-4 py-6 text-center">
+                                @php
+                                    $p = $item->prevalensi_stunting ?? 0;
+                                    // Warna dinamis: Merah (>20%), Amber (>10%), Emerald (<=10%)
+                                    $style = $p > 20 ? 'bg-red-100 text-red-700' : ($p > 10 ? 'bg-amber-100 text-amber-700' : 'bg-emerald-100 text-emerald-700');
+                                @endphp
+                                <span class="px-3 py-1.5 rounded-full text-[9px] font-black uppercase tracking-tighter {{ $style }}">
+                                    {{ number_format($p, 2) }}%
+                                </span>
                             </td>
                             <td class="px-4 py-6 text-center">
                                 @php
