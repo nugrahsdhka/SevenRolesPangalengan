@@ -27,8 +27,8 @@
             <p class="text-[10px] font-black uppercase tracking-[0.2em]">
                 Sistem Informasi Data Stunting <span class="hidden md:inline opacity-50">• Kecamatan Pangalengan</span>
             </p>
-            <p class="hidden md:block text-[10px] font-black uppercase tracking-[0.2em] opacity-50">
-                {{ date('d M Y') }} | v2.1.15
+            <p class="hidden md:block text-[10px] font-black tracking-[0.2em] opacity-50">
+                {{ date('d M Y') }} | v{{ config('app_version.version') }}
             </p>
         </div>
     </div>
