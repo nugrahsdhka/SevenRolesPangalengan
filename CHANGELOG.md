@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.2.1](https://github.com/nugrahsdhka/SevenRolesPangalengan/compare/v1.1.3...v1.2.1) (2026-07-08)
+
+
+### Bug Fixes
+
+* perbikan tampilan dan bug ([383b359](https://github.com/nugrahsdhka/SevenRolesPangalengan/commit/383b35968e005a4c9db94f2fe84cdbde96860279))
+
 ## [1.2.0](https://github.com/nugrahsdhka/SevenRolesPangalengan/compare/v1.1.3...v1.2.0) (2026-07-08)
 
 
