@@ -10,7 +10,7 @@
     <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
         <div class="p-2">
             <form action="{{ route('data-stunting') }}" method="GET" id="chartFilterFormHeader"
-                class="flex flex-col lg:flex-row items-end gap-4">
+                  class="flex flex-col lg:flex-row items-end gap-4">
 
                 {{-- Pastikan tetap di tab chart --}}
                 <input type="hidden" name="view" value="chart">
@@ -21,7 +21,7 @@
                         Periode Laporan
                     </label>
                     <select name="period" id="chartPeriodeInput"
-                        class="w-full px-4 py-3 bg-gray-50 border-none rounded-2xl text-sm font-bold text-gray-700 focus:ring-2 focus:ring-red-500 transition-all cursor-pointer">
+                            class="w-full px-4 py-3 bg-gray-50 border-none rounded-2xl text-sm font-bold text-gray-700 focus:ring-2 focus:ring-primary-500 transition-all cursor-pointer">
                         <option value="" @selected(empty($selectedPeriod))>Semua Periode</option>
                         @foreach ($availablePeriods as $ym)
                             @php
@@ -31,8 +31,7 @@
                                     $label = $ym;
                                 }
                             @endphp
-                            <option value="{{ $ym }}" @selected($selectedPeriod === $ym)>{{ $label }}
-                            </option>
+                            <option value="{{ $ym }}" @selected($selectedPeriod === $ym)>{{ $label }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -44,12 +43,12 @@
                     </label>
                     <div class="relative group">
                         <input type="text" name="search" value="{{ request('search') }}"
-                            placeholder="Cari nama desa..."
-                            class="w-full pl-11 pr-4 py-3 bg-gray-50 border-none rounded-2xl text-sm font-bold text-gray-700 focus:ring-2 focus:ring-red-500 transition-all">
+                               placeholder="Cari nama desa..."
+                               class="w-full pl-11 pr-4 py-3 bg-gray-50 border-none rounded-2xl text-sm font-bold text-gray-700 focus:ring-2 focus:ring-primary-500 transition-all">
                         <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                             <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
-                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                             </svg>
                         </div>
                     </div>
@@ -58,7 +57,7 @@
                 {{-- Action Buttons --}}
                 <div class="flex gap-2 w-full lg:w-auto">
                     <button type="submit"
-                        class="flex-1 lg:flex-none px-8 py-3 bg-red-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-red-700 shadow-lg shadow-red-200 transition-all active:scale-95">
+                            class="flex-1 lg:flex-none px-8 py-3 bg-primary-500 text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-primary-600 shadow-lg shadow-primary-200 transition-all active:scale-95">
                         Tampilkan Chart
                     </button>
                 </div>
@@ -71,17 +70,16 @@
         <div class="p-6 md:p-10">
             <div id="chartContainer" class="relative w-full h-[60vh] md:h-[75vh]">
                 <canvas id="stuntingChart"
-                    data-chart-url="{{ route('data-stunting.chart-zs', ['period' => $selectedPeriod, 'search' => request('search'), 'tingkat_zs' => request('tingkat_zs')]) }}"
-                    class="absolute inset-0 w-full h-full">
+                        data-chart-url="{{ route('data-stunting.chart-zs', ['period' => $selectedPeriod, 'search' => request('search'), 'tingkat_zs' => request('tingkat_zs')]) }}"
+                        class="absolute inset-0 w-full h-full">
                 </canvas>
 
                 {{-- Loading State --}}
                 <div id="chartMessage"
-                    class="absolute inset-0 flex flex-col items-center justify-center bg-white/80 backdrop-blur-sm z-10 hidden">
+                     class="absolute inset-0 flex flex-col items-center justify-center bg-white/80 backdrop-blur-sm z-10 hidden">
                     <div class="flex flex-col items-center">
-                        <div class="w-12 h-12 border-4 border-red-200 border-t-red-600 rounded-full animate-spin"></div>
-                        <p class="mt-4 text-sm font-black text-gray-900 uppercase tracking-widest">Sinkronisasi Data...
-                        </p>
+                        <div class="w-12 h-12 border-4 border-primary-200 border-t-primary-500 rounded-full animate-spin"></div>
+                        <p class="mt-4 text-sm font-black text-gray-900 uppercase tracking-widest">Sinkronisasi Data...</p>
                     </div>
                 </div>
             </div>
@@ -122,21 +120,21 @@
         // Tampilkan pesan loading
         if (chartMessageEl) {
             chartMessageEl.innerHTML = `
-                    <svg class="w-12 h-12 sm:w-16 sm:h-16 text-blue-400 mb-4 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-                    </svg>
-                    <span class="text-sm sm:text-base font-semibold text-gray-700">Memuat data chart...</span>
-                    <div class="mt-3 w-48 h-1 bg-gray-200 rounded-full overflow-hidden">
-                        <div class="h-full bg-gradient-to-r from-blue-500 to-purple-500 rounded-full animate-pulse"></div>
-                    </div>
-                `;
+                <svg class="w-12 h-12 sm:w-16 sm:h-16 text-blue-400 mb-4 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                </svg>
+                <span class="text-sm sm:text-base font-semibold text-gray-700">Memuat data chart...</span>
+                <div class="mt-3 w-48 h-1 bg-gray-200 rounded-full overflow-hidden">
+                    <div class="h-full bg-gradient-to-r from-blue-500 to-purple-500 rounded-full animate-pulse"></div>
+                </div>
+            `;
             chartMessageEl.classList.remove('hidden');
         }
 
         const urlParams = new URLSearchParams(window.location.search);
         const searchParam = urlParams.get('search') || '';
         const tingkatZsParam = urlParams.get('tingkat_zs') || '';
-        const periodParam = urlParams.get('period'); // boleh null / "" / "2025-01"
+        const periodParam = urlParams.get('period');
 
         // Buat URL fetch
         const chartDataUrl = new URL(@json(route('data-stunting.chart-zs')));
@@ -173,12 +171,12 @@
             console.error('Error fetching or processing chart data:', error);
             if (chartMessageEl) {
                 chartMessageEl.innerHTML = `
-                        <svg class="w-12 h-12 sm:w-16 sm:h-16 text-red-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
-                        <span class="text-sm sm:text-base font-semibold text-red-600">Gagal memuat data chart</span>
-                        <p class="text-xs sm:text-sm text-gray-500 mt-2">Silakan refresh halaman atau coba lagi nanti</p>
-                    `;
+                    <svg class="w-12 h-12 sm:w-16 sm:h-16 text-primary-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <span class="text-sm sm:text-base font-semibold text-primary-600">Gagal memuat data chart</span>
+                    <p class="text-xs sm:text-sm text-gray-500 mt-2">Silakan refresh halaman atau coba lagi nanti</p>
+                `;
                 chartMessageEl.classList.remove('hidden');
             }
             const canvasElement = document.getElementById('stuntingChart');
@@ -217,12 +215,7 @@
                     if (avg < xScale.min || avg > xScale.max) return;
 
                     const xPos = xScale.getPixelForValue(avg);
-                    const {
-                        top,
-                        bottom,
-                        left,
-                        right
-                    } = ca;
+                    const { top, bottom, left, right } = ca;
                     const ctx = chart.ctx;
 
                     ctx.save();
@@ -244,7 +237,7 @@
                     ctx.setLineDash([]);
                     ctx.shadowBlur = 0;
 
-                    // Label pill “Avg xx”
+                    // Label pill "Avg xx"
                     const labelText = 'Avg ' + avg.toFixed(2);
                     ctx.font = '600 12px Figtree, sans-serif';
                     const textW = ctx.measureText(labelText).width;
@@ -314,7 +307,6 @@
         if (existingChart) {
             existingChart.destroy();
         }
-
 
         ctx2d.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -421,7 +413,7 @@
                     }]
                 },
                 options: {
-                    indexAxis: 'y', // ⬅️ tetap horizontal seperti sebelumnya
+                    indexAxis: 'y',
                     responsive: true,
                     maintainAspectRatio: false,
                     layout: {
@@ -551,10 +543,10 @@
             console.error('Error draw chart:', err);
             if (chartMessageEl) {
                 chartMessageEl.innerHTML =
-                    '<svg class="w-12 h-12 sm:w-16 sm:h-16 text-red-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">' +
+                    '<svg class="w-12 h-12 sm:w-16 sm:h-16 text-primary-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">' +
                     '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>' +
                     '</svg>' +
-                    '<span class="text-sm sm:text-base font-semibold text-red-600">Terjadi error saat menampilkan chart</span>' +
+                    '<span class="text-sm sm:text-base font-semibold text-primary-600">Terjadi error saat menampilkan chart</span>' +
                     '<p class="text-xs sm:text-sm text-gray-500 mt-2">Silakan refresh halaman</p>';
                 chartMessageEl.classList.remove('hidden');
             }
@@ -624,7 +616,7 @@
         }
 
         [openChartInfoModalBtn, openChartInfoModalBtnMobile, openChartInfoModalBtnDesktop]
-        .filter(Boolean)
+            .filter(Boolean)
             .forEach(btn => {
                 btn.addEventListener('click', openChartInfoModal);
             });

@@ -29,7 +29,6 @@
     </div>
 
     @php
-        // Route yang tidak perlu footer
         $hideFooterRoutes = [
             'login',
             'register.complete.show',
@@ -49,6 +48,8 @@
     @endif
 
     @stack('scripts')
+    <x-chatbot />
+    <x-goToTop />
 </body>
 
 </html>

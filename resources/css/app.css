@@ -1,79 +1,31 @@
+/* Tailwind Setup */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* Configuration & Sources */
 @import 'tailwindcss';
+@import './chatbot.css';
 
+/* Custom Modules */
+@import './components/effects.css';
+@import './components/forms.css';
+@import './components/scrollbar.css';
+@import './utilities.css';
+
+/* Scan Lokasi File untuk Tailwind */
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
 @source '../**/*.blade.php';
 @source '../**/*.js';
 
-::-webkit-scrollbar {
-  width: 3px; /* Anda bisa ubah ukurannya, misal: 10px */
-  height: 8px;
+* {
+    -ms-overflow-style: none !important;
+    scrollbar-width: none !important;
 }
 
-::-webkit-scrollbar-track {
-  background-color: #f1f5f9; /* Warna slate-100, cocok dengan background Anda */
-  border-radius: 10px;
-}
-
-::-webkit-scrollbar-thumb {
-  background-color: #dc2626; /* Warna merah-600, sesuai tema Anda */
-  border-radius: 10px;
-  border: 1px solid #f1f5f9; /* Memberi sedikit jarak antara thumb dan track */
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background-color: #b91c1c; /* Warna merah-700 */
-}
-
-
-html {
-  scrollbar-width: none; /* Opsi: 'auto', 'thin', 'none' */
-  scrollbar-color: #dc2626 #fff; /* Warna thumb dan track */
-}   
-
-.preserve-lines {
-  white-space: pre-wrap;
-}
-
-
-.shimmer-effect {
-    position: relative;
-    overflow: hidden; /* Penting untuk menyembunyikan 'cahaya' sebelum dan sesudah */
-}
-
-.shimmer-effect::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%; /* Mulai dari luar kiri */
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(
-        90deg,
-        transparent,
-        rgba(255, 255, 255, 0.4), /* Cahaya putih transparan */
-        transparent
-    );
-    transition: left 0.7s ease-in-out; /* Animasi pergeseran */
-}
-
-.shimmer-effect:hover::before {
-    left: 100%; /* Geser ke luar kanan saat hover */
-}
-
-/* Hilangin arrow native select untuk semua browser utama */
-.select-no-arrow {
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-    background-image: none !important;
-}
-
-/* Khusus IE/old Edge */
-.select-no-arrow::-ms-expand {
-    display: none;
-}
+*::-webkit-scrollbar {
+    display: none !important;
+    width: 0px !important;
+    height: 0px !important;
+} 

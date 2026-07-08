@@ -116,7 +116,7 @@ class HomeController extends Controller
             ->first();
 
         // 6. Kirim semua data ke view
-        return view('public.home.welcome', compact(
+        return view('public.home.index', compact(
             'total_faskes',
             'total_desa',
             'rata_rata_kasus',

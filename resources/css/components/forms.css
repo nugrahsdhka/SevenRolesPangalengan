@@ -1,0 +1,11 @@
+/* Form Adjustments */
+.select-no-arrow {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-image: none !important;
+}
+
+.select-no-arrow::-ms-expand {
+    display: none;
+}

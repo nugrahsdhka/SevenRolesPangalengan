@@ -40,16 +40,16 @@
     $soloMode = ($hasApproved xor $hasPublished);
 @endphp
 
-<div class="space-y-2">
+<div class="space-y-4">
 
     {{-- ================= HEADER CARD: JUDUL & FILTER PERIODE ================= --}}
-    <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden transition-all duration-300">
-        <div class="p-2">
+    <div class="bg-white/80 backdrop-blur-xl rounded-3xl shadow-sm border border-white/50 overflow-hidden transition-all duration-300">
+        <div class="p-4 md:p-6">
             <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
                 {{-- Kiri: Judul --}}
-                <div class="space-y-1 text-center lg:text-left p-2">
+                <div class="space-y-1 text-center lg:text-left">
                     <h1 class="text-2xl font-black text-gray-900 tracking-tight uppercase leading-none">
-                        Review <span class="text-red-600">Data Gizi</span>
+                        Review <span class="text-primary-500">Data Gizi</span>
                     </h1>
                     <p class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">
                         Periode Aktif: <span class="text-gray-700">{{ $currentPeriodLabel }}</span>
@@ -58,11 +58,11 @@
 
                 {{-- Kanan: Filter Periode --}}
                 <div class="flex flex-col sm:flex-row items-center gap-4 w-full lg:w-auto">
-                    {{-- Info Prevalensi (Baru) --}}
-                    <div class="bg-red-50 border border-red-100 px-6 py-3 rounded-2xl flex items-center gap-3">
+                    {{-- Info Prevalensi --}}
+                    <div class="bg-primary-50/80 border border-primary-100/60 px-6 py-3 rounded-2xl flex items-center gap-3 backdrop-blur-sm">
                         <div class="flex flex-col">
-                            <span class="text-[9px] font-black text-red-400 uppercase tracking-widest">Prevalensi Kec.</span>
-                            <span class="text-sm font-black text-red-700 tracking-tight leading-none">
+                            <span class="text-[9px] font-black text-primary-400 uppercase tracking-widest">Prevalensi Kec.</span>
+                            <span class="text-sm font-black text-primary-700 tracking-tight leading-none">
                                 {{ number_format($totalPrevalensiKecamatan ?? 0, 2) }}%
                             </span>
                         </div>
@@ -74,7 +74,7 @@
                         
                         <div class="relative flex-1 lg:flex-none">
                             <select name="period" required
-                                    class="w-full lg:w-56 pl-5 pr-10 py-3 bg-gray-50 border-none rounded-2xl text-[11px] font-black text-gray-700 uppercase tracking-widest focus:ring-2 focus:ring-red-500 transition-all appearance-none cursor-pointer">
+                                    class="w-full lg:w-56 pl-5 pr-10 py-3 bg-gray-50/80 border border-gray-100 rounded-2xl text-[11px] font-black text-gray-700 uppercase tracking-widest focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all appearance-none cursor-pointer hover:bg-white">
                                 @forelse($availablePeriods ?? [] as $p)
                                     @php $ym = \Carbon\Carbon::parse($p)->format('Y-m'); @endphp
                                     <option value="{{ $ym }}" {{ ($periodYm ?? now()->format('Y-m')) === $ym ? 'selected' : '' }}>
@@ -88,7 +88,7 @@
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7" /></svg>
                             </div>
                         </div>
-                        <button type="submit" class="px-6 py-3 bg-gray-900 text-white rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] hover:bg-red-600 transition-all shadow-lg active:scale-95">
+                        <button type="submit" class="px-6 py-3 bg-gray-900 text-white rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] hover:bg-primary-500 transition-all shadow-lg shadow-gray-200/50 hover:shadow-primary-200/50 active:scale-95">
                             Ganti
                         </button>
                     </form>
@@ -98,7 +98,7 @@
     </div>
 
     {{-- ================= TAB STATUS & BULK ACTIONS ================= --}}
-    <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-4">
+    <div class="bg-white/80 backdrop-blur-xl rounded-3xl shadow-sm border border-white/50 p-4 md:p-6">
         <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
             <nav class="flex p-1.5 bg-gray-100 rounded-[2rem] shadow-inner overflow-x-auto no-scrollbar">
                 @foreach ($tabItems as $key => $meta)
@@ -127,7 +127,7 @@
                         <input type="hidden" name="model_type" value="gizi"><input type="hidden" name="action" value="publish_all">
                         <input type="hidden" name="active_tab" value="gizi"><input type="hidden" name="period" value="{{ $periodYm }}">
                         <button type="button" @click.prevent="$dispatch('open-confirm', { form: $el.closest('form'), title: 'Publish Semua?', message: 'Data berstatus Approved akan dipublish ke publik.' })"
-                                class="px-6 py-3 bg-emerald-600 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-emerald-700 shadow-lg shadow-emerald-100 transition-all active:scale-95 flex items-center gap-2">
+                                class="px-6 py-3 bg-emerald-600 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-emerald-700 shadow-lg shadow-emerald-100/50 transition-all active:scale-95 flex items-center gap-2">
                             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7" /></svg>
                             Publish Approved
                         </button>
@@ -151,7 +151,7 @@
     </div>
 
     {{-- ================= STICKY TABLE CARD ================= --}}
-    <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden flex flex-col max-h-[70vh]">
+    <div class="bg-white/80 backdrop-blur-xl rounded-[2.5rem] shadow-sm border border-white/50 overflow-hidden flex flex-col max-h-[70vh]">
         <div class="overflow-auto scrollbar-hide border-separate border-spacing-0">
             <table class="w-full min-w-[1100px]">
                 <thead class="sticky top-0 z-20">
@@ -166,40 +166,31 @@
                         <th class="px-6 py-5 text-center text-[10px] font-black text-gray-400 tracking-[0.2em] border-b border-gray-100">Aksi</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-gray-50 bg-white">
+                <tbody class="divide-y divide-gray-100/80 bg-white/60">
                     @forelse ($dataGizi as $item)
                         @php $avgZsTbu = $item->total_anak > 0 ? $item->sum_zs_tbu / $item->total_anak : null; @endphp
-                        <tr class="group hover:bg-red-50/30 transition-colors">
-                            <td class="px-6 py-5 font-black text-gray-900 uppercase text-sm group-hover:text-red-600 transition-colors">
-                                {{ $item->desa_kelurahan }}
+                        <tr class="group hover:bg-primary-50/40 transition-all duration-300 cursor-pointer">
+                            <td class="px-6 py-5">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-lg bg-primary-100 flex items-center justify-center flex-shrink-0">
+                                        <span class="text-xs font-black text-primary-600">{{ substr($item->desa_kelurahan, 0, 1) }}</span>
+                                    </div>
+                                    <span class="font-black text-gray-900 uppercase text-sm group-hover:text-primary-600 transition-colors">
+                                        {{ $item->desa_kelurahan }}
+                                    </span>
+                                </div>
                             </td>
                             <td class="px-4 py-5 text-center">
-                                <span class="px-3 py-1 bg-gray-100 text-gray-600 text-[10px] font-black rounded-lg uppercase leading-none">{{ $item->total_anak }} Anak</span>
+                                <span class="text-sm font-bold text-gray-700 group-hover:text-gray-900 transition-colors">{{ $item->total_anak }} Anak</span>
                             </td>
                             <td class="px-4 py-5 text-center">
                                 <x-zscore-badge :value="$avgZsTbu" />
                             </td>
                             <td class="px-4 py-5 text-center">
-                                @php
-                                    $p = $item->prevalensi_stunting ?? 0;
-                                    // Warna dinamis: Merah jika > 20%, Amber jika > 10%, Emerald jika <= 10%
-                                    $style = $p > 20 ? 'bg-red-100 text-red-700' : ($p > 10 ? 'bg-amber-100 text-amber-700' : 'bg-emerald-100 text-emerald-700');
-                                @endphp
-                                <span class="px-3 py-1.5 rounded-full text-[9px] font-black uppercase tracking-tighter {{ $style }}">
-                                    {{ number_format($p, 2) }}%
-                                </span>
+                                <x-prevalensi-badge :value="$item->prevalensi_stunting" />
                             </td>
                             <td class="px-4 py-5 text-center">
-                                @php
-                                    $style = match($item->status) {
-                                        'published' => 'bg-emerald-100 text-emerald-700',
-                                        'approved' => 'bg-blue-100 text-blue-700',
-                                        default => 'bg-amber-100 text-amber-700',
-                                    };
-                                @endphp
-                                <span class="px-3 py-1.5 rounded-full text-[9px] font-black uppercase tracking-tighter {{ $style }}">
-                                    {{ $item->status }}
-                                </span>
+                                <x-status-badge :value="$item->status" />
                             </td>
                             <td class="px-4 py-5 text-center text-[10px] font-black text-gray-500 uppercase leading-tight">
                                 {{ $item->user->name ?? 'System' }}
@@ -213,7 +204,7 @@
                                     <a href="{{ route('admin.gizi.detail', ['desa_kelurahan' => $item->desa_kelurahan, 'period' => $periodYm, 'status' => $status]) }}"
                                        title="Lihat Detail"
                                        class="p-2 bg-indigo-50 text-indigo-600 rounded-xl hover:bg-indigo-600 hover:text-white transition-all shadow-sm">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" alt="Icon Detail">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                                             <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
                                         </svg>
                                     </a>
@@ -228,7 +219,7 @@
                                                     title="Publish ke Publik"
                                                     @click.prevent="$dispatch('open-confirm', { form: $el.closest('form'), title: 'Publish Data?', message: 'Data desa {{ $item->desa_kelurahan }} akan tampil di publik.' })"
                                                     class="p-2 bg-emerald-50 text-emerald-600 rounded-xl hover:bg-emerald-600 hover:text-white transition-all shadow-sm">
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" alt="Icon Publish">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                                                     <path d="M5 13l4 4L19 7"/>
                                                 </svg>
                                             </button>
@@ -242,7 +233,7 @@
                                                     title="Tarik dari Publik"
                                                     @click.prevent="$dispatch('open-confirm', { form: $el.closest('form'), title: 'Tarik Data?', message: 'Data desa {{ $item->desa_kelurahan }} akan ditarik dari publik.' })"
                                                     class="p-2 bg-amber-50 text-amber-600 rounded-xl hover:bg-amber-600 hover:text-white transition-all shadow-sm">
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" alt="Icon Tarik">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                                                     <path d="M6 18L18 6M6 6l12 12"/>
                                                 </svg>
                                             </button>
@@ -256,8 +247,8 @@
                                         <button type="button" 
                                                 title="Hapus Data"
                                                 @click.prevent="$dispatch('open-confirm', { form: $el.closest('form'), title: 'Hapus Data?', message: 'Seluruh data desa {{ $item->desa_kelurahan }} pada periode ini akan dihapus.' })"
-                                                class="p-2 bg-red-50 text-red-600 rounded-xl hover:bg-red-600 hover:text-white transition-all shadow-sm">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" alt="Icon Hapus">
+                                                class="p-2 bg-primary-50 text-primary-500 rounded-xl hover:bg-primary-500 hover:text-white transition-all shadow-sm">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                                                 <path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                                             </svg>
                                         </button>
@@ -267,10 +258,13 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="py-24 text-center">
+                            <td colspan="8" class="py-24 text-center">
                                 <div class="flex flex-col items-center opacity-40">
-                                    <svg class="w-16 h-16 mb-4 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" /></svg>
+                                    <div class="w-16 h-16 rounded-2xl bg-gray-100 flex items-center justify-center mb-4">
+                                        <svg class="w-8 h-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" /></svg>
+                                    </div>
                                     <p class="text-[10px] font-black uppercase tracking-widest text-gray-500">Tidak ada data untuk status ini</p>
+                                    <p class="text-gray-300 text-xs mt-1">Coba ubah filter atau periode pencarian</p>
                                 </div>
                             </td>
                         </tr>

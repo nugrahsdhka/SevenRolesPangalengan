@@ -25,7 +25,7 @@ use App\Http\Controllers\Auth\EmailVerificationEntryController;
 
 // Guest Route
 // Home
-Route::get('/', [HomeController::class, 'index'])->name('welcome');
+Route::get('/', [HomeController::class, 'index'])->name('index');
 
 // Data Stunting
 Route::get('/data-stunting', [DataStuntingController::class, 'index'])->name('data-stunting');
