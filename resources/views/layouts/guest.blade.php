@@ -48,7 +48,6 @@
     @endif
 
     @stack('scripts')
-    <x-chatbot />
     <x-goToTop />
 </body>
 

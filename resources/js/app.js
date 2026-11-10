@@ -1,5 +1,4 @@
 import './bootstrap';
-import './chatbot';
 import './components/goToTop';
 import './components/loading';
 
