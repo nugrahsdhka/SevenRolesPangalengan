@@ -31,8 +31,18 @@ class CamatController extends Controller
         // =========================
         //  2. Tentukan periodYm (Y-m)
         // =========================
-        $requestedPeriod = $request->input('period');
+        $validated = $request->validate([
+            'period' => ['nullable', 'date_format:Y-m'],
+            'status' => ['nullable', Rule::in(['pending', 'approved', 'published'])],
+        ]);
+
+        $requestedPeriod = $validated['period'] ?? null;
         $sessionPeriod   = session('camat_gizi_period');
+
+        // Abaikan nilai periode lama di session jika formatnya tidak valid.
+        if (! is_string($sessionPeriod) || ! preg_match('/^\\d{4}-(0[1-9]|1[0-2])$/', $sessionPeriod)) {
+            $sessionPeriod = null;
+        }
 
         if ($availablePeriods->isNotEmpty()) {
             $latestPeriodYm = Carbon::parse($availablePeriods->first())->format('Y-m');
@@ -54,7 +64,7 @@ class CamatController extends Controller
         // =========================
         //  STATUS TAB
         // =========================
-        $status = $request->input('status', 'pending');
+        $status = $validated['status'] ?? 'pending';
 
         // =========================
         //  QUERY DATA GIZI
@@ -67,19 +77,18 @@ class CamatController extends Controller
                 DB::raw('SUM(CASE WHEN zs_tb_u < -2 THEN 1 ELSE 0 END) as total_kasus_stunting'),
                 DB::raw('ROUND(SUM(CASE WHEN zs_tb_u < -2 THEN 1 ELSE 0 END) * 100.0 / NULLIF(COUNT(*), 0), 2) as prevalensi_stunting'),
                 DB::raw('SUM(zs_tb_u) as sum_zs_tbu'),
-                DB::raw('MAX(created_at) as tanggal_input_terbaru'),
-                DB::raw("
-                    (
-                        SELECT dg2.user_id
-                        FROM data_gizis dg2
-                        WHERE dg2.desa_kelurahan = data_gizis.desa_kelurahan
-                        AND dg2.status = data_gizis.status
-                        AND DATE_FORMAT(dg2.period, '%Y-%m') = '" . $periodYm . "'
-                        ORDER BY dg2.created_at DESC
-                        LIMIT 1
-                    ) as user_id
-                ")
+                DB::raw('MAX(created_at) as tanggal_input_terbaru')
             )
+            ->selectSub(function ($query) use ($year, $month) {
+                $query->from('data_gizis as dg2')
+                    ->select('dg2.user_id')
+                    ->whereColumn('dg2.desa_kelurahan', 'data_gizis.desa_kelurahan')
+                    ->whereColumn('dg2.status', 'data_gizis.status')
+                    ->whereYear('dg2.period', (int) $year)
+                    ->whereMonth('dg2.period', (int) $month)
+                    ->orderByDesc('dg2.created_at')
+                    ->limit(1);
+            }, 'user_id')
             ->whereYear('period', $year)
             ->whereMonth('period', $month)
             ->where('status', $status)
