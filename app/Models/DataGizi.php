@@ -140,68 +140,66 @@ class DataGizi extends Model
             return;
         }
 
-        // Normalisasi dasar
         $v = strtolower(trim($value));
 
-        // Semua variasi yang berarti "Laki-laki"
         $l_keywords = [
             'l', 'laki', 'laki-laki', 'laki laki',
             'lk', 'cowok', 'cowo', 'lelaki', 'pria'
         ];
 
-        // Semua variasi yang berarti "Perempuan"
         $p_keywords = [
             'p', 'perempuan', 'wanita', 'cewek', 'cewe', 'cw', 'gadis'
         ];
 
-        // Tentukan berdasarkan keyword
         if (in_array($v, $l_keywords)) {
             $this->attributes['jenis_kelamin'] = 'L';
         } elseif (in_array($v, $p_keywords)) {
             $this->attributes['jenis_kelamin'] = 'P';
         } else {
-            // Jika tidak dikenali → NULL
             $this->attributes['jenis_kelamin'] = null;
         }
     }
 
-    // ZS BB/U – Filter anomali & normalisasi
+    /**
+     * Normalize WHO Z-Score values.
+     *
+     * Values outside the plausible range (-6 to 6), non-numeric values,
+     * and non-finite numbers are stored as null.
+     */
+    private function normalizeZScore($value): ?float
+    {
+        if ($value === null || $value === '') {
+            return null;
+        }
+
+        if (! is_numeric($value)) {
+            return null;
+        }
+
+        $numericValue = (float) $value;
+
+        if (! is_finite($numericValue) || $numericValue < -6 || $numericValue > 6) {
+            return null;
+        }
+
+        return $numericValue;
+    }
+
+    // ZS BB/U
     public function setZsBbUAttribute($value)
     {
-        $filteredValue = ($value === '' || $value === null) ? null : $value;
-        
-        // Tambahan filter anomali
-        if ($filteredValue !== null && ($filteredValue < -6 || $filteredValue > 6)) {
-            $filteredValue = null;
-        }
-
-        // $this->attributes['zs_bb_u'] = $filteredValue;
-        $this->attributes['zs_bb_u'] = ($value === '' || $value === null) ? null : $value;
+        $this->attributes['zs_bb_u'] = $this->normalizeZScore($value);
     }
 
-    // ZS TB/U – Filter anomali & normalisasi
+    // ZS TB/U
     public function setZsTbUAttribute($value)
     {
-        $filteredValue = ($value === '' || $value === null) ? null : $value;
-
-        if ($filteredValue !== null && ($filteredValue < -6 || $filteredValue > 6)) {
-            $filteredValue = null;
-        }
-
-        // $this->attributes['zs_tb_u'] = $filteredValue;
-        $this->attributes['zs_tb_u'] = ($value === '' || $value === null) ? null : $value;
+        $this->attributes['zs_tb_u'] = $this->normalizeZScore($value);
     }
 
-    // ZS BB/TB – Filter anomali & normalisasi
+    // ZS BB/TB
     public function setZsBbTbAttribute($value)
     {
-        $filteredValue = ($value === '' || $value === null) ? null : $value;
-
-        if ($filteredValue !== null && ($filteredValue < -6 || $filteredValue > 6)) {
-            $filteredValue = null;
-        }
-
-        // $this->attributes['zs_bb_tb'] = $filteredValue;
-        $this->attributes['zs_bb_tb'] = ($value === '' || $value === null) ? null : $value;
+        $this->attributes['zs_bb_tb'] = $this->normalizeZScore($value);
     }
 }
