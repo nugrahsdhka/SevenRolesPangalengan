@@ -18,80 +18,44 @@
 
     <style>
         @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        .animate-fade {
-            opacity: 0;
-            animation: fadeInUp 0.3s ease-out forwards;
-        }
-
-        .delay-1 {
-            animation-delay: 0.2s;
-        }
-
-        .delay-2 {
-            animation-delay: 0.4s;
-        }
-
-        .delay-3 {
-            animation-delay: 0.6s;
-        }
-
-        .delay-4 {
-            animation-delay: 0.8s;
-        }
-
-        .delay-5 {
-            animation-delay: 1.0s;
-        }
-
-        .delay-6 {
-            animation-delay: 1.2s;
-        }
+        .animate-fade { opacity: 0; animation: fadeInUp 0.3s ease-out forwards; }
+        .delay-1 { animation-delay: 0.2s; }
+        .delay-2 { animation-delay: 0.4s; }
+        .delay-3 { animation-delay: 0.6s; }
+        .delay-4 { animation-delay: 0.8s; }
+        .delay-5 { animation-delay: 1.0s; }
+        .delay-6 { animation-delay: 1.2s; }
     </style>
 </head>
 
 <body class="font-sans antialiased">
     <div class="min-h-screen flex flex-col justify-center items-center bg-white px-5 overflow-hidden">
-
         <div class="max-w-2xl w-full text-center">
-
-            {{-- Logo --}}
             <img src="{{ asset('img/logo-kab-bandung.png') }}" alt="Logo Kabupaten Bandung"
                 class="animate-fade delay-1 max-w-[130px] h-auto mx-auto mb-6">
 
-            {{-- Pre-title --}}
             <p class="animate-fade delay-2 text-sm font-semibold text-red-600 uppercase tracking-widest mb-2.5">
                 Rumah Stunting Pangalengan
             </p>
 
-            {{-- Main Title --}}
             <h1 class="animate-fade delay-3 text-5xl md:text-6xl font-bold text-gray-900 mt-0 mb-5">
                 Halaman Tidak Ditemukan
             </h1>
 
-            {{-- Divider --}}
             <hr class="animate-fade delay-4 w-16 h-0.5 bg-red-600 border-0 mx-auto mb-6">
 
-            {{-- Description --}}
             <p class="animate-fade delay-5 text-lg text-gray-600 mb-8 leading-relaxed">
                 Maaf, halaman yang Anda cari tidak dapat ditemukan.
                 <br>
                 Halaman mungkin telah dipindahkan atau dihapus.
             </p>
 
-            {{-- Action Button --}}
             <div class="animate-fade delay-6">
-                <a href="{{ route('welcome') }}"
+                <a href="{{ route('index') }}"
                     class="inline-flex items-center justify-center px-8 py-3 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition-colors duration-200">
                     <svg class="w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                         stroke-width="2" stroke="currentColor">
@@ -100,7 +64,6 @@
                     Kembali ke Home
                 </a>
             </div>
-
         </div>
     </div>
 </body>
