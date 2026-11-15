@@ -12,12 +12,14 @@ use App\Http\Controllers\Divisi\DivisiPencegahanController;
 use App\Http\Controllers\Divisi\DivisiPenanggulanganController;
 use App\Http\Controllers\Profile\ProfileController;
 use App\Http\Controllers\Admin\FaskesController;
+use App\Http\Controllers\Admin\PengaduanController as AdminPengaduanController;
 
 // Guest
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\Guest\HomeController;
 use App\Http\Controllers\Guest\PetaController;
+use App\Http\Controllers\Guest\PengaduanController as GuestPengaduanController;
 use App\Http\Controllers\Guest\DataWilayahController;
 use App\Http\Controllers\Guest\DataStuntingController;
 use App\Http\Controllers\Guest\AnalisisHotspotController;
@@ -43,6 +45,15 @@ Route::get('/api/hotspot', [AnalisisHotspotController::class, 'getChartDataHotsp
 
 // Peta
 Route::get('/peta-faskes', [PetaController::class, 'index'])->name('peta-faskes');
+
+// Pengaduan Warga (publik, tanpa login)
+Route::get('/pengaduan', [GuestPengaduanController::class, 'create'])->name('pengaduan.create');
+Route::post('/pengaduan', [GuestPengaduanController::class, 'store'])
+    ->middleware('throttle:5,10') // maks 5 pengaduan / 10 menit per IP
+    ->name('pengaduan.store');
+Route::get('/pengaduan/cek-status', [GuestPengaduanController::class, 'track'])
+    ->middleware('throttle:20,1')
+    ->name('pengaduan.track');
 
 // Forgot / Reset Password
 Route::middleware('guest')->group(function () {
@@ -86,6 +97,12 @@ Route::get('/dashboard', function () {
 
 // Authenticated Routes
 Route::middleware('auth', 'verified')->group(function () {
+    // Pengaduan Warga — semua role internal bisa melihat
+    Route::middleware(['role:IT Admin|Camat|Divisi Gizi|Divisi Pencegahan|Divisi Penanggulangan|Divisi Desa'])->group(function () {
+        Route::get('/pengaduan-masuk', [AdminPengaduanController::class, 'index'])->name('complaints.index');
+        Route::get('/pengaduan-masuk/{complaint}', [AdminPengaduanController::class, 'show'])->name('complaints.show');
+    });
+
     // Divisi Gizi
     Route::middleware(['role:Divisi Gizi'])->prefix('divisi-gizi')->name('gizi.')->group(function () {
         Route::post('/aggregated-delete', [DivisiGiziController::class, 'destroyAggregated'])->name('destroyAggregated');
@@ -163,6 +180,10 @@ Route::middleware('auth', 'verified')->group(function () {
         Route::delete('/users/{id}', [UserController::class, 'destroy'])->name('users.destroy');
         Route::patch('/users/{id}/password', [UserController::class, 'updatePassword'])->name('users.password.update');
         Route::patch('/users/{id}/restore', [UserController::class, 'restore'])->name('users.restore'); // ✅ RUTE BARU
+
+        // Kelola pengaduan (hanya IT Admin)
+        Route::patch('/pengaduan/{complaint}', [AdminPengaduanController::class, 'update'])->name('complaints.update');
+        Route::delete('/pengaduan/{complaint}', [AdminPengaduanController::class, 'destroy'])->name('complaints.destroy');
 
         Route::post('/bulk-publish', [AdminController::class, 'bulkPublish'])->name('bulk_publish');
         Route::delete('/delete', [AdminController::class, 'destroy'])->name('destroy');
