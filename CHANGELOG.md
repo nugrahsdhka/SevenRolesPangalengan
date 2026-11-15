@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.3.1](https://github.com/nugrahsdhka/SevenRolesPangalengan/compare/v1.3.0...v1.3.1) (2026-11-15)
+
+
+### Bug Fixes
+
+* hapus endpoint publik data per-anak ([33c515e](https://github.com/nugrahsdhka/SevenRolesPangalengan/commit/33c515e9b2712f15ff2586544db286679331d614))
+* perbaiki urutan import CSS dan konfigurasi Tailwind v3 ([76f498f](https://github.com/nugrahsdhka/SevenRolesPangalengan/commit/76f498fa630d9dd164df5b4e54bc369c23bc1976))
+
 ## [1.3.0](https://github.com/nugrahsdhka/SevenRolesPangalengan/compare/v1.2.1...v1.3.0) (2026-11-15)
 
 
