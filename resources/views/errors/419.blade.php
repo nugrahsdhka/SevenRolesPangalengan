@@ -89,7 +89,7 @@
 
             {{-- Action Button --}}
             <div class="animate-fade delay-6">
-                <a href="{{ route('welcome') }}"
+                <a href="{{ route('index') }}"
                     class="inline-flex items-center justify-center px-8 py-3 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition-colors duration-200">
                     <svg class="w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                         stroke-width="2" stroke="currentColor">
