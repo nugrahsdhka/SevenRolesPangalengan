@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.3.4](https://github.com/nugrahsdhka/SevenRolesPangalengan/compare/v1.3.3...v1.3.4) (2026-11-15)
+
+
+### Bug Fixes
+
+* validasi period Camat (SQL injection), unik import Desa per periode, hapus route mati Gizi ([8a835c6](https://github.com/nugrahsdhka/SevenRolesPangalengan/commit/8a835c690a42e3abcfe641ac865e448eff4d90c5))
+
 ### [1.3.3](https://github.com/nugrahsdhka/SevenRolesPangalengan/compare/v1.3.2...v1.3.3) (2026-11-15)
 
 
