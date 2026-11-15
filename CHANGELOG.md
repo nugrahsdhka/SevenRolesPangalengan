@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.3.2](https://github.com/nugrahsdhka/SevenRolesPangalengan/compare/v1.3.1...v1.3.2) (2026-11-15)
+
+
+### Bug Fixes
+
+* throttle login & token flow, hash tokens, uniform auth errors, fix seeder, remove /mem-test ([41619b9](https://github.com/nugrahsdhka/SevenRolesPangalengan/commit/41619b9be7e0ef4379da4ed486b867636e817988))
+
 ### [1.3.1](https://github.com/nugrahsdhka/SevenRolesPangalengan/compare/v1.3.0...v1.3.1) (2026-11-15)
 
 
