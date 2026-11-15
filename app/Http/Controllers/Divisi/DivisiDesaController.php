@@ -58,7 +58,7 @@ class DivisiDesaController extends Controller
         $userRoleName = Auth::user()->roles->first()->name;
         $userIdsInSameRole = User::role($userRoleName)->pluck('id');
 
-        $request->validate([
+        $data = $request->validate([
             'periode' => 'required|date',
             'nama_desa' => [
                 'required', 'string', 'max:255',
@@ -75,9 +75,10 @@ class DivisiDesaController extends Controller
             'nama_desa.unique' => 'Data untuk desa ini pada periode yang dipilih sudah diinput oleh rekan Anda.'
         ]);
 
-        $data = $request->all();
+        // user_id & status ditentukan server, tidak boleh datang dari input user.
         $data['user_id'] = Auth::id();
-        $data['jumlah_kasus_stunting'] = $request->input('jumlah_kasus_stunting', 0);
+        $data['status']  = 'pending';
+        $data['jumlah_kasus_stunting'] = $data['jumlah_kasus_stunting'] ?? 0;
         DataDesa::create($data);
 
         return redirect()->route('desa.index')->with('success', 'Data Desa berhasil ditambahkan.');
@@ -89,6 +90,9 @@ class DivisiDesaController extends Controller
         if (!$data_desa->user->hasRole($currentUserRoleName)) {
             abort(403, 'AKSES DITOLAK: Anda hanya bisa mengelola data dari divisi Anda sendiri.');
         }
+        if (in_array($data_desa->status, ['approved', 'published'], true)) {
+            return redirect()->route('desa.index')->with('error', 'Data berstatus Approved/Published terkunci dan tidak bisa diubah. Minta Camat untuk membatalkan approval terlebih dahulu.');
+        }
         return view('divisi.desa.edit', ['data' => $data_desa]);
     }
 
@@ -97,6 +101,9 @@ class DivisiDesaController extends Controller
         $currentUserRoleName = Auth::user()->roles->first()->name;
         if (!$data_desa->user->hasRole($currentUserRoleName)) {
             abort(403, 'AKSES DITOLAK: Anda hanya bisa mengelola data dari divisi Anda sendiri.');
+        }
+        if (in_array($data_desa->status, ['approved', 'published'], true)) {
+            return redirect()->route('desa.index')->with('error', 'Data berstatus Approved/Published terkunci dan tidak bisa diubah. Minta Camat untuk membatalkan approval terlebih dahulu.');
         }
 
         $request->merge([
@@ -107,7 +114,7 @@ class DivisiDesaController extends Controller
         $userRoleName = Auth::user()->roles->first()->name;
         $userIdsInSameRole = User::role($userRoleName)->pluck('id');
         
-        $request->validate([
+        $data = $request->validate([
             'periode' => 'required|date',
             'nama_desa' => [
                 'required', 'string', 'max:255',
@@ -124,8 +131,7 @@ class DivisiDesaController extends Controller
             'nama_desa.unique' => 'Data untuk desa ini pada periode yang dipilih sudah diinput oleh rekan Anda.'
         ]);
 
-        $data = $request->all();
-        $data['jumlah_kasus_stunting'] = $request->input('jumlah_kasus_stunting', 0);
+        $data['jumlah_kasus_stunting'] = $data['jumlah_kasus_stunting'] ?? 0;
         $data_desa->update($data);
 
         return redirect()->route('desa.index')->with('success', 'Data Desa berhasil diperbarui.');
@@ -136,6 +142,9 @@ class DivisiDesaController extends Controller
         $currentUserRoleName = Auth::user()->roles->first()->name;
         if (!$data_desa->user->hasRole($currentUserRoleName)) {
             abort(403, 'AKSES DITOLAK: Anda hanya bisa mengelola data dari divisi Anda sendiri.');
+        }
+        if (in_array($data_desa->status, ['approved', 'published'], true)) {
+            return redirect()->route('desa.index')->with('error', 'Data berstatus Approved/Published terkunci dan tidak bisa diubah. Minta Camat untuk membatalkan approval terlebih dahulu.');
         }
         $data_desa->delete();
         return redirect()->route('desa.index')->with('success', 'Data Desa berhasil dihapus.');

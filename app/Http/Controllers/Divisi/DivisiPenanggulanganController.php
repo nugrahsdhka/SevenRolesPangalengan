@@ -34,14 +34,15 @@ class DivisiPenanggulanganController extends Controller
     public function store(Request $request)
     {
         $request->merge(['periode' => $request->periode . '-01']);
-        $request->validate([
+        $data = $request->validate([
             'periode' => 'required|date',
             'jenis_bencana' => 'required|string|max:255',
             'jumlah_korban' => 'required|integer|min:0',
             'tindakan' => 'required|string',
         ]);
-        $data = $request->all();
+        // user_id & status ditentukan server, tidak boleh datang dari input user.
         $data['user_id'] = Auth::id();
+        $data['status']  = 'pending';
         DataPenanggulangan::create($data);
         return redirect()->route('penanggulangan.index')->with('success', 'Data Penanggulangan berhasil ditambahkan.');
     }
@@ -55,6 +56,9 @@ class DivisiPenanggulanganController extends Controller
         if (!$data_penanggulangan->user->hasRole($currentUserRoleName)) {
             abort(403, 'AKSES DITOLAK: Anda hanya bisa mengelola data dari divisi Anda sendiri.');
         }
+        if (in_array($data_penanggulangan->status, ['approved', 'published'], true)) {
+            return redirect()->route('penanggulangan.index')->with('error', 'Data berstatus Approved/Published terkunci dan tidak bisa diubah. Minta Camat untuk membatalkan approval terlebih dahulu.');
+        }
         return view('divisi.penanggulangan.edit', ['data' => $data_penanggulangan]);
     }
 
@@ -67,14 +71,17 @@ class DivisiPenanggulanganController extends Controller
         if (!$data_penanggulangan->user->hasRole($currentUserRoleName)) {
             abort(403, 'AKSES DITOLAK: Anda hanya bisa mengelola data dari divisi Anda sendiri.');
         }
+        if (in_array($data_penanggulangan->status, ['approved', 'published'], true)) {
+            return redirect()->route('penanggulangan.index')->with('error', 'Data berstatus Approved/Published terkunci dan tidak bisa diubah. Minta Camat untuk membatalkan approval terlebih dahulu.');
+        }
         $request->merge(['periode' => $request->periode . '-01']);
-        $request->validate([
+        $data = $request->validate([
             'periode' => 'required|date',
             'jenis_bencana' => 'required|string|max:255',
             'jumlah_korban' => 'required|integer|min:0',
             'tindakan' => 'required|string',
         ]);
-        $data_penanggulangan->update($request->all());
+        $data_penanggulangan->update($data);
         return redirect()->route('penanggulangan.index')->with('success', 'Data Penanggulangan berhasil diperbarui.');
     }
 
@@ -86,6 +93,9 @@ class DivisiPenanggulanganController extends Controller
         $currentUserRoleName = Auth::user()->roles->first()->name;
         if (!$data_penanggulangan->user->hasRole($currentUserRoleName)) {
             abort(403, 'AKSES DITOLAK: Anda hanya bisa mengelola data dari divisi Anda sendiri.');
+        }
+        if (in_array($data_penanggulangan->status, ['approved', 'published'], true)) {
+            return redirect()->route('penanggulangan.index')->with('error', 'Data berstatus Approved/Published terkunci dan tidak bisa diubah. Minta Camat untuk membatalkan approval terlebih dahulu.');
         }
         $data_penanggulangan->delete();
         return redirect()->route('penanggulangan.index')->with('success', 'Data Penanggulangan berhasil dihapus.');

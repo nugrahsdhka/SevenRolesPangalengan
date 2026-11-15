@@ -35,15 +35,16 @@ class DivisiPencegahanController extends Controller
     public function store(Request $request)
     {
         $request->merge(['periode' => $request->periode . '-01']);
-        $request->validate([
+        $data = $request->validate([
             'periode' => 'required|date',
             'judul_kegiatan' => 'required|string|max:255',
             'lokasi' => 'required|string|max:255',
             'tanggal_kegiatan' => 'required|date',
             'laporan_singkat' => 'required|string',
         ]);
-        $data = $request->all();
+        // user_id & status ditentukan server, tidak boleh datang dari input user.
         $data['user_id'] = Auth::id();
+        $data['status']  = 'pending';
         DataPencegahan::create($data);
         return redirect()->route('pencegahan.index')->with('success', 'Data Pencegahan berhasil ditambahkan.');
     }
@@ -54,6 +55,9 @@ class DivisiPencegahanController extends Controller
         if (!$data_pencegahan->user->hasRole($currentUserRoleName)) {
             abort(403, 'AKSES DITOLAK: Anda hanya bisa mengelola data dari divisi Anda sendiri.');
         }
+        if (in_array($data_pencegahan->status, ['approved', 'published'], true)) {
+            return redirect()->route('pencegahan.index')->with('error', 'Data berstatus Approved/Published terkunci dan tidak bisa diubah. Minta Camat untuk membatalkan approval terlebih dahulu.');
+        }
         return view('divisi.pencegahan.edit', ['data' => $data_pencegahan]);
     }
     
@@ -63,15 +67,18 @@ class DivisiPencegahanController extends Controller
         if (!$data_pencegahan->user->hasRole($currentUserRoleName)) {
             abort(403, 'AKSES DITOLAK: Anda hanya bisa mengelola data dari divisi Anda sendiri.');
         }
+        if (in_array($data_pencegahan->status, ['approved', 'published'], true)) {
+            return redirect()->route('pencegahan.index')->with('error', 'Data berstatus Approved/Published terkunci dan tidak bisa diubah. Minta Camat untuk membatalkan approval terlebih dahulu.');
+        }
         $request->merge(['periode' => $request->periode . '-01']);
-        $request->validate([
+        $data = $request->validate([
             'periode' => 'required|date',
             'judul_kegiatan' => 'required|string|max:255',
             'lokasi' => 'required|string|max:255',
             'tanggal_kegiatan' => 'required|date',
             'laporan_singkat' => 'required|string',
         ]);
-        $data_pencegahan->update($request->all());
+        $data_pencegahan->update($data);
         return redirect()->route('pencegahan.index')->with('success', 'Data Pencegahan berhasil diperbarui.');
     }
     
@@ -80,6 +87,9 @@ class DivisiPencegahanController extends Controller
         $currentUserRoleName = Auth::user()->roles->first()->name;
         if (!$data_pencegahan->user->hasRole($currentUserRoleName)) {
             abort(403, 'AKSES DITOLAK: Anda hanya bisa mengelola data dari divisi Anda sendiri.');
+        }
+        if (in_array($data_pencegahan->status, ['approved', 'published'], true)) {
+            return redirect()->route('pencegahan.index')->with('error', 'Data berstatus Approved/Published terkunci dan tidak bisa diubah. Minta Camat untuk membatalkan approval terlebih dahulu.');
         }
         $data_pencegahan->delete();
         return redirect()->route('pencegahan.index')->with('success', 'Data Pencegahan berhasil dihapus.');

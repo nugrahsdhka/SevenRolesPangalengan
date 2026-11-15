@@ -210,12 +210,18 @@ class DivisiGiziController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'period'         => ['required', 'regex:/^\d{4}-\d{2}(-\d{2})?$/'],
             'desa_kelurahan' => 'required|string|max:150',
-            // sekarang berat & tinggi boleh null
+            // berat & tinggi boleh null
             'berat'          => 'nullable|numeric',
             'tinggi'         => 'nullable|numeric',
+            'zs_tb_u'        => 'nullable|numeric',
+            'zs_bb_u'        => 'nullable|numeric',
+            'zs_bb_tb'       => 'nullable|numeric',
+            'status_tb_u'    => 'nullable|string|max:100',
+            'status_bb_u'    => 'nullable|string|max:100',
+            'status_bb_tb'   => 'nullable|string|max:100',
         ]);
 
         $period      = date('Y-m-01', strtotime($request->period));
@@ -233,8 +239,27 @@ class DivisiGiziController extends Controller
             return back()->with('error', 'Data desa ini sudah di-Approve/Published.');
         }
 
-        $data            = $request->all();
-        $data['user_id'] = Auth::id();
+        // Hanya field yang tervalidasi yang diterima. Field alur kerja
+        // (status, is_published, user_id, import_notes) ditentukan server,
+        // BUKAN dari input user.
+        $data = [
+            'berat'          => $validated['berat']        ?? null,
+            'tinggi'         => $validated['tinggi']       ?? null,
+            'zs_tb_u'        => $validated['zs_tb_u']      ?? null,
+            'zs_bb_u'        => $validated['zs_bb_u']      ?? null,
+            'zs_bb_tb'       => $validated['zs_bb_tb']     ?? null,
+            'status_tb_u'    => $validated['status_tb_u']  ?? null,
+            'status_bb_u'    => $validated['status_bb_u']  ?? null,
+            'status_bb_tb'   => $validated['status_bb_tb'] ?? null,
+            'period'         => $period,
+            'desa_kelurahan' => $desa,
+            'user_id'        => Auth::id(),
+            'is_published'   => false,
+        ] + $this->resolveReviewStatus([
+            $validated['zs_tb_u']  ?? null,
+            $validated['zs_bb_u']  ?? null,
+            $validated['zs_bb_tb'] ?? null,
+        ]);
 
         DataGizi::create($data);
 
@@ -242,8 +267,38 @@ class DivisiGiziController extends Controller
             ->with('success', 'Data berhasil ditambahkan.');
     }
 
+    /**
+     * Tentukan status & catatan berdasarkan rentang z-score (-6 s/d 6).
+     * Di luar rentang → need_review, selain itu → pending.
+     */
+    private function resolveReviewStatus(array $zScores): array
+    {
+        foreach ($zScores as $val) {
+            if ($val !== null && ($val < -6 || $val > 6)) {
+                return [
+                    'status'       => 'need_review',
+                    'import_notes' => 'Data masih di luar batas normal (-6 s/d 6).',
+                ];
+            }
+        }
+
+        return ['status' => 'pending', 'import_notes' => null];
+    }
+
     public function update(Request $request, DataGizi $data_gizi)
     {
+        // Hanya divisi pemilik data yang boleh mengubah (sama seperti controller Divisi lain).
+        $currentUserRoleName = Auth::user()->roles->first()->name;
+        if (! $data_gizi->user || ! $data_gizi->user->hasRole($currentUserRoleName)) {
+            abort(403, 'AKSES DITOLAK: Anda hanya bisa mengelola data dari divisi Anda sendiri.');
+        }
+
+        // Data yang sudah Approved/Published terkunci: kalau diubah, statusnya akan
+        // turun ke pending dan data terbit hilang dari statistik publik.
+        if (in_array($data_gizi->status, ['approved', 'published'], true)) {
+            return back()->with('error', 'Data berstatus Approved/Published terkunci dan tidak bisa diubah. Minta Camat untuk membatalkan approval terlebih dahulu.');
+        }
+
         $request->validate([
             'desa_kelurahan' => 'required|string|max:150',
             'berat'          => 'nullable|numeric',
@@ -255,22 +310,7 @@ class DivisiGiziController extends Controller
 
         $data = $request->only(['zs_tb_u', 'zs_bb_u', 'zs_bb_tb']);
 
-        // Re-Validation Range
-        $isStillAnomali = false;
-        foreach($data as $val) {
-            if ($val !== null && ($val < -6 || $val > 6)) {
-                $isStillAnomali = true;
-                break;
-            }
-        }
-
-        if ($isStillAnomali) {
-            $data['status'] = 'need_review';
-            $data['import_notes'] = "Data masih di luar batas normal (-6 s/d 6).";
-        } else {
-            $data['status'] = 'pending';
-            $data['import_notes'] = null; // Bersihkan catatan jika sudah benar
-        }
+        $data += $this->resolveReviewStatus(array_values($data));
 
         $data_gizi->update($data);
 
