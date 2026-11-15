@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.3.0](https://github.com/nugrahsdhka/SevenRolesPangalengan/compare/v1.2.1...v1.3.0) (2026-11-15)
+
+
+### Features
+
+* penambahan fitur pengaduan ([6b529ee](https://github.com/nugrahsdhka/SevenRolesPangalengan/commit/6b529ee536659335b971d6ce1ba6d9de1a5855e3))
+
+
+### Bug Fixes
+
+* penghapusan chatbot dan penyesuaian responsive ([5c8b72b](https://github.com/nugrahsdhka/SevenRolesPangalengan/commit/5c8b72bacedab46233a0f16d4ce5338a3712ab7d))
+* perbaikan penulisan Role and user ([4f86ec3](https://github.com/nugrahsdhka/SevenRolesPangalengan/commit/4f86ec36fb718999f6ab421a73dc859f9b384744))
+
 ### [1.2.1](https://github.com/nugrahsdhka/SevenRolesPangalengan/compare/v1.1.3...v1.2.1) (2026-07-08)
 
 
