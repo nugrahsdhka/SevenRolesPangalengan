@@ -42,6 +42,16 @@ class User extends Authenticatable implements MustVerifyEmail
         'verification_token_expires_at' => 'datetime',
     ];
 
+    /**
+     * Hash token verifikasi sebelum disimpan / dibandingkan.
+     * HMAC dengan APP_KEY, sehingga token 6 digit tidak bisa ditebak offline
+     * kalau isi database bocor.
+     */
+    public static function hashVerificationToken(string $token): string
+    {
+        return hash_hmac('sha256', $token, (string) config('app.key'));
+    }
+
     public function sendPasswordResetNotification($token)
     {
         $this->notify(new ResetPasswordNotification($token));

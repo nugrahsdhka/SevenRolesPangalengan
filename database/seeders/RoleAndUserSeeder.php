@@ -20,7 +20,14 @@ class RoleAndUserSeeder extends Seeder
         // VALIDASI KONFIGURASI SEEDER
         // ==========================================
 
-        $accounts = config('seeders.accounts', []);
+        // Nama file konfigurasi: config/seeder.php  → kunci "seeder"
+        $accounts = config('seeder.accounts', []);
+
+        if (empty($accounts)) {
+            throw new RuntimeException(
+                "Konfigurasi 'seeder.accounts' tidak ditemukan. Pastikan config/seeder.php ada."
+            );
+        }
 
         foreach ($accounts as $key => $account) {
             if (
@@ -117,7 +124,7 @@ class RoleAndUserSeeder extends Seeder
         string $name,
         Role $role
     ): User {
-        $account = config("seeders.accounts.{$key}");
+        $account = config("seeder.accounts.{$key}");
 
         $user = User::firstOrCreate(
             ['email' => $account['email']],

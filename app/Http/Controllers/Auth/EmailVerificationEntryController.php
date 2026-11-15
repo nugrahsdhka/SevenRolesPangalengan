@@ -19,9 +19,9 @@ class EmailVerificationEntryController extends Controller
 
     /**
      * Proses email untuk menentukan ke mana user diarahkan:
-     * - kalau sudah terverifikasi → arahkan ke login dengan pesan
-     * - kalau belum & ada token aktif → ke halaman input token
-     * - kalau belum & belum ada token → ke halaman lengkapi registrasi
+     * - akun pending dengan token aktif → ke halaman input token
+     * - selain itu (termasuk email tak dikenal / sudah terverifikasi)
+     *   → ke halaman lengkapi registrasi (respons seragam)
      */
     public function store(Request $request)
     {
@@ -30,36 +30,28 @@ class EmailVerificationEntryController extends Controller
             'email' => ['required', 'string', 'email'],
         ]);
 
-        $user = User::where('email', $data['email'])->first();
+        // Email tidak terdaftar & email yang sudah terverifikasi diperlakukan sama
+        // dengan akun "belum punya token" (→ form lengkapi registrasi), supaya
+        // status akun tidak bisa ditebak lewat halaman ini.
+        $user = User::where('email', $data['email'])
+            ->whereNull('email_verified_at')
+            ->first();
 
-        if (!$user) {
-            return back()->withErrors([
-                'email' => 'Akun dengan email tersebut tidak ditemukan.',
-            ])->withInput();
-        }
-
-        // Kalau sudah terverifikasi → langsung suruh login
-        if ($user->hasVerifiedEmail()) {
-            return redirect()
-                ->route('login')
-                ->with('status', 'Email Anda sudah terverifikasi. Silakan login.');
-        }
-
-        // Kalau BELUM terverifikasi:
-        // cek apakah sudah punya token yang masih aktif
+        // Akun pending dengan token yang masih aktif → langsung ke input token
         if (
+            $user &&
             $user->verification_token &&
             $user->verification_token_expires_at &&
             now()->lessThan($user->verification_token_expires_at)
         ) {
             return redirect()
-                ->route('verification.token.show', ['email' => $user->email])
+                ->route('verification.token.show', ['email' => $data['email']])
                 ->with('status', 'Silakan masukkan token verifikasi yang telah dikirim ke email Anda.');
         }
 
         // Kalau belum punya token / token kadaluarsa → ke halaman lengkapi registrasi
         return redirect()
-            ->route('register.complete.show', ['email' => $user->email])
+            ->route('register.complete.show', ['email' => $data['email']])
             ->with('status', 'Silakan lengkapi registrasi dan lakukan verifikasi email.');
     }
 }

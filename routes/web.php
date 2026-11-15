@@ -76,6 +76,7 @@ Route::middleware('guest')->group(function () {
         ->name('verification.entry.show');
 
     Route::post('/verify-email-entry', [EmailVerificationEntryController::class, 'store'])
+        ->middleware('throttle:20,1')
         ->name('verification.entry.store');
 });
 
@@ -192,10 +193,5 @@ Route::middleware('auth', 'verified')->group(function () {
     Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit'); // Halaman Edit Form
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
 });
-
-Route::get('/mem-test', function () {
-    return ini_get('memory_limit');
-});
-
 
 require __DIR__.'/auth.php';

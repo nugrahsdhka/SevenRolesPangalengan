@@ -14,20 +14,26 @@ Route::middleware('guest')->group(function () {
         ->name('login');
 
     // PROSES LOGIN
-    Route::post('/kec-pangalengan-login-access', [AuthenticatedSessionController::class, 'store']);
+    Route::post('/kec-pangalengan-login-access', [AuthenticatedSessionController::class, 'store'])
+        ->middleware('throttle:30,1');
 
     // LENGKAPI REGISTRASI (nama + password)
     Route::get('/register/complete', [CompleteRegistrationController::class, 'show'])
+        ->middleware('throttle:30,1')
         ->name('register.complete.show');
     Route::post('/register/complete', [CompleteRegistrationController::class, 'store'])
+        ->middleware('throttle:token-send')
         ->name('register.complete.store');
 
     // VERIFIKASI TOKEN
     Route::get('/verify-token', [TokenVerificationController::class, 'show'])
+        ->middleware('throttle:30,1')
         ->name('verification.token.show');
     Route::post('/verify-token', [TokenVerificationController::class, 'verify'])
+        ->middleware('throttle:verify-token')
         ->name('verification.token.verify');
     Route::post('/verify-token/resend', [TokenVerificationController::class, 'resend'])
+        ->middleware('throttle:token-send')
         ->name('verification.token.resend');
 });
 

@@ -28,32 +28,21 @@
             <div class="flex-grow overflow-y-auto px-6 py-6">
                 <form method="POST" action="{{ route('register.complete.store') }}" class="space-y-4">
                     @csrf
-                    <input type="hidden" name="email" value="{{ $user->email }}">
+                    <input type="hidden" name="email" value="{{ $email }}">
 
                     {{-- Email --}}
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-1">Email</label>
                         <input
                             class="w-full rounded-xl border border-gray-200 bg-gray-50 text-gray-500 text-sm py-2.5 px-3 cursor-not-allowed"
-                            value="{{ $user->email }}" disabled />
-                    </div>
-
-                    {{-- Role --}}
-                    @php
-                        $roleLabel = $user->roles->pluck('name')->join(', ');
-                    @endphp
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-1">Role</label>
-                        <input
-                            class="w-full rounded-xl border border-gray-200 bg-gray-50 text-gray-500 text-sm py-2.5 px-3 cursor-not-allowed"
-                            value="{{ $roleLabel ?: 'Belum memiliki role' }}" disabled />
+                            value="{{ $email }}" disabled />
                     </div>
 
                     {{-- Nama --}}
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-1">Nama Lengkap <span
                                 class="text-red-600">*</span></label>
-                        <input id="name" name="name" value="{{ old('name', $user->name) }}" required
+                        <input id="name" name="name" value="{{ old('name') }}" required
                             class="w-full rounded-xl border border-gray-300 bg-white text-gray-900 text-sm py-2.5 px-3 focus:ring-1 focus:ring-red-500 focus:border-red-500"
                             placeholder="Masukkan nama lengkap" />
                         <x-input-error :messages="$errors->get('name')" class="mt-1" />
