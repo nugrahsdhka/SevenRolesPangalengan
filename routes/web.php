@@ -107,22 +107,16 @@ Route::middleware('auth', 'verified')->group(function () {
     Route::middleware(['role:Divisi Gizi'])->prefix('divisi-gizi')->name('gizi.')->group(function () {
         Route::post('/aggregated-delete', [DivisiGiziController::class, 'destroyAggregated'])->name('destroyAggregated');
 
-        Route::get('/gizi/desa/{desa}', [DivisiGiziController::class, 'detail'])->name('detail');
         Route::post('/import', [DivisiGiziController::class, 'import'])->name('import');
 
-        Route::get('/gizi/import/{job}/progress', [DivisiGiziController::class, 'importProgress'])
-            ->name('gizi.import.progress');
-
-        Route::get('/gizi/import-status/{job}', [DivisiGiziController::class, 'importStatus'])
-            ->name('gizi.import.status');
-            
-        Route::delete('/divisi/gizi/aggregat', [DivisiGiziController::class, 'destroyAggregat'])
-            ->name('gizi.destroyAggregat');
-
-        Route::get('export', [App\Http\Controllers\Divisi\DivisiGiziController::class, 'export'])
+        Route::get('export', [DivisiGiziController::class, 'export'])
             ->name('export');
 
-        Route::resource('/', DivisiGiziController::class)->parameters(['' => 'data_gizi']);
+        // Hanya method yang benar-benar ada di DivisiGiziController (show/edit/destroy
+        // tidak ada, jadi tidak didaftarkan agar tidak berujung 500).
+        Route::resource('/', DivisiGiziController::class)
+            ->only(['index', 'create', 'store', 'update'])
+            ->parameters(['' => 'data_gizi']);
     });
 
     // Divisi Pencegahan

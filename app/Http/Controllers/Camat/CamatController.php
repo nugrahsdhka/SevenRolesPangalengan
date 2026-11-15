@@ -15,6 +15,14 @@ use Illuminate\Validation\Rule;
 
 class CamatController extends Controller
 {
+    /**
+     * Periode harus persis "YYYY-MM" dengan bulan 01-12.
+     */
+    private function isValidPeriodYm($value): bool
+    {
+        return is_string($value) && preg_match('/^\d{4}-(0[1-9]|1[0-2])$/', $value) === 1;
+    }
+
     public function index(Request $request)
     {
         $perPage = 15;
@@ -40,9 +48,12 @@ class CamatController extends Controller
             $latestPeriodYm = now()->format('Y-m');
         }
 
-        if ($requestedPeriod) {
+        // Input period dan nilai di session HANYA dipakai kalau berformat Y-m yang
+        // valid; selain itu diabaikan (jatuh ke periode terbaru). Nilainya kemudian
+        // dipakai di query, jadi tidak boleh lolos sebagai string bebas.
+        if ($this->isValidPeriodYm($requestedPeriod)) {
             $periodYm = $requestedPeriod;
-        } elseif ($sessionPeriod) {
+        } elseif ($this->isValidPeriodYm($sessionPeriod)) {
             $periodYm = $sessionPeriod;
         } else {
             $periodYm = $availablePeriods->isNotEmpty() ? $latestPeriodYm : now()->format('Y-m');
@@ -55,6 +66,9 @@ class CamatController extends Controller
         //  STATUS TAB
         // =========================
         $status = $request->input('status', 'pending');
+        if (! in_array($status, ['pending', 'approved', 'published'], true)) {
+            $status = 'pending';
+        }
 
         // =========================
         //  QUERY DATA GIZI
@@ -67,19 +81,20 @@ class CamatController extends Controller
                 DB::raw('SUM(CASE WHEN zs_tb_u < -2 THEN 1 ELSE 0 END) as total_kasus_stunting'),
                 DB::raw('ROUND(SUM(CASE WHEN zs_tb_u < -2 THEN 1 ELSE 0 END) * 100.0 / NULLIF(COUNT(*), 0), 2) as prevalensi_stunting'),
                 DB::raw('SUM(zs_tb_u) as sum_zs_tbu'),
-                DB::raw('MAX(created_at) as tanggal_input_terbaru'),
-                DB::raw("
-                    (
-                        SELECT dg2.user_id
-                        FROM data_gizis dg2
-                        WHERE dg2.desa_kelurahan = data_gizis.desa_kelurahan
-                        AND dg2.status = data_gizis.status
-                        AND DATE_FORMAT(dg2.period, '%Y-%m') = '" . $periodYm . "'
-                        ORDER BY dg2.created_at DESC
-                        LIMIT 1
-                    ) as user_id
-                ")
+                DB::raw('MAX(created_at) as tanggal_input_terbaru')
             )
+            // Parameter binding (?), bukan string-concat, supaya aman dari SQL injection.
+            ->selectRaw("
+                (
+                    SELECT dg2.user_id
+                    FROM data_gizis dg2
+                    WHERE dg2.desa_kelurahan = data_gizis.desa_kelurahan
+                    AND dg2.status = data_gizis.status
+                    AND DATE_FORMAT(dg2.period, '%Y-%m') = ?
+                    ORDER BY dg2.created_at DESC
+                    LIMIT 1
+                ) as user_id
+            ", [$periodYm])
             ->whereYear('period', $year)
             ->whereMonth('period', $month)
             ->where('status', $status)
@@ -205,7 +220,7 @@ class CamatController extends Controller
         if ($request->model === 'DataGizi') {
             $request->validate([
                 'desa_kelurahan' => 'required|string',
-                'period'         => 'nullable|string',
+                'period'         => ['nullable', 'regex:/^\d{4}-(0[1-9]|1[0-2])$/'],
             ]);
 
             $desaKelurahan = $request->desa_kelurahan;
@@ -270,7 +285,7 @@ class CamatController extends Controller
             'model_type' => 'required|string|in:gizi,pencegahan,penanggulangan,desa',
             'action'     => 'required|string|in:approve_all,unapprove_all',
             'active_tab' => 'required|string',
-            'period'     => 'nullable|string',
+            'period'     => ['nullable', 'regex:/^\d{4}-(0[1-9]|1[0-2])$/'],
         ]);
 
         $modelMap = [
@@ -334,7 +349,7 @@ class CamatController extends Controller
         if ($request->model === 'DataGizi') {
             $request->validate([
                 'desa_kelurahan' => 'required|string',
-                'period'         => 'nullable|string', // Y-m
+                'period'         => ['nullable', 'regex:/^\d{4}-(0[1-9]|1[0-2])$/'], // Y-m
                 'status'         => ['required', Rule::in(['pending', 'approved', 'published'])],
             ]);
 
@@ -385,6 +400,10 @@ class CamatController extends Controller
     public function showGiziDetail(Request $request, $desaKelurahan)
     {
         $perPage = 100;
+
+        $request->validate([
+            'period' => ['nullable', 'regex:/^\d{4}-(0[1-9]|1[0-2])$/'],
+        ]);
 
         // =========================
         //  Tentukan periode aktif

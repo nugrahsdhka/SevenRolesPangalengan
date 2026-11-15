@@ -101,19 +101,19 @@ class DivisiGiziController extends Controller
                 DB::raw('SUM(CASE WHEN status != "need_review" THEN tinggi ELSE 0 END) as sum_tinggi'),
                 DB::raw('SUM(zs_bb_u) as sum_zs_bbu'),
                 DB::raw('SUM(zs_tb_u) as sum_zs_tbu'),
-                DB::raw('SUM(zs_bb_tb) as sum_zs_bbtb'),
-                DB::raw("
-                    (
-                        SELECT dg2.user_id
-                        FROM data_gizis dg2
-                        WHERE dg2.desa_kelurahan = data_gizis.desa_kelurahan
-                        AND dg2.status = data_gizis.status
-                        AND DATE(dg2.period) = '" . $currentPeriod . "'
-                        ORDER BY dg2.created_at DESC
-                        LIMIT 1
-                    ) as user_id
-                ")
+                DB::raw('SUM(zs_bb_tb) as sum_zs_bbtb')
             )
+            ->selectRaw("
+                (
+                    SELECT dg2.user_id
+                    FROM data_gizis dg2
+                    WHERE dg2.desa_kelurahan = data_gizis.desa_kelurahan
+                    AND dg2.status = data_gizis.status
+                    AND DATE(dg2.period) = ?
+                    ORDER BY dg2.created_at DESC
+                    LIMIT 1
+                ) as user_id
+            ", [$currentPeriod])
             ->groupBy('desa_kelurahan', 'status')
             ->orderBy('tanggal_input_terbaru', 'desc')
             ->paginate(50)

@@ -8,11 +8,14 @@ use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\WithValidation;
-use Illuminate\Validation\Rule;
+use Illuminate\Support\Str;
 
 class DataDesaImport implements ToModel, WithHeadingRow, WithValidation
 {
     private $userIdsInSameRole;
+
+    /** Kunci "desa|periode" yang sudah terlihat di file ini (deteksi duplikat dalam file). */
+    private array $seen = [];
 
     public function __construct()
     {
@@ -40,20 +43,51 @@ class DataDesaImport implements ToModel, WithHeadingRow, WithValidation
         ]);
     }
 
+    /**
+     * Closure rule Laravel hanya melihat satu nilai, sehingga kunci gabungan
+     * "desa + periode" dibuat di sini sebagai field sintetis `desa_periode`.
+     * Dipakai untuk cek unik per desa + periode (bukan unik global).
+     */
+    public function prepareForValidation(array $data, int $index): array
+    {
+        $nama    = isset($data['nama_desa']) ? trim((string) $data['nama_desa']) : '';
+        $periode = isset($data['periode']) ? trim((string) $data['periode']) : '';
+
+        $data['desa_periode'] = ($nama !== '' && $periode !== '')
+            ? Str::title($nama) . '|' . $periode
+            : null;
+
+        return $data;
+    }
+
     public function rules(): array
     {
         return [
             'periode' => 'required|date_format:Y-m',
-            
-            // Validasi: nama_desa harus unik untuk periode yang sama di antara rekan satu divisi
-            'nama_desa' => [
-                'required', 'string', 'max:255',
-                Rule::unique('data_desas')->where(function ($query) {
-                    // $this->data['periode'] tidak tersedia di sini, kita harus ambil dari row
-                    // Kita akan validasi manual atau biarkan controller yang menangani duplikasi kompleks
-                    // Untuk kesederhanaan, kita hanya validasi dasar di sini.
-                    // Validasi unik yang kompleks lebih baik ditangani di controller jika diperlukan.
-                }),
+
+            'nama_desa' => ['required', 'string', 'max:255'],
+
+            // Unik per desa + periode di antara rekan satu divisi (sama seperti form
+            // manual di DivisiDesaController), plus tidak boleh dobel di dalam satu file.
+            'desa_periode' => [
+                function ($attribute, $value, $fail) {
+                    if (isset($this->seen[$value])) {
+                        $fail('Desa ini muncul lebih dari sekali untuk periode yang sama di dalam file.');
+                        return;
+                    }
+                    $this->seen[$value] = true;
+
+                    [$nama, $periode] = explode('|', $value, 2);
+
+                    $exists = DataDesa::where('nama_desa', $nama)
+                        ->whereDate('periode', $periode . '-01')
+                        ->whereIn('user_id', $this->userIdsInSameRole)
+                        ->exists();
+
+                    if ($exists) {
+                        $fail('Data untuk desa ini pada periode tersebut sudah diinput oleh divisi Anda.');
+                    }
+                },
             ],
 
             'jumlah_penduduk' => 'required|integer|min:0',
