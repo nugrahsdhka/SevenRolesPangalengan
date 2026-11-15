@@ -98,7 +98,7 @@
     };
 
     // ===== FETCH INTERCEPTOR =====
-    const SKIP_LOADER = ['/api/chat'];
+    const SKIP_LOADER = [];
     let pendingRequests = 0;
 
     if (!window.__fetchWrapped) {

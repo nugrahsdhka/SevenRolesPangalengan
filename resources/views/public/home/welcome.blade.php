@@ -242,6 +242,4 @@
         </a>
 
     </div>
-    
-    <x-chatbot />
 </main>
