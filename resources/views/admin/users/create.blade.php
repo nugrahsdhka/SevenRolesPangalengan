@@ -77,6 +77,20 @@
                             </select>
                             <x-input-error :messages="$errors->get('role')" class="mt-2" />
                         </div>
+
+                        {{-- Puskesmas (khusus Divisi Gizi / petugas puskesmas) --}}
+                        <div id="puskesmas-wrap" class="hidden">
+                            <x-input-label for="puskesmas" :value="__('Puskesmas Tempat Bertugas')" class="text-sm font-medium text-gray-700" />
+                            <select name="puskesmas" id="puskesmas"
+                                class="mt-2 block w-full rounded-lg border-gray-300 bg-gray-50 px-4 py-2.5 transition focus:border-red-500 focus:bg-white focus:ring-2 focus:ring-red-500/20">
+                                <option value="">Pilih Puskesmas</option>
+                                @foreach ($puskesmasList as $p)
+                                    <option value="{{ $p }}" {{ old('puskesmas') == $p ? 'selected' : '' }}>{{ $p }}</option>
+                                @endforeach
+                            </select>
+                            <p class="mt-1 text-xs text-gray-500">Petugas hanya bisa membalas pengaduan untuk puskesmas ini.</p>
+                            <x-input-error :messages="$errors->get('puskesmas')" class="mt-2" />
+                        </div>
                     </div>
 
                     {{-- Action Buttons --}}
@@ -94,4 +108,14 @@
             </section>
         </div>
     </div>
+
+    <script>
+        (function () {
+            const role = document.getElementById('role');
+            const wrap = document.getElementById('puskesmas-wrap');
+            const toggle = () => wrap.classList.toggle('hidden', role.value !== 'Divisi Gizi');
+            role.addEventListener('change', toggle);
+            toggle();
+        })();
+    </script>
 </x-app-layout>

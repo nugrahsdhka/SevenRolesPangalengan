@@ -101,6 +101,8 @@ Route::middleware('auth', 'verified')->group(function () {
     Route::middleware(['role:IT Admin|Camat|Divisi Gizi|Divisi Pencegahan|Divisi Penanggulangan|Divisi Desa'])->group(function () {
         Route::get('/pengaduan-masuk', [AdminPengaduanController::class, 'index'])->name('complaints.index');
         Route::get('/pengaduan-masuk/{complaint}', [AdminPengaduanController::class, 'show'])->name('complaints.show');
+        // Balas pengaduan: dicek per puskesmas di controller (User::canRespondTo)
+        Route::patch('/pengaduan-masuk/{complaint}', [AdminPengaduanController::class, 'update'])->name('complaints.update');
     });
 
     // Divisi Gizi
@@ -175,8 +177,7 @@ Route::middleware('auth', 'verified')->group(function () {
         Route::patch('/users/{id}/password', [UserController::class, 'updatePassword'])->name('users.password.update');
         Route::patch('/users/{id}/restore', [UserController::class, 'restore'])->name('users.restore'); // ✅ RUTE BARU
 
-        // Kelola pengaduan (hanya IT Admin)
-        Route::patch('/pengaduan/{complaint}', [AdminPengaduanController::class, 'update'])->name('complaints.update');
+        // Hapus pengaduan (hanya IT Admin)
         Route::delete('/pengaduan/{complaint}', [AdminPengaduanController::class, 'destroy'])->name('complaints.destroy');
 
         Route::post('/bulk-publish', [AdminController::class, 'bulkPublish'])->name('bulk_publish');

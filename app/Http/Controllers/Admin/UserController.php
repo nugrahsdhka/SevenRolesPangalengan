@@ -27,7 +27,8 @@ class UserController extends Controller
     public function create()
     {
         $roles = Role::where('name', '!=', 'Guest')->pluck('name', 'name');
-        return view('admin.users.create', compact('roles'));
+        $puskesmasList = \App\Models\Faskes::whereNotNull('puskesmas')->distinct()->orderBy('puskesmas')->pluck('puskesmas');
+        return view('admin.users.create', compact('roles', 'puskesmasList'));
     }
 
     public function store(Request $request)
@@ -36,6 +37,9 @@ class UserController extends Controller
             'name'  => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:' . User::class],
             'role'  => ['required', 'string', 'exists:roles,name'],
+            // Wajib untuk petugas puskesmas (Divisi Gizi) agar tahu pengaduan mana yang boleh dibalas
+            'puskesmas' => ['nullable', 'required_if:role,Divisi Gizi', 'string', 'max:100',
+                'exists:faskes,puskesmas'],
         ]);
 
         $randomPassword = Str::random(32);
@@ -43,6 +47,7 @@ class UserController extends Controller
         $user = User::create([
             'name'     => $request->name,
             'email'    => $request->email,
+            'puskesmas' => $request->role === 'Divisi Gizi' ? $request->puskesmas : null,
             'password' => Hash::make($randomPassword),
         ]);
 

@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
+use App\Models\Complaint;
 use App\Notifications\ResetPasswordNotification;
 use App\Notifications\VerifyEmailNotification;
 
@@ -23,6 +24,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'name',
         'email',
         'password',
+        'puskesmas',
     ];
 
     /**
@@ -50,6 +52,34 @@ class User extends Authenticatable implements MustVerifyEmail
     public static function hashVerificationToken(string $token): string
     {
         return hash_hmac('sha256', $token, (string) config('app.key'));
+    }
+
+    /**
+     * Petugas hanya boleh membalas pengaduan yang ditujukan ke puskesmasnya sendiri.
+     */
+    public function canRespondTo(Complaint $complaint): bool
+    {
+        return $this->hasRole('Divisi Gizi') && $this->belongsToComplaintPuskesmas($complaint);
+    }
+
+    /**
+     * IT Admin & Camat memantau semua pengaduan (hanya lihat).
+     */
+    public function canViewAllComplaints(): bool
+    {
+        return $this->hasAnyRole(['IT Admin', 'Camat']);
+    }
+
+    public function canViewComplaint(Complaint $complaint): bool
+    {
+        return $this->canViewAllComplaints() || $this->belongsToComplaintPuskesmas($complaint);
+    }
+
+    public function belongsToComplaintPuskesmas(Complaint $complaint): bool
+    {
+        return filled($this->puskesmas)
+            && filled($complaint->puskesmas)
+            && mb_strtolower(trim($this->puskesmas)) === mb_strtolower(trim($complaint->puskesmas));
     }
 
     public function sendPasswordResetNotification($token)

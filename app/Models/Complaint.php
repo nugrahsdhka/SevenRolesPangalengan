@@ -47,6 +47,23 @@ class Complaint extends Model
         'ditanggapi_at' => 'datetime',
     ];
 
+    /**
+     * Batasi pengaduan sesuai user: IT Admin & Camat melihat semua,
+     * petugas lain hanya pengaduan untuk puskesmasnya sendiri.
+     */
+    public function scopeVisibleTo($query, User $user)
+    {
+        if ($user->canViewAllComplaints()) {
+            return $query;
+        }
+
+        if (blank($user->puskesmas)) {
+            return $query->whereRaw('1 = 0');
+        }
+
+        return $query->whereRaw('LOWER(puskesmas) = ?', [mb_strtolower(trim($user->puskesmas))]);
+    }
+
     public function penangan(): BelongsTo
     {
         return $this->belongsTo(User::class, 'ditangani_oleh');

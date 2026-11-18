@@ -81,19 +81,22 @@ class RoleAndUserSeeder extends Seeder
         $this->createUser(
             'gizi_pangalengan',
             'Puskesmas Pangalengan',
-            $roleGizi
+            $roleGizi,
+            'PANGALENGAN DTP'
         );
 
         $this->createUser(
             'gizi_warnasari',
             'Puskesmas Warnasari',
-            $roleGizi
+            $roleGizi,
+            'WARNASARI'
         );
 
         $this->createUser(
             'gizi_sukamanah',
             'Puskesmas Sukamanah',
-            $roleGizi
+            $roleGizi,
+            'SUKAMANAH'
         );
 
         // Divisi Pencegahan dan Penanggulangan
@@ -122,7 +125,8 @@ class RoleAndUserSeeder extends Seeder
     private function createUser(
         string $key,
         string $name,
-        Role $role
+        Role $role,
+        ?string $puskesmas = null
     ): User {
         $account = config("seeder.accounts.{$key}");
 
@@ -134,6 +138,10 @@ class RoleAndUserSeeder extends Seeder
                 'email_verified_at' => now(),
             ]
         );
+
+        if ($puskesmas) {
+            $user->forceFill(['puskesmas' => $puskesmas])->save();
+        }
 
         $user->syncRoles([$role]);
 

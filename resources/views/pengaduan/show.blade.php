@@ -82,8 +82,8 @@
             </div>
 
             {{-- Tanggapan --}}
-            @if ($isAdmin)
-                <form method="POST" action="{{ route('admin.complaints.update', $complaint) }}"
+            @if ($canRespond)
+                <form method="POST" action="{{ route('complaints.update', $complaint) }}"
                       class="bg-white shadow-sm rounded-xl border border-gray-100 p-4 sm:p-6 space-y-4">
                     @csrf
                     @method('PATCH')
@@ -119,6 +119,18 @@
                     </div>
                 </form>
 
+            @else
+                <div class="bg-white shadow-sm rounded-xl border border-gray-100 p-4 sm:p-6">
+                    <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Tanggapan Puskesmas</p>
+                    @if ($complaint->tanggapan)
+                        <p class="text-sm text-gray-800 whitespace-pre-line break-words">{{ $complaint->tanggapan }}</p>
+                    @else
+                        <p class="text-sm text-gray-500">Belum ada tanggapan. Hanya petugas {{ $complaint->puskesmas ? 'Puskesmas ' . $complaint->puskesmas : 'puskesmas terkait' }} yang dapat membalas.</p>
+                    @endif
+                </div>
+            @endif
+
+            @if ($isAdmin)
                 <form method="POST" action="{{ route('admin.complaints.destroy', $complaint) }}"
                       onsubmit="return confirm('Hapus pengaduan ini secara permanen?')"
                       class="flex justify-end">
@@ -129,15 +141,6 @@
                         Hapus Pengaduan
                     </button>
                 </form>
-            @else
-                <div class="bg-white shadow-sm rounded-xl border border-gray-100 p-4 sm:p-6">
-                    <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Tanggapan Admin</p>
-                    @if ($complaint->tanggapan)
-                        <p class="text-sm text-gray-800 whitespace-pre-line break-words">{{ $complaint->tanggapan }}</p>
-                    @else
-                        <p class="text-sm text-gray-500">Belum ada tanggapan. Pengaduan dikelola oleh IT Admin.</p>
-                    @endif
-                </div>
             @endif
         </div>
     </div>

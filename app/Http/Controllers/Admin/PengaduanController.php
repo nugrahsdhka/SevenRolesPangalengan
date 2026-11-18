@@ -14,7 +14,7 @@ class PengaduanController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Complaint::query()->latest();
+        $query = Complaint::query()->visibleTo($request->user())->latest();
 
         if ($request->filled('status') && array_key_exists($request->status, Complaint::STATUS)) {
             $query->where('status', $request->status);
@@ -38,7 +38,7 @@ class PengaduanController extends Controller
 
         $complaints = $query->paginate(15)->withQueryString();
 
-        $counts = Complaint::selectRaw('status, COUNT(*) as total')
+        $counts = Complaint::visibleTo($request->user())->selectRaw('status, COUNT(*) as total')
             ->groupBy('status')
             ->pluck('total', 'status');
 
@@ -55,19 +55,26 @@ class PengaduanController extends Controller
      */
     public function show(Complaint $complaint)
     {
+        abort_unless(auth()->user()->canViewComplaint($complaint), 403,
+            'Pengaduan ini bukan untuk puskesmas Anda.');
+
         $complaint->load('penangan:id,name');
 
         return view('pengaduan.show', [
-            'complaint' => $complaint,
-            'statuses'  => Complaint::STATUS,
+            'complaint'  => $complaint,
+            'statuses'   => Complaint::STATUS,
+            'canRespond' => auth()->user()->canRespondTo($complaint),
         ]);
     }
 
     /**
-     * Ubah status & beri tanggapan — khusus IT Admin.
+     * Ubah status & beri tanggapan — khusus petugas dari puskesmas yang diadukan.
      */
     public function update(Request $request, Complaint $complaint)
     {
+        abort_unless($request->user()->canRespondTo($complaint), 403,
+            'Pengaduan ini bukan untuk puskesmas Anda.');
+
         $data = $request->validate([
             'status'    => ['required', Rule::in(array_keys(Complaint::STATUS))],
             'tanggapan' => ['nullable', 'string', 'max:2000'],
