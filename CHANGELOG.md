@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.4.0](https://github.com/nugrahsdhka/SevenRolesPangalengan/compare/v1.3.6...v1.4.0) (2026-11-18)
+
+
+### Features
+
+* add public footer to all guest pages with S1 Teknik Komputer credit ([294c81f](https://github.com/nugrahsdhka/SevenRolesPangalengan/commit/294c81f2a2bfe1932b736ac758dd02efb359f3c6))
+
 ### [1.3.6](https://github.com/nugrahsdhka/SevenRolesPangalengan/compare/v1.3.5...v1.3.6) (2026-11-18)
 
 
