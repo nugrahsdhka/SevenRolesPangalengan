@@ -17,6 +17,7 @@ class Faskes extends Model
         'jenis',
         'alamat',
         'desa_kelurahan',
+        'puskesmas',
         'lat',
         'lng',
         'is_active',

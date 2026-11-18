@@ -49,6 +49,10 @@
                                 <span>{{ $complaint->kategori_label }}</span>
                                 <span>&middot;</span>
                                 <span>{{ ucwords(strtolower($complaint->desa_kelurahan)) }}</span>
+                                @if ($complaint->posyandu)
+                                    <span>&middot;</span>
+                                    <span>Posyandu {{ $complaint->posyandu }}</span>
+                                @endif
                                 <span>&middot;</span>
                                 <span>Dikirim {{ $complaint->created_at->translatedFormat('d F Y, H:i') }}</span>
                             </div>

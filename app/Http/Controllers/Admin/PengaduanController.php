@@ -30,6 +30,8 @@ class PengaduanController extends Controller
                 $w->where('ticket_code', 'like', $q)
                   ->orWhere('judul', 'like', $q)
                   ->orWhere('desa_kelurahan', 'like', $q)
+                  ->orWhere('puskesmas', 'like', $q)
+                  ->orWhere('posyandu', 'like', $q)
                   ->orWhere('nama', 'like', $q);
             });
         }

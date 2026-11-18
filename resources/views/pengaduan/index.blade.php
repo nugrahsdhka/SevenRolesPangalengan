@@ -40,7 +40,7 @@
                 {{-- Filter --}}
                 <form method="GET" action="{{ route('complaints.index') }}"
                       class="px-3 sm:px-6 py-3 sm:py-4 flex flex-col md:flex-row gap-2 md:items-center border-b border-gray-100">
-                    <input type="text" name="q" value="{{ request('q') }}" placeholder="Cari kode, judul, desa, atau nama..."
+                    <input type="text" name="q" value="{{ request('q') }}" placeholder="Cari kode, judul, desa, posyandu, atau nama..."
                            class="flex-1 rounded-lg border-gray-300 text-sm focus:border-red-500 focus:ring-red-500">
 
                     <select name="status" class="rounded-lg border-gray-300 text-sm focus:border-red-500 focus:ring-red-500">
@@ -95,7 +95,12 @@
                                         <div class="font-medium text-gray-900 break-words">{{ $c->judul }}</div>
                                         <div class="text-xs text-gray-500 mt-0.5">{{ $c->nama ?: 'Anonim' }}</div>
                                     </td>
-                                    <td class="px-4 py-3 align-top">{{ ucwords(strtolower($c->desa_kelurahan)) }}</td>
+                                    <td class="px-4 py-3 align-top">
+                                        {{ ucwords(strtolower($c->desa_kelurahan)) }}
+                                        @if ($c->posyandu)
+                                            <div class="text-xs text-gray-500">{{ $c->posyandu }}</div>
+                                        @endif
+                                    </td>
                                     <td class="px-4 py-3 align-top text-xs text-gray-600">{{ $c->kategori_label }}</td>
                                     <td class="px-4 py-3 align-top text-center">
                                         <x-complaint-status :status="$c->status" />

@@ -52,36 +52,86 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                    <div>
-                        <label for="desa_kelurahan" class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1">
-                            Desa / Kelurahan <span class="text-primary-500">*</span>
-                        </label>
-                        <input type="text" id="desa_kelurahan" name="desa_kelurahan" list="desa-list"
-                               value="{{ old('desa_kelurahan') }}" maxlength="100" required
-                               class="w-full rounded-xl border-gray-300 text-sm focus:border-primary-500 focus:ring-primary-500"
-                               placeholder="Ketik atau pilih desa">
-                        <datalist id="desa-list">
-                            @foreach ($desaList as $desa)
-                                <option value="{{ ucwords(strtolower($desa)) }}">
-                            @endforeach
-                        </datalist>
-                        @error('desa_kelurahan') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
+                {{-- Lokasi: harus dipilih berurutan Puskesmas -> Desa -> Posyandu --}}
+                @if ($wilayah->isEmpty())
+                    <div class="rounded-xl bg-amber-50 border border-amber-200 p-4 text-sm text-amber-800">
+                        Data puskesmas, desa, dan posyandu belum tersedia. Silakan coba lagi nanti.
                     </div>
+                @else
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-5"
+                         x-data="{
+                             tree: @js($wilayah),
+                             puskesmas: @js(old('puskesmas', '')),
+                             desa: @js(old('desa_kelurahan', '')),
+                             posyandu: @js(old('posyandu', '')),
+                             get desaOptions() {
+                                 return this.puskesmas ? Object.keys(this.tree[this.puskesmas] ?? {}) : [];
+                             },
+                             get posyanduOptions() {
+                                 return (this.puskesmas && this.desa) ? (this.tree[this.puskesmas]?.[this.desa] ?? []) : [];
+                             },
+                         }">
+                        <div>
+                            <label for="puskesmas" class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1">
+                                Puskesmas <span class="text-primary-500">*</span>
+                            </label>
+                            <select id="puskesmas" name="puskesmas" required
+                                    @change="puskesmas = $event.target.value; desa = ''; posyandu = ''"
+                                    class="w-full rounded-xl border-gray-300 text-sm focus:border-primary-500 focus:ring-primary-500">
+                                <option value="" disabled :selected="!puskesmas">Pilih puskesmas</option>
+                                <template x-for="p in Object.keys(tree)" :key="p">
+                                    <option :value="p" x-text="p" :selected="p === puskesmas"></option>
+                                </template>
+                            </select>
+                            @error('puskesmas') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
+                        </div>
 
-                    <div>
-                        <label for="kategori" class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1">
-                            Kategori <span class="text-primary-500">*</span>
-                        </label>
-                        <select id="kategori" name="kategori" required
-                                class="w-full rounded-xl border-gray-300 text-sm focus:border-primary-500 focus:ring-primary-500">
-                            <option value="" disabled @selected(!old('kategori'))>Pilih kategori</option>
-                            @foreach ($kategori as $value => $label)
-                                <option value="{{ $value }}" @selected(old('kategori') === $value)>{{ $label }}</option>
-                            @endforeach
-                        </select>
-                        @error('kategori') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
+                        <div>
+                            <label for="desa_kelurahan" class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1">
+                                Desa / Kelurahan <span class="text-primary-500">*</span>
+                            </label>
+                            <select id="desa_kelurahan" name="desa_kelurahan" required
+                                    :disabled="!puskesmas"
+                                    @change="desa = $event.target.value; posyandu = ''"
+                                    class="w-full rounded-xl border-gray-300 text-sm focus:border-primary-500 focus:ring-primary-500 disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed">
+                                <option value="" disabled :selected="!desa" x-text="puskesmas ? 'Pilih desa' : 'Pilih puskesmas dulu'"></option>
+                                <template x-for="d in desaOptions" :key="d">
+                                    <option :value="d" x-text="d" :selected="d === desa"></option>
+                                </template>
+                            </select>
+                            @error('desa_kelurahan') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
+                        </div>
+
+                        <div>
+                            <label for="posyandu" class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1">
+                                Posyandu <span class="text-primary-500">*</span>
+                            </label>
+                            <select id="posyandu" name="posyandu" required
+                                    :disabled="!desa"
+                                    @change="posyandu = $event.target.value"
+                                    class="w-full rounded-xl border-gray-300 text-sm focus:border-primary-500 focus:ring-primary-500 disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed">
+                                <option value="" disabled :selected="!posyandu" x-text="desa ? 'Pilih posyandu' : 'Pilih desa dulu'"></option>
+                                <template x-for="po in posyanduOptions" :key="po">
+                                    <option :value="po" x-text="po" :selected="po === posyandu"></option>
+                                </template>
+                            </select>
+                            @error('posyandu') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
+                        </div>
                     </div>
+                @endif
+
+                <div>
+                    <label for="kategori" class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1">
+                        Kategori <span class="text-primary-500">*</span>
+                    </label>
+                    <select id="kategori" name="kategori" required
+                            class="w-full rounded-xl border-gray-300 text-sm focus:border-primary-500 focus:ring-primary-500">
+                        <option value="" disabled @selected(!old('kategori'))>Pilih kategori</option>
+                        @foreach ($kategori as $value => $label)
+                            <option value="{{ $value }}" @selected(old('kategori') === $value)>{{ $label }}</option>
+                        @endforeach
+                    </select>
+                    @error('kategori') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
                 </div>
 
                 <div>

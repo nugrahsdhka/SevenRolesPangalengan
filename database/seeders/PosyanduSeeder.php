@@ -15,69 +15,80 @@ class PosyanduSeeder extends Seeder
             dd('File CSV tidak ditemukan di: ' . $path);
         }
 
-        $lines = file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+        $handle = fopen($path, 'r');
+        $header = fgetcsv($handle); // buang header
 
-        if (!$lines || count($lines) <= 1) {
-            dd('File CSV kosong atau cuma header.');
+        if (!$header) {
+            dd('File CSV kosong.');
         }
-
-        array_shift($lines); // hapus header
 
         $insertCount = 0;
         $updateCount = 0;
+        $seen        = [];
 
-        foreach ($lines as $line) {
-            $line = trim($line);
-            if ($line === '') continue;
+        DB::transaction(function () use ($handle, &$insertCount, &$updateCount, &$seen) {
+            // Semua posyandu lama dinonaktifkan dulu. Yang ada di CSV baru
+            // akan diaktifkan lagi di bawah, sisanya tetap nonaktif (tidak dihapus).
+            DB::table('faskes')->where('jenis', 'Posyandu')->update([
+                'is_active'  => false,
+                'updated_at' => now(),
+            ]);
 
-            $row = str_getcsv($line, ';');
+            // Kolom CSV: nama_posyandu,desa,puskesmas,lat,lng,alamat_posyandu,google_maps
+            while (($row = fgetcsv($handle)) !== false) {
+                if (count($row) < 6) continue;
 
-            if (count($row) < 4) continue;
+                $nama = trim($row[0]);
+                $desa = trim($row[1]);
+                $puskesmas = trim($row[2]);
+                $lat  = (float) str_replace(',', '.', trim($row[3]));
+                $lng  = (float) str_replace(',', '.', trim($row[4]));
+                $alamat = trim($row[5]);
 
-            $nama   = trim($row[0]);
-            $alamat = trim($row[1]);
-            $latRaw = str_replace(',', '.', trim($row[2]));
-            $lngRaw = str_replace(',', '.', trim($row[3]));
+                if ($nama === '' || $desa === '' || $puskesmas === '' || $lat == 0.0 || $lng == 0.0) continue;
 
-            if ($nama === '' || $alamat === '' || $latRaw === '' || $lngRaw === '') continue;
+                // Pengaman: lat Pangalengan harus negatif, lng sekitar 107.x
+                if ($lat > 0 || $lng < 107 || $lng > 108) {
+                    dump("Dilewati (koordinat tidak wajar): {$nama} ({$lat}, {$lng})");
+                    continue;
+                }
 
-            $lat = (float) $latRaw;
-            $lng = (float) $lngRaw;
+                $key = strtolower($nama . '|' . $desa);
+                if (isset($seen[$key])) continue; // hindari duplikat dalam file
+                $seen[$key] = true;
 
-            // check if already exists
-            $existing = DB::table('faskes')
-                ->where('nama_faskes', $nama)
-                ->where('alamat', $alamat)
-                ->first();
+                $existing = DB::table('faskes')
+                    ->where('jenis', 'Posyandu')
+                    ->where('nama_faskes', $nama)
+                    ->where('desa_kelurahan', $desa)
+                    ->first();
 
-            if ($existing) {
-                // UPDATE
-                DB::table('faskes')->where('id', $existing->id)->update([
-                    'lat'        => $lat,
-                    'lng'        => $lng,
-                    'jenis'      => 'Posyandu',
-                    'is_active'  => true,
-                    'updated_at' => now(),
-                ]);
+                $data = [
+                    'lat'            => $lat,
+                    'lng'            => $lng,
+                    'desa_kelurahan' => $desa,
+                    'puskesmas'      => $puskesmas,
+                    'alamat'         => $alamat !== '' ? $alamat : null,
+                    'is_active'      => true,
+                    'updated_at'     => now(),
+                ];
 
-                $updateCount++;
-            } else {
-                // INSERT
-                DB::table('faskes')->insert([
-                    'nama_faskes' => $nama,
-                    'alamat'      => $alamat,
-                    'lat'         => $lat,
-                    'lng'         => $lng,
-                    'jenis'       => 'Posyandu',
-                    'is_active'   => true,
-                    'created_at'  => now(),
-                    'updated_at'  => now(),
-                ]);
-
-                $insertCount++;
+                if ($existing) {
+                    DB::table('faskes')->where('id', $existing->id)->update($data);
+                    $updateCount++;
+                } else {
+                    DB::table('faskes')->insert($data + [
+                        'nama_faskes' => $nama,
+                        'jenis'       => 'Posyandu',
+                        'created_at'  => now(),
+                    ]);
+                    $insertCount++;
+                }
             }
-        }
+        });
 
-        dump("Seeder faskes selesai. Insert: {$insertCount} | Update: {$updateCount}");
+        fclose($handle);
+
+        dump("Seeder posyandu selesai. Insert: {$insertCount} | Update: {$updateCount}");
     }
 }

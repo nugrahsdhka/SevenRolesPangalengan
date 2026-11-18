@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Complaint;
+use App\Models\Faskes;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Permission\Models\Role;
@@ -13,12 +14,36 @@ class PengaduanTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        // Data wilayah contoh: puskesmas -> desa -> posyandu
+        foreach ([
+            ['WARNASARI', 'WARNASARI', 'MAWAR 1'],
+            ['WARNASARI', 'SUKALUYU', 'ASTER 1'],
+            ['SUKAMANAH', 'SUKAMANAH', 'MUTIARA 01'],
+        ] as [$puskesmas, $desa, $nama]) {
+            Faskes::create([
+                'nama_faskes'    => $nama,
+                'jenis'          => 'Posyandu',
+                'desa_kelurahan' => $desa,
+                'puskesmas'      => $puskesmas,
+                'lat'            => -7.2,
+                'lng'            => 107.5,
+                'is_active'      => true,
+            ]);
+        }
+    }
+
     private function payload(array $override = []): array
     {
         return array_merge([
             'nama'           => 'Warga Contoh',
             'kontak'         => '081234567890',
-            'desa_kelurahan' => 'Warnasari',
+            'puskesmas'      => 'WARNASARI',
+            'desa_kelurahan' => 'WARNASARI',
+            'posyandu'       => 'MAWAR 1',
             'kategori'       => 'layanan_kesehatan',
             'judul'          => 'Posyandu jarang buka',
             'isi'            => 'Posyandu di RW 05 sudah dua bulan tidak buka sehingga balita tidak bisa ditimbang.',
@@ -38,13 +63,20 @@ class PengaduanTest extends TestCase
 
     public function test_guest_can_open_form_and_submit_complaint(): void
     {
-        $this->get(route('pengaduan.create'))->assertOk();
+        $this->get(route('pengaduan.create'))
+            ->assertOk()
+            ->assertSee('Pilih puskesmas')
+            ->assertSee('SUKAMANAH')
+            ->assertSee('MUTIARA 01');
 
         $response = $this->post(route('pengaduan.store'), $this->payload());
 
         $complaint = Complaint::firstOrFail();
         $this->assertMatchesRegularExpression('/^PGD-[A-Z2-9]{8}$/', $complaint->ticket_code);
         $this->assertSame('baru', $complaint->status);
+        $this->assertSame('WARNASARI', $complaint->puskesmas);
+        $this->assertSame('WARNASARI', $complaint->desa_kelurahan);
+        $this->assertSame('MAWAR 1', $complaint->posyandu);
         $response->assertRedirect(route('pengaduan.track', ['kode' => $complaint->ticket_code]));
     }
 
@@ -60,6 +92,43 @@ class PengaduanTest extends TestCase
     {
         $this->post(route('pengaduan.store'), $this->payload(['kategori' => 'ngawur', 'isi' => 'pendek']))
             ->assertSessionHasErrors(['kategori', 'isi']);
+
+        $this->assertDatabaseCount('complaints', 0);
+    }
+
+    public function test_puskesmas_desa_and_posyandu_are_required(): void
+    {
+        $this->post(route('pengaduan.store'), $this->payload([
+            'puskesmas' => null, 'desa_kelurahan' => null, 'posyandu' => null,
+        ]))->assertSessionHasErrors(['puskesmas', 'desa_kelurahan', 'posyandu']);
+
+        $this->assertDatabaseCount('complaints', 0);
+    }
+
+    public function test_posyandu_must_belong_to_selected_desa(): void
+    {
+        // ASTER 1 ada di desa SUKALUYU, bukan WARNASARI
+        $this->post(route('pengaduan.store'), $this->payload(['posyandu' => 'ASTER 1']))
+            ->assertSessionHasErrors('posyandu');
+
+        $this->assertDatabaseCount('complaints', 0);
+    }
+
+    public function test_desa_must_belong_to_selected_puskesmas(): void
+    {
+        // Desa WARNASARI ada di bawah puskesmas WARNASARI, bukan SUKAMANAH
+        $this->post(route('pengaduan.store'), $this->payload(['puskesmas' => 'SUKAMANAH']))
+            ->assertSessionHasErrors('posyandu');
+
+        $this->assertDatabaseCount('complaints', 0);
+    }
+
+    public function test_inactive_posyandu_cannot_be_chosen(): void
+    {
+        Faskes::where('nama_faskes', 'MAWAR 1')->update(['is_active' => false]);
+
+        $this->post(route('pengaduan.store'), $this->payload())
+            ->assertSessionHasErrors('posyandu');
 
         $this->assertDatabaseCount('complaints', 0);
     }

@@ -45,10 +45,22 @@
                         <dt class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Kontak</dt>
                         <dd class="text-gray-900 break-words">{{ $complaint->kontak ?: '-' }}</dd>
                     </div>
+                    @if ($complaint->puskesmas)
+                        <div>
+                            <dt class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Puskesmas</dt>
+                            <dd class="text-gray-900">{{ $complaint->puskesmas }}</dd>
+                        </div>
+                    @endif
                     <div>
                         <dt class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Desa / Kelurahan</dt>
                         <dd class="text-gray-900">{{ ucwords(strtolower($complaint->desa_kelurahan)) }}</dd>
                     </div>
+                    @if ($complaint->posyandu)
+                        <div>
+                            <dt class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Posyandu</dt>
+                            <dd class="text-gray-900">{{ $complaint->posyandu }}</dd>
+                        </div>
+                    @endif
                     <div>
                         <dt class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Kategori</dt>
                         <dd class="text-gray-900">{{ $complaint->kategori_label }}</dd>

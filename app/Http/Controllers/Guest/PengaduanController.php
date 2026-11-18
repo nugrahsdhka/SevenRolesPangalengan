@@ -7,6 +7,7 @@ use App\Models\Complaint;
 use App\Models\Faskes;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 
 class PengaduanController extends Controller
 {
@@ -15,13 +16,24 @@ class PengaduanController extends Controller
      */
     public function create()
     {
-        $desaList = Faskes::whereNotNull('desa_kelurahan')
-            ->distinct()
+        // Pohon pilihan: puskesmas -> desa -> daftar posyandu.
+        // Sumbernya tabel faskes (diisi dari database/seeders/data/posyandu_faskes.csv).
+        $wilayah = Faskes::query()
+            ->where('jenis', 'Posyandu')
+            ->where('is_active', true)
+            ->whereNotNull('puskesmas')
+            ->whereNotNull('desa_kelurahan')
+            ->orderBy('puskesmas')
             ->orderBy('desa_kelurahan')
-            ->pluck('desa_kelurahan');
+            ->orderBy('nama_faskes')
+            ->get(['puskesmas', 'desa_kelurahan', 'nama_faskes'])
+            ->groupBy('puskesmas')
+            ->map(fn ($perPuskesmas) => $perPuskesmas
+                ->groupBy('desa_kelurahan')
+                ->map(fn ($perDesa) => $perDesa->pluck('nama_faskes')->values()));
 
         return view('public.pengaduan.create', [
-            'desaList' => $desaList,
+            'wilayah'  => $wilayah,
             'kategori' => Complaint::KATEGORI,
         ]);
     }
@@ -34,11 +46,34 @@ class PengaduanController extends Controller
         $data = $request->validate([
             'nama'           => ['nullable', 'string', 'max:100'],
             'kontak'         => ['nullable', 'string', 'max:100'],
+            'puskesmas'      => ['required', 'string', 'max:100'],
             'desa_kelurahan' => ['required', 'string', 'max:100'],
+            'posyandu'       => ['required', 'string', 'max:150'],
             'kategori'       => ['required', Rule::in(array_keys(Complaint::KATEGORI))],
             'judul'          => ['required', 'string', 'min:5', 'max:150'],
             'isi'            => ['required', 'string', 'min:20', 'max:3000'],
         ]);
+
+        // Pilihan harus berurutan dan saling cocok: posyandu harus benar-benar
+        // berada di desa tsb, dan desa tsb di bawah puskesmas tsb.
+        $posyandu = Faskes::query()
+            ->where('jenis', 'Posyandu')
+            ->where('is_active', true)
+            ->where('puskesmas', $data['puskesmas'])
+            ->where('desa_kelurahan', $data['desa_kelurahan'])
+            ->where('nama_faskes', $data['posyandu'])
+            ->first();
+
+        if (! $posyandu) {
+            throw ValidationException::withMessages([
+                'posyandu' => 'Pilihan puskesmas, desa, dan posyandu tidak sesuai. Silakan pilih ulang secara berurutan.',
+            ]);
+        }
+
+        // Simpan nilai kanonik dari database (bukan teks mentah dari request).
+        $data['puskesmas']      = $posyandu->puskesmas;
+        $data['desa_kelurahan'] = $posyandu->desa_kelurahan;
+        $data['posyandu']       = $posyandu->nama_faskes;
 
         // Honeypot anti-spam: field "website" disembunyikan dari manusia.
         // Kalau terisi, anggap bot — pura-pura sukses tanpa menyimpan.
