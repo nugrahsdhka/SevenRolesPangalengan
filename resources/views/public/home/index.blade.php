@@ -12,4 +12,7 @@
     {{-- 3. WELCOME / KONTEN UTAMA (Kartu-kartu) --}}
     @include('public.home.welcome')
 
+    {{-- 4. FOOTER --}}
+    <x-public-footer />
+
 </x-app-layout>

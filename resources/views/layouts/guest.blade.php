@@ -29,22 +29,23 @@
     </div>
 
     @php
-        $hideFooterRoutes = [
-            'login',
-            'register.complete.show',
-            'verification.token.show',
-            'password.request',
-            'password.email',
-            'password.reset',
-            'password.store',
+        // Halaman guest/publik yang menampilkan footer.
+        // Halaman auth (login, reset password, dll.) sengaja tidak diberi footer.
+        $showFooterRoutes = [
+            'data-stunting',
+            'data-stunting.*',
+            'data-wilayah',
+            'analisis-hotspot',
+            'analisis-hotspot.*',
             'peta-faskes',
+            'pengaduan.create',
+            'pengaduan.store',
+            'pengaduan.track',
         ];
     @endphp
 
-    @if (Route::currentRouteName() === 'welcome')
-        <footer class="text-xs text-gray-500 text-center mb-4">
-            &copy; {{ date('Y') }} Rumah Stunting Pangalengan. All rights reserved.
-        </footer>
+    @if (request()->routeIs(...$showFooterRoutes))
+        <x-public-footer />
     @endif
 
     @stack('scripts')
