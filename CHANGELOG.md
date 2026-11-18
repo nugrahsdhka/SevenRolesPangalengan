@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.3.6](https://github.com/nugrahsdhka/SevenRolesPangalengan/compare/v1.3.5...v1.3.6) (2026-11-18)
+
+
+### Features
+
+* Changes to Village Data Collection in the Complaint Form ([fbd51b3](https://github.com/nugrahsdhka/SevenRolesPangalengan/commit/fbd51b3c3b567ae8f7810726e3053eaec489933e))
+* Restrict complaint replies and list to the reported puskesmas (admin and camat view-only), add puskesmas to users, and seed 3 sample complaints per puskesmas ([20d7975](https://github.com/nugrahsdhka/SevenRolesPangalengan/commit/20d79757a4d3cbd4409f7dcb8e63abd171f0dccc))
+
 ### [1.3.5](https://github.com/nugrahsdhka/SevenRolesPangalengan/compare/v1.3.4...v1.3.5) (2026-11-18)
 
 
