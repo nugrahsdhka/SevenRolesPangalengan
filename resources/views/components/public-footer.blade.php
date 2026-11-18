@@ -8,67 +8,52 @@
         ['route' => 'peta-faskes', 'label' => 'Peta Faskes'],
     ];
 
-    // Taruh file logo di public/img/logo-teknik-komputer.png (kalau belum ada, logo otomatis disembunyikan)
-    $prodiLogo = 'img/logo-teknik-komputer.png';
-
     $footerLayanan = [
         ['route' => 'pengaduan.create', 'label' => 'Buat Pengaduan'],
         ['route' => 'pengaduan.track', 'label' => 'Cek Status Pengaduan'],
     ];
+
+    // Taruh file logo di public/img/ (kalau file belum ada, logonya otomatis disembunyikan)
+    $developers = [
+        ['file' => 'img/logo-telkom-university.png', 'alt' => 'Logo Telkom University', 'name' => 'Telkom University'],
+        ['file' => 'img/logo-teknik-komputer.png',   'alt' => 'Logo S1 Teknik Komputer', 'name' => 'S1 Teknik Komputer'],
+    ];
 @endphp
 
-<footer class="relative overflow-hidden bg-gray-900 text-gray-400">
+<footer class="relative bg-gray-900 text-gray-400">
 
-    {{-- Aksen garis merah di atas --}}
-    <div class="h-1 w-full bg-gradient-to-r from-primary-700 via-primary-500 to-primary-700"></div>
+    {{-- Aksen garis tipis di atas --}}
+    <div class="h-px w-full bg-gradient-to-r from-transparent via-primary-500/60 to-transparent"></div>
 
-    {{-- Background blob --}}
-    <div class="absolute inset-0 pointer-events-none overflow-hidden">
-        <div class="absolute -top-24 -right-24 w-72 h-72 rounded-full opacity-20 blur-[60px]"
-             style="background: radial-gradient(circle, rgba(239,68,68,0.6) 0%, transparent 70%);"></div>
-    </div>
+    <div class="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 pt-8 pb-5 md:pt-14 md:pb-8">
 
-    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-8">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+        {{-- Mobile: 2 kolom (identitas full, menu & layanan berdampingan). Desktop: 12 kolom --}}
+        <div class="grid grid-cols-2 md:grid-cols-12 gap-x-6 gap-y-7 md:gap-8">
 
             {{-- Identitas --}}
-            <div>
+            <div class="col-span-2 md:col-span-5">
                 <a href="{{ route('index') }}" class="inline-flex items-center gap-3 group">
                     <img src="{{ asset('img/logo-kab-bandung.png') }}" alt="Logo Kabupaten Bandung"
-                         class="h-12 w-auto object-contain transition-transform duration-500 group-hover:scale-110">
+                         class="h-9 md:h-11 w-auto object-contain transition-transform duration-300 group-hover:scale-105">
                     <div class="flex flex-col leading-none">
-                        <span class="font-black text-white tracking-tighter text-xs uppercase">Rumah Stunting</span>
-                        <span class="font-bold text-primary-400 tracking-tighter text-lg uppercase">Pangalengan</span>
+                        <span class="text-[10px] font-semibold uppercase tracking-[0.2em] text-gray-500">Rumah Stunting</span>
+                        <span class="mt-1 text-base md:text-lg font-bold uppercase tracking-tight text-white">Pangalengan</span>
                     </div>
                 </a>
-                <p class="mt-4 text-sm leading-relaxed text-gray-400 max-w-xs">
+                <p class="mt-3 md:mt-5 max-w-sm text-xs md:text-sm leading-relaxed text-gray-500">
                     Sistem informasi data stunting untuk memantau status gizi dan sebaran kasus
                     di Kecamatan Pangalengan, Kabupaten Bandung.
                 </p>
-
-                {{-- Dikembangkan oleh --}}
-                <div class="mt-6 pt-5 border-t border-white/10 flex items-center gap-3">
-                    @if (file_exists(public_path($prodiLogo)))
-                        <div class="shrink-0 rounded-xl p-1.5">
-                            <img src="{{ asset($prodiLogo) }}" alt="Logo S1 Teknik Komputer"
-                                 class="h-12 w-auto object-contain">
-                        </div>
-                    @endif
-                    <div class="flex flex-col leading-tight">
-                        <span class="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500">Dikembangkan oleh</span>
-                        <span class="text-sm font-bold text-white">S1 Teknik Komputer</span>
-                    </div>
-                </div>
             </div>
 
             {{-- Menu --}}
-            <div>
-                <h3 class="text-[10px] font-black uppercase tracking-[0.2em] text-white mb-4">Menu</h3>
-                <ul class="space-y-2.5">
+            <div class="col-span-1 md:col-span-3">
+                <h3 class="mb-3 md:mb-5 text-[10px] font-semibold uppercase tracking-[0.2em] text-gray-500">Menu</h3>
+                <ul class="space-y-2 md:space-y-3">
                     @foreach ($footerMenu as $item)
                         <li>
                             <a href="{{ route($item['route']) }}"
-                               class="text-sm font-semibold transition-colors hover:text-primary-400 {{ request()->routeIs($item['route']) ? 'text-primary-400' : '' }}">
+                               class="text-[13px] md:text-sm transition-colors duration-200 hover:text-white {{ request()->routeIs($item['route']) ? 'text-white font-medium' : '' }}">
                                 {{ $item['label'] }}
                             </a>
                         </li>
@@ -77,13 +62,13 @@
             </div>
 
             {{-- Layanan --}}
-            <div>
-                <h3 class="text-[10px] font-black uppercase tracking-[0.2em] text-white mb-4">Layanan Warga</h3>
-                <ul class="space-y-2.5">
+            <div class="col-span-1 md:col-span-4">
+                <h3 class="mb-3 md:mb-5 text-[10px] font-semibold uppercase tracking-[0.2em] text-gray-500">Layanan Warga</h3>
+                <ul class="space-y-2 md:space-y-3">
                     @foreach ($footerLayanan as $item)
                         <li>
                             <a href="{{ route($item['route']) }}"
-                               class="text-sm font-semibold transition-colors hover:text-primary-400 {{ request()->routeIs($item['route']) ? 'text-primary-400' : '' }}">
+                               class="text-[13px] md:text-sm transition-colors duration-200 hover:text-white {{ request()->routeIs($item['route']) ? 'text-white font-medium' : '' }}">
                                 {{ $item['label'] }}
                             </a>
                         </li>
@@ -92,12 +77,31 @@
             </div>
         </div>
 
+        {{-- Dikembangkan oleh --}}
+        <div class="mt-7 md:mt-12 pt-5 md:pt-8 border-t border-white/5 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-8">
+            <span class="text-[10px] font-semibold uppercase tracking-[0.2em] text-gray-500">
+                Dikembangkan oleh
+            </span>
+
+            <div class="flex flex-wrap items-center gap-x-5 md:gap-x-8 gap-y-3">
+                @foreach ($developers as $dev)
+                    @if (file_exists(public_path($dev['file'])))
+                        <div class="flex items-center gap-2 md:gap-3">
+                            <img src="{{ asset($dev['file']) }}" alt="{{ $dev['alt'] }}"
+                                 class="h-7 md:h-9 w-auto object-contain opacity-90 transition-opacity duration-200 hover:opacity-100">
+                            <span class="text-xs md:text-sm font-medium text-gray-300">{{ $dev['name'] }}</span>
+                        </div>
+                    @endif
+                @endforeach
+            </div>
+        </div>
+
         {{-- Bottom bar --}}
-        <div class="mt-10 pt-6 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-2 text-center md:text-left">
-            <p class="text-xs text-gray-500">
+        <div class="mt-5 md:mt-8 pt-4 md:pt-6 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-1 md:gap-2 text-center md:text-left">
+            <p class="text-[11px] md:text-xs text-gray-600">
                 &copy; {{ date('Y') }} Rumah Stunting Pangalengan. All rights reserved.
             </p>
-            <p class="text-[10px] font-black uppercase tracking-[0.2em] text-gray-600">
+            <p class="text-[10px] font-semibold uppercase tracking-[0.2em] text-gray-600">
                 Kecamatan Pangalengan &bull; v{{ config('app_version.version') }}
             </p>
         </div>
