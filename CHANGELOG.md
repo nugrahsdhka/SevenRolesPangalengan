@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.3.5](https://github.com/nugrahsdhka/SevenRolesPangalengan/compare/v1.3.4...v1.3.5) (2026-11-18)
+
+
+### Bug Fixes
+
+* limit complaint submissions with throttle ([a6c44f3](https://github.com/nugrahsdhka/SevenRolesPangalengan/commit/a6c44f33120063e27b02c32955a37d89a8fec5d3))
+
 ### [1.3.4](https://github.com/nugrahsdhka/SevenRolesPangalengan/compare/v1.3.3...v1.3.4) (2026-11-15)
 
 
