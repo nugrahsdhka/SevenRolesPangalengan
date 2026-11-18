@@ -48,7 +48,7 @@ Route::get('/peta-faskes', [PetaController::class, 'index'])->name('peta-faskes'
 // Pengaduan Warga (publik, tanpa login)
 Route::get('/pengaduan', [GuestPengaduanController::class, 'create'])->name('pengaduan.create');
 Route::post('/pengaduan', [GuestPengaduanController::class, 'store'])
-    ->middleware('throttle:5,10') // maks 5 pengaduan / 10 menit per IP
+    ->middleware('throttle:10,10') // maks 20 pengaduan / 10 menit per IP
     ->name('pengaduan.store');
 Route::get('/pengaduan/cek-status', [GuestPengaduanController::class, 'track'])
     ->middleware('throttle:20,1')
