@@ -20,12 +20,19 @@
         </div>
     </x-slot>
 
-    @php $isAdmin = auth()->user()->hasRole('IT Admin'); @endphp
-
     <div class="py-2">
         <div class="max-w-4xl mx-auto px-2 space-y-4">
 
             @include('Message.flash-message')
+
+            @if ($complaint->isDibuang())
+                <div class="rounded-xl bg-amber-50 ring-1 ring-amber-200 p-4 text-sm text-amber-900">
+                    Pengaduan ini ada di <strong>sampah</strong>
+                    (dibuang {{ $complaint->dibuang_at->translatedFormat('d F Y, H:i') }}
+                    @if ($complaint->pembuang) oleh {{ $complaint->pembuang->name }} @endif).
+                    Warga masih bisa mengeceknya lewat kode tiket sampai dihapus permanen.
+                </div>
+            @endif
 
             {{-- Detail pengaduan --}}
             <div class="bg-white shadow-sm rounded-xl border border-gray-100 p-4 sm:p-6 space-y-4">
@@ -73,6 +80,12 @@
                         <dt class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Ditangani Oleh</dt>
                         <dd class="text-gray-900">{{ $complaint->penangan?->name ?? '-' }}</dd>
                     </div>
+                    @if ($complaint->hapusOtomatisPada())
+                        <div>
+                            <dt class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Dihapus Otomatis Pada</dt>
+                            <dd class="text-gray-900">{{ $complaint->hapusOtomatisPada()->translatedFormat('d F Y') }}</dd>
+                        </div>
+                    @endif
                 </dl>
 
                 <div class="border-t border-gray-100 pt-4">
@@ -130,17 +143,38 @@
                 </div>
             @endif
 
-            @if ($isAdmin)
-                <form method="POST" action="{{ route('admin.complaints.destroy', $complaint) }}"
-                      onsubmit="return confirm('Hapus pengaduan ini secara permanen?')"
-                      class="flex justify-end">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit"
-                            class="px-4 py-2 rounded-lg border border-red-200 bg-red-50 text-red-700 text-sm font-medium hover:bg-red-100 transition">
-                        Hapus Pengaduan
-                    </button>
-                </form>
+            @if ($canManageTrash)
+                <div class="flex flex-wrap justify-end gap-2">
+                    @if ($complaint->isDibuang())
+                        <form method="POST" action="{{ route('complaints.trash.restore', $complaint) }}">
+                            @csrf
+                            @method('PATCH')
+                            <button type="submit"
+                                    class="px-4 py-2 rounded-lg border border-gray-300 bg-white text-gray-700 text-sm font-medium hover:bg-gray-50 transition">
+                                Pulihkan
+                            </button>
+                        </form>
+                        <form method="POST" action="{{ route('complaints.trash.destroy', $complaint) }}"
+                              onsubmit="return confirm('Hapus pengaduan ini secara permanen? Tindakan ini tidak bisa dibatalkan.')">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit"
+                                    class="px-4 py-2 rounded-lg border border-red-200 bg-red-50 text-red-700 text-sm font-medium hover:bg-red-100 transition">
+                                Hapus Permanen
+                            </button>
+                        </form>
+                    @elseif ($complaint->isStatusAkhir())
+                        <form method="POST" action="{{ route('complaints.trash.move', $complaint) }}"
+                              onsubmit="return confirm('Pindahkan pengaduan ini ke sampah? Warga tetap bisa mengeceknya lewat kode tiket.')">
+                            @csrf
+                            @method('PATCH')
+                            <button type="submit"
+                                    class="px-4 py-2 rounded-lg border border-red-200 bg-red-50 text-red-700 text-sm font-medium hover:bg-red-100 transition">
+                                Buang ke Sampah
+                            </button>
+                        </form>
+                    @endif
+                </div>
             @endif
         </div>
     </div>

@@ -70,6 +70,12 @@
                                 <p class="text-sm text-gray-500">Belum ada tanggapan. Pengaduan Anda akan segera ditinjau.</p>
                             @endif
                         </div>
+
+                        @if ($complaint->hapusOtomatisPada())
+                            <p class="text-xs text-gray-400">
+                                Data pengaduan ini disimpan sampai {{ $complaint->hapusOtomatisPada()->translatedFormat('d F Y') }}, setelah itu dihapus otomatis.
+                            </p>
+                        @endif
                     </div>
                 @else
                     <div class="mt-6 rounded-2xl bg-red-50 ring-1 ring-red-200 p-4 text-sm text-red-800">

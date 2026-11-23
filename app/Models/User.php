@@ -70,6 +70,15 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasAnyRole(['IT Admin', 'Camat']);
     }
 
+    /**
+     * Membuang ke sampah / memulihkan / menghapus permanen pengaduan:
+     * IT Admin, Camat, dan petugas puskesmas yang bersangkutan (Divisi Gizi).
+     */
+    public function canManageComplaintTrash(Complaint $complaint): bool
+    {
+        return $this->hasAnyRole(['IT Admin', 'Camat']) || $this->canRespondTo($complaint);
+    }
+
     public function canViewComplaint(Complaint $complaint): bool
     {
         return $this->canViewAllComplaints() || $this->belongsToComplaintPuskesmas($complaint);

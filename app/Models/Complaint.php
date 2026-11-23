@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 
 class Complaint extends Model
@@ -41,11 +42,69 @@ class Complaint extends Model
         'tanggapan',
         'ditangani_oleh',
         'ditanggapi_at',
+        'status_diperbarui_at',
+        'dibuang_at',
+        'dibuang_oleh',
     ];
 
+    /** Status akhir: hanya pengaduan berstatus ini yang boleh dibuang ke sampah. */
+    public const STATUS_AKHIR = ['selesai', 'ditolak'];
+
+    /** Lama (bulan) pengaduan selesai/ditolak disimpan sebelum dihapus permanen otomatis. */
+    public const RETENSI_BULAN = 3;
+
     protected $casts = [
-        'ditanggapi_at' => 'datetime',
+        'ditanggapi_at'        => 'datetime',
+        'status_diperbarui_at' => 'datetime',
+        'dibuang_at'           => 'datetime',
     ];
+
+    /** Pengaduan yang tampil di halaman utama (belum dibuang ke sampah). */
+    public function scopeAktif($query)
+    {
+        return $query->whereNull('dibuang_at');
+    }
+
+    /** Pengaduan yang ada di halaman sampah. */
+    public function scopeDibuang($query)
+    {
+        return $query->whereNotNull('dibuang_at');
+    }
+
+    /** Pengaduan selesai/ditolak yang status terakhirnya sudah lewat masa retensi. */
+    public function scopeKedaluwarsa($query)
+    {
+        return $query->whereIn('status', self::STATUS_AKHIR)
+            // Data tanpa status_diperbarui_at (mis. dibuat lewat seeder) memakai updated_at.
+            ->whereRaw('COALESCE(status_diperbarui_at, updated_at) <= ?', [
+                now()->subMonthsNoOverflow(self::RETENSI_BULAN),
+            ]);
+    }
+
+    public function isDibuang(): bool
+    {
+        return $this->dibuang_at !== null;
+    }
+
+    public function isStatusAkhir(): bool
+    {
+        return in_array($this->status, self::STATUS_AKHIR, true);
+    }
+
+    /** Waktu pengaduan ini akan dihapus permanen otomatis (null jika belum berstatus akhir). */
+    public function hapusOtomatisPada(): ?Carbon
+    {
+        if (! $this->isStatusAkhir()) {
+            return null;
+        }
+
+        return ($this->status_diperbarui_at ?? $this->updated_at)->copy()->addMonthsNoOverflow(self::RETENSI_BULAN);
+    }
+
+    public function pembuang(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'dibuang_oleh');
+    }
 
     /**
      * Batasi pengaduan sesuai user: IT Admin & Camat melihat semua,

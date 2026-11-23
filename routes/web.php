@@ -100,9 +100,16 @@ Route::middleware('auth', 'verified')->group(function () {
     // Pengaduan Warga — semua role internal bisa melihat
     Route::middleware(['role:IT Admin|Camat|Divisi Gizi|Divisi Pencegahan|Divisi Penanggulangan|Divisi Desa'])->group(function () {
         Route::get('/pengaduan-masuk', [AdminPengaduanController::class, 'index'])->name('complaints.index');
+        // Halaman sampah: HARUS di atas /pengaduan-masuk/{complaint} supaya "sampah" tidak dianggap ID
+        Route::get('/pengaduan-masuk/sampah', [AdminPengaduanController::class, 'trash'])->name('complaints.trash');
         Route::get('/pengaduan-masuk/{complaint}', [AdminPengaduanController::class, 'show'])->name('complaints.show');
         // Balas pengaduan: dicek per puskesmas di controller (User::canRespondTo)
         Route::patch('/pengaduan-masuk/{complaint}', [AdminPengaduanController::class, 'update'])->name('complaints.update');
+        // Sampah: dibuang / dipulihkan / dihapus permanen (hak akses dicek di controller:
+        // IT Admin, Camat, dan petugas puskesmas yang bersangkutan)
+        Route::patch('/pengaduan-masuk/{complaint}/buang', [AdminPengaduanController::class, 'moveToTrash'])->name('complaints.trash.move');
+        Route::patch('/pengaduan-masuk/{complaint}/pulihkan', [AdminPengaduanController::class, 'restore'])->name('complaints.trash.restore');
+        Route::delete('/pengaduan-masuk/{complaint}/hapus-permanen', [AdminPengaduanController::class, 'forceDelete'])->name('complaints.trash.destroy');
     });
 
     // Divisi Gizi
@@ -176,9 +183,6 @@ Route::middleware('auth', 'verified')->group(function () {
         Route::delete('/users/{id}', [UserController::class, 'destroy'])->name('users.destroy');
         Route::patch('/users/{id}/password', [UserController::class, 'updatePassword'])->name('users.password.update');
         Route::patch('/users/{id}/restore', [UserController::class, 'restore'])->name('users.restore'); // ✅ RUTE BARU
-
-        // Hapus pengaduan (hanya IT Admin)
-        Route::delete('/pengaduan/{complaint}', [AdminPengaduanController::class, 'destroy'])->name('complaints.destroy');
 
         Route::post('/bulk-publish', [AdminController::class, 'bulkPublish'])->name('bulk_publish');
         Route::delete('/delete', [AdminController::class, 'destroy'])->name('destroy');
