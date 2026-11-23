@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Guest;
 use App\Http\Controllers\Controller;
 use App\Models\Complaint;
 use App\Models\Faskes;
+use App\Support\ComplaintNotifier;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
@@ -86,6 +87,10 @@ class PengaduanController extends Controller
             'ticket_code' => Complaint::generateTicketCode(),
             'status'      => 'baru',
         ]);
+
+        // Email ke puskesmas yang dipilih + camat + IT Admin. Dijalankan setelah
+        // respons terkirim (warga tidak menunggu SMTP) dan tidak pernah menggagalkan pengaduan.
+        defer(fn () => ComplaintNotifier::notify($complaint));
 
         return redirect()
             ->route('pengaduan.track', ['kode' => $complaint->ticket_code])
